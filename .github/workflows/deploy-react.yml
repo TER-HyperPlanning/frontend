@@ -1,0 +1,45 @@
+name: Deploy React App
+
+on:
+  push:
+    branches: [ "main" ]
+    # Also trigger if we push changes specifically to the react folder
+    paths:
+      - 'client/**' # Assuming your react app is in a subfolder named 'client'
+      - '.github/workflows/deploy-react.yml'
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./client # CHANGE THIS if your package.json is in the root
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # The source folder ON GITHUB (dist for Vite, build for CRA)
+          source: "client/dist/*" 
+          # The destination ON VPS
+          target: "/var/www/myapp/client"
+          # Strip the folder structure so we don't get /var/www/myapp/client/client/dist/index.html
+          strip_components: 2
