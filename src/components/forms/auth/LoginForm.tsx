@@ -51,7 +51,7 @@ function LoginForm() {
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               leftIcon={<EnvelopeIcon className="w-5 h-5" />}
-              error={field.state.meta.errors.join(', ')}
+              error={field.state.meta.errors.map((error) => error ? error.message : '').join(', ')}
             />
           )}
         </form.Field>
@@ -72,7 +72,7 @@ function LoginForm() {
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               leftIcon={<LockClosedIcon className="w-5 h-5" />}
-              error={field.state.meta.errors.join(', ')}
+              error={field.state.meta.errors.map((error) => error ? error.message : '').join(', ')}
             />
           )}
         </form.Field>

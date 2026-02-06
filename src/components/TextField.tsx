@@ -1,5 +1,6 @@
 import { twMerge } from 'tailwind-merge';
 import { type ReactNode, type InputHTMLAttributes } from 'react';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
   label?: string;
@@ -17,7 +18,7 @@ export default function TextField({
   name,
   ...inputProps
 }: TextFieldProps) {
-  const baseInputClasses = 'input input-bordered w-full transition-all duration-200';
+  const baseInputClasses = 'input input-bordered w-full transition-all duration-200 bg-white/10 text-white placeholder:text-white/60';
   const errorClasses = error ? 'input-error border-red-500' : '';
   const iconPaddingClasses = leftIcon ? 'pl-10' : '';
 
@@ -49,9 +50,10 @@ export default function TextField({
         />
       </div>
       {error && (
-        <label className="label">
-          <span className="label-text-alt text-red-500">{error}</span>
-        </label>
+        <div className="flex items-center gap-0.5 mt-1">
+          <ExclamationCircleIcon className="size-4 text-red-500" />
+          <span className="label-text-alt text-xs font-semibold text-red-500">{error}</span>
+        </div>
       )}
     </div>
   );

@@ -58,7 +58,8 @@ function ForgotPasswordForm() {
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               leftIcon={<EnvelopeIcon className="w-5 h-5" />}
-              error={field.state.meta.errors.join(', ')}
+              error={field.state.meta.errors.map((error) => error ? error : '').join(', ')}
+              className="bg-white/10 text-white placeholder:text-white/60"
             />
           )}
         </form.Field>
