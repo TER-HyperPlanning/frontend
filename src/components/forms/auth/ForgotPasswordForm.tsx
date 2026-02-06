@@ -2,31 +2,38 @@ import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import Button from '../../Button';
 import TextField from '../../TextField';
-import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import { Link } from '@tanstack/react-router';
+import { EnvelopeIcon } from '@heroicons/react/24/outline';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 // Schéma de validation Zod
-const loginSchema = z.object({
+const forgotPasswordSchema = z.object({
   email: z.string().email('Veuillez entrer une adresse email valide'),
-  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
 });
 
-function LoginForm() {
+function ForgotPasswordForm() {
+  const navigate = useNavigate();
+  
   const form = useForm({
     defaultValues: {
       email: '',
-      password: '',
     },
     onSubmit: async ({ value }) => {
       // Gérer la soumission du formulaire
-      console.log('Formulaire soumis:', value);
-      // Ajoutez votre logique de connexion ici
+      console.log('Demande de réinitialisation pour:', value);
+      // Ajoutez votre logique de réinitialisation ici
+      // Simuler un délai pour l'envoi de l'email
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Redirection vers la page de réinitialisation
+      navigate({ to: '/auth/init-pwd' });
     },
   });
 
   return (
     <div className="w-full max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">connectez vous !</h2>
+      <h2 className="text-2xl font-bold mb-2 text-center">Mot de passe oublié ?</h2>
+      <p className="text-sm text-center mb-6 opacity-80">
+        Entrez votre adresse email pour recevoir un lien de réinitialisation
+      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -38,7 +45,7 @@ function LoginForm() {
         <form.Field
           name="email"
           validators={{
-            onChange: loginSchema.shape.email,
+            onChange: forgotPasswordSchema.shape.email,
           }}
         >
           {(field) => (
@@ -56,36 +63,6 @@ function LoginForm() {
           )}
         </form.Field>
 
-        <form.Field
-          name="password"
-          validators={{
-            onChange: loginSchema.shape.password,
-          }}
-        >
-          {(field) => (
-            <TextField
-              name={field.name}
-              label="Mot de passe"
-              type="password"
-              placeholder="Entrez votre mot de passe"
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              leftIcon={<LockClosedIcon className="w-5 h-5" />}
-              error={field.state.meta.errors.join(', ')}
-            />
-          )}
-        </form.Field>
-
-        <div className="text-right">
-          <Link 
-            to="/auth/forget-pwd" 
-            className="text-sm hover:underline opacity-80 hover:opacity-100 transition-opacity"
-          >
-            Mot de passe oublié ?
-          </Link>
-        </div>
-
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
         >
@@ -95,13 +72,22 @@ function LoginForm() {
               disabled={!canSubmit}
               className="w-full"
             >
-              {isSubmitting ? 'Connexion en cours...' : 'Se connecter'}
+              {isSubmitting ? 'Envoi en cours...' : 'Envoyer le lien'}
             </Button>
           )}
         </form.Subscribe>
+
+        <div className="text-center mt-4">
+          <Link 
+            to="/auth/login" 
+            className="text-sm hover:underline opacity-80 hover:opacity-100 transition-opacity"
+          >
+            Retour à la connexion
+          </Link>
+        </div>
       </form>
     </div>
   );
 }
 
-export default LoginForm;
+export default ForgotPasswordForm;
