@@ -17,9 +17,9 @@ function InitPasswordForm() {
   });
 
   return (
-    <div className="w-full max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-2 text-center">Nouveau mot de passe</h2>
-      <p className="text-sm text-center mb-6 opacity-80">
+    <div className="w-full max-w-md mx-auto p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold mb-2 text-center">Nouveau mot de passe</h2>
+      <p className="text-xs sm:text-sm text-center mb-4 sm:mb-6 opacity-80">
         Choisissez un nouveau mot de passe sécurisé
       </p>
       <form

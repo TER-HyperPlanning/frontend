@@ -29,9 +29,9 @@ function ForgotPasswordForm() {
   });
 
   return (
-    <div className="w-full max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-2 text-center">Mot de passe oublié ?</h2>
-      <p className="text-sm text-center mb-6 opacity-80">
+    <div className="w-full max-w-md mx-auto p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold mb-2 text-center">Mot de passe oublié ?</h2>
+      <p className="text-xs sm:text-sm text-center mb-4 sm:mb-6 opacity-80">
         Entrez votre adresse email pour recevoir un lien de réinitialisation
       </p>
       <form
@@ -58,7 +58,7 @@ function ForgotPasswordForm() {
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               leftIcon={<EnvelopeIcon className="w-5 h-5" />}
-              error={field.state.meta.errors.map((error) => error ? error : '').join(', ')}
+              error={field.state.meta.errors.map((error) => error ? error.message : '').join(', ')}
               className="bg-white/10 text-white placeholder:text-white/60"
             />
           )}

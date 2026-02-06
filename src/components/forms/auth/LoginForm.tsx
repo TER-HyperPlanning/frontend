@@ -25,8 +25,8 @@ function LoginForm() {
   });
 
   return (
-    <div className="w-full max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">connectez vous !</h2>
+    <div className="w-full max-w-md mx-auto p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">connectez vous !</h2>
       <form
         onSubmit={(e) => {
           e.preventDefault();

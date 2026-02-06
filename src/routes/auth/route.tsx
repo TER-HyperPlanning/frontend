@@ -15,9 +15,9 @@ function RouteComponent() {
     setKey(prev => prev + 1)
   }, [router.location.pathname])
 
-   return <PageLayout className='bg-[url("/signin-bg.webp")] bg-cover bg-center bg-no-repeat flex justify-center items-center'>
-    <div className='flex flex-col items-center gap-6'>
-        <Logo showText className='text-white h-20'/>
+   return <PageLayout className='bg-[url("/signin-bg.webp")] bg-cover bg-center bg-no-repeat flex justify-center items-center px-4 sm:px-6'>
+    <div className='flex flex-col items-center gap-4 sm:gap-6 w-full max-w-md'>
+        <Logo showText className='text-white h-16 sm:h-20'/>
         <div 
           key={key}
           className='w-full flex justify-center animate-[fadeSlideIn_0.5s_ease-out]'

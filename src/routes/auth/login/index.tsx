@@ -7,7 +7,7 @@ export const Route = createFileRoute('/auth/login/')({
 })
 
 function RouteComponent() {
-  return <GlassLayout className='w-96 rounded-md bg-primary-100/20'>
+  return <GlassLayout className='w-full sm:w-96 rounded-md bg-primary-100/20'>
             <LoginForm/>
         </GlassLayout>
 }
