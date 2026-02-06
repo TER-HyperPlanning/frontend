@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import Logo from '@/components/Logo'
+import Button from '@/components/Button'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -26,6 +27,12 @@ function App() {
             la planification des cours et la coordination des ressources académiques.
           </p>
         </div>
+        
+        <Link to="/auth/login" className="mt-4 md:mt-6">
+          <Button variant='filled' className="px-6 py-3 text-base sm:text-lg font-semibold bg-secondary-700">
+            Essayer la démo
+          </Button>
+        </Link>
       </div>
     </div>
   )
