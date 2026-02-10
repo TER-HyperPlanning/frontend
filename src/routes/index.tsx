@@ -1,6 +1,6 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { ArrowRight, Calendar, CheckCircle, Clock, Users } from 'lucide-react'
 import Logo from '@/components/Logo'
 import Button from '@/components/Button'
@@ -16,6 +16,7 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-stone-900 text-white overflow-x-hidden selection:bg-primary-500 selection:text-white font-sans">
+      <BackgroundGradientFollower />
       {/* Dynamic Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-600/20 rounded-full blur-[120px] animate-pulse" />
@@ -164,5 +165,42 @@ function FeatureCard({ icon, title, description, delay }: { icon: ReactNode, tit
         {description}
       </p>
     </motion.div>
+  )
+}
+
+function BackgroundGradientFollower() {
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+
+  // Smooth spring physics for fluid movement
+  const springConfig = { damping: 20, stiffness: 50 }
+  const x = useSpring(mouseX, springConfig)
+  const y = useSpring(mouseY, springConfig)
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Center the orb on the cursor
+      mouseX.set(e.clientX - 300) 
+      mouseY.set(e.clientY - 300)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [mouseX, mouseY])
+
+  return (
+    <motion.div
+      style={{ x, y }}
+      className="fixed top-0 left-0 w-[600px] h-[600px] rounded-full bg-linear-to-r from-primary-500/30 via-purple-500/30 to-secondary-500/30 blur-[120px] pointer-events-none z-0 mix-blend-screen opacity-50"
+      animate={{
+        scale: [1, 1.1, 1],
+        rotate: [0, 90, 0],
+      }}
+      transition={{
+        duration: 10,
+        repeat: Infinity,
+        ease: "linear"
+      }}
+    />
   )
 }
