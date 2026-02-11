@@ -1,0 +1,290 @@
+# Project Rules — AI Agent Instructions
+
+You are working on a **React + TypeScript** frontend application. Follow every rule below strictly. These rules reflect the project owner's conventions and must never be overridden.
+
+---
+
+## 1. Tech Stack (Non-Negotiable)
+
+| Concern              | Library / Tool                              |
+| -------------------- | ------------------------------------------- |
+| Framework            | React 19 + TypeScript                       |
+| Build / Dev server   | Vite 7                                      |
+| Routing              | **@tanstack/react-router** (file-based)     |
+| Forms                | **@tanstack/react-form**                    |
+| Form Validation      | **Zod** (via `@tanstack/zod-form-adapter`)  |
+| Global State         | **Zustand**                                 |
+| Data Fetching        | **@tanstack/react-query** (when needed)     |
+| UI Components        | **DaisyUI v5** (Tailwind CSS v4 plugin)     |
+| CSS                  | **Tailwind CSS v4** (`@import "tailwindcss"` + `@plugin "daisyui"`) |
+| Class Merging        | `tailwind-merge` via the `cn()` utility (`@/utils/cn`) |
+| Animation            | **Framer Motion** (`framer-motion`)         |
+| Icons                | `@heroicons/react`, `lucide-react`, `react-icons` |
+| Package Manager      | **pnpm**                                    |
+| Testing              | Vitest + Testing Library                    |
+| Linting / Formatting | ESLint + Prettier                           |
+
+### Priority Order for Choosing Libraries
+
+1. **TanStack packages first** — always prefer TanStack Router, TanStack Form, TanStack Query, TanStack Table, etc. before reaching for any alternative.
+2. **Zustand** for any global / shared state management.
+3. **DaisyUI** component classes before writing custom CSS.
+4. **Zod** for all validation (forms, API responses, env vars).
+5. **Framer Motion** for all animations and transitions.
+6. **Never** install a competing library (e.g. React Hook Form, Redux, Formik, Yup, Ant Design, MUI, Chakra, React Spring, CSS Modules) without explicit approval.
+
+---
+
+## 2. Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── Button.tsx
+│   ├── TextField.tsx
+│   ├── Logo.tsx
+│   └── forms/           # Form components grouped by feature domain
+│       └── auth/
+│           ├── LoginForm.tsx
+│           ├── ForgotPasswordForm.tsx
+│           └── InitPasswordForm.tsx
+├── hooks/               # Custom React hooks (extract ALL reusable logic here)
+├── stores/              # Zustand stores (one file per store)
+├── layout/              # Layout wrapper components
+│   ├── MainLayout.tsx
+│   ├── PageLayout.tsx
+│   └── GlassLayout.tsx
+├── routes/              # TanStack file-based route definitions
+│   ├── __root.tsx
+│   ├── index.tsx
+│   └── auth/
+│       ├── login/index.tsx
+│       ├── forget-pwd/index.tsx
+│       └── init-pwd/index.tsx
+├── utils/               # Pure utility functions
+│   └── cn.ts
+├── types/               # Shared TypeScript types/interfaces
+├── services/            # API service functions
+├── styles.css           # Global styles & Tailwind/DaisyUI theme
+└── main.tsx             # App entry point
+```
+
+### Key Rules
+
+- **Path alias**: use `@/` which maps to `./src/`. Always import with `@/` instead of relative `../` paths when crossing directory boundaries.
+- **Route files**: use `createFileRoute` from `@tanstack/react-router`. Route components are thin — they import and compose components, never contain business logic.
+- **Layout components** live in `src/layout/`, not in `src/components/`.
+
+---
+
+## 3. Component Architecture — Single Responsibility
+
+Every component must have **one and only one responsibility**. When building a page:
+
+1. **Decompose the page** into the smallest meaningful components.
+2. Each component handles only rendering for its specific concern.
+3. Place components in `src/components/` (grouped by feature domain via sub-folders when related).
+4. Pages (`src/routes/`) are **composition layers only** — they import and assemble components with layout wrappers.
+
+### Example pattern (Page → Composition):
+
+```tsx
+// src/routes/auth/login/index.tsx  (THIN — composition only)
+import LoginForm from '@/components/forms/auth/LoginForm'
+import GlassLayout from '@/layout/GlassLayout'
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/auth/login/')({
+  component: RouteComponent,
+})
+
+function RouteComponent() {
+  return (
+    <GlassLayout className="w-full sm:w-96 rounded-md">
+      <LoginForm />
+    </GlassLayout>
+  )
+}
+```
+
+---
+
+## 4. Custom Hooks — Extract Everything
+
+**Prioritize creating custom hooks for any reusable or non-trivial logic.** This is the most important architectural rule.
+
+### What MUST become a hook:
+
+- Form logic (wrap `useForm` in a custom hook like `useLoginForm`)
+- Data fetching / mutations (wrap `useQuery`/`useMutation`)
+- Any `useEffect` or `useState` combo that has a clear purpose
+- Timer, scroll, resize, or media query logic
+- Auth state checks
+- Any logic shared by 2+ components
+
+### Hook file conventions:
+
+- Place in `src/hooks/` (or `src/hooks/<domain>/` for feature-specific hooks)
+- Name: `use<PurposeName>.ts` (e.g., `useLoginForm.ts`, `useAuth.ts`, `useDebounce.ts`)
+- Export a single default or named hook function
+- Return clearly typed objects/tuples
+
+### Example:
+
+```tsx
+// src/hooks/auth/useLoginForm.ts
+import { useForm } from '@tanstack/react-form'
+import { z } from 'zod'
+
+const loginSchema = z.object({
+  email: z.string().email('Veuillez entrer une adresse email valide'),
+  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
+})
+
+export type LoginFormValues = z.infer<typeof loginSchema>
+
+export function useLoginForm(onSuccess?: (values: LoginFormValues) => void) {
+  return useForm({
+    defaultValues: { email: '', password: '' },
+    onSubmit: async ({ value }) => {
+      onSuccess?.(value)
+    },
+  })
+}
+```
+
+```tsx
+// Component just uses the hook — keeps JSX clean
+const form = useLoginForm(handleLogin)
+```
+
+---
+
+## 5. Global State — Zustand Only
+
+- Use **Zustand** for all global/shared state.
+- One store per domain: `src/stores/useAuthStore.ts`, `src/stores/useUIStore.ts`, etc.
+- Keep stores minimal — only truly global state belongs here.
+- Use Zustand **selectors** to avoid unnecessary re-renders.
+- Never use React Context for state management (Context is ok for dependency injection / theming only).
+
+### Store template:
+
+```tsx
+// src/stores/useAuthStore.ts
+import { create } from 'zustand'
+
+interface AuthState {
+  user: User | null
+  isAuthenticated: boolean
+  setUser: (user: User | null) => void
+  logout: () => void
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  isAuthenticated: false,
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  logout: () => set({ user: null, isAuthenticated: false }),
+}))
+```
+
+---
+
+## 6. Forms — TanStack Form + Zod
+
+All forms follow this exact pattern:
+
+1. **Define a Zod schema** for validation at the top of the file or in a shared schemas file.
+2. **Use `@tanstack/react-form`** with the `useForm` hook.
+3. Use `<form.Field>` with `validators.onChange` wired to Zod schema fields (e.g., `loginSchema.shape.email`).
+4. Use `<form.Subscribe>` to reactively access `canSubmit` and `isSubmitting` for the submit button.
+5. Use the project's `<TextField>` and `<Button>` components — never raw `<input>` or `<button>`.
+6. Display errors using `field.state.meta.errors`.
+
+---
+
+## 7. Styling Rules
+
+- **Always use DaisyUI classes first** (`btn`, `input`, `card`, `modal`, `badge`, etc.).
+- **Compose with Tailwind utilities** on top of DaisyUI when needed.
+- **Use `cn()` from `@/utils/cn`** (which wraps `twMerge`) to merge class names. Never concatenate class strings manually.
+- **Component `className` prop**: every visual component should accept an optional `className` prop merged via `cn()`.
+- **Theme colors**: use the project's custom oklch color tokens defined in `src/styles.css` (`primary-50` to `primary-950`, `secondary-50` to `secondary-950`).
+- **Dark backgrounds with glassmorphism**: the project uses `bg-white/X backdrop-blur-md` patterns for glass effects.
+- **Responsive**: always implement mobile-first responsive design using Tailwind breakpoints (`sm:`, `md:`, `lg:`).
+
+---
+
+## 8. Animations — Framer Motion
+
+- Use **`framer-motion`** (`motion` components, `AnimatePresence`, `useAnimation`, etc.) for all animations.
+- Prefer `motion.div`, `motion.span`, etc. over CSS transitions for entrance/exit animations.
+- Use `AnimatePresence` for components that mount/unmount.
+- Keep animation definitions in the component file or extract to a shared `src/utils/animations.ts` if reused.
+- Never use a different animation library.
+
+---
+
+## 9. Coding Conventions
+
+### TypeScript
+
+- **Strict mode** is enabled — no `any` types, no ignoring errors.
+- Use `interface` for object shapes, `type` for unions/intersections.
+- Always type component props with an explicit `interface` (e.g., `interface TextFieldProps`).
+- Use `type` imports: `import { type ReactNode } from 'react'`.
+
+### Components
+
+- Use **function declarations** (not arrow functions) for components: `function MyComponent() {}`.
+- Export with `export default` at the bottom, or inline `export default function`.
+- Props interface named `<ComponentName>Props` or `Props` (for local-only types).
+- Destructure props in the function signature.
+
+### Files
+
+- **One component per file** (single responsibility).
+- File name matches the component name in PascalCase: `TextField.tsx`.
+- Hook files use camelCase: `useLoginForm.ts`.
+- Store files use camelCase: `useAuthStore.ts`.
+
+### Imports
+
+- Use the `@/` path alias for all cross-directory imports.
+- Group imports: React/libraries → project components → hooks → utils → types → styles.
+
+---
+
+## 10. What NOT To Do
+
+> **CAUTION**: Violating any of these will be rejected in code review.
+
+- ❌ Do NOT use Redux, MobX, Jotai, Recoil, or React Context for state management.
+- ❌ Do NOT use React Hook Form, Formik, or any other form library.
+- ❌ Do NOT use Yup or Joi for validation — only Zod.
+- ❌ Do NOT use MUI, Ant Design, Chakra UI, Headless UI, or Shadcn — only DaisyUI.
+- ❌ Do NOT use React Spring, GSAP, or CSS animation libraries — only Framer Motion.
+- ❌ Do NOT use `npm` or `yarn` — only `pnpm`.
+- ❌ Do NOT write inline logic in route files — extract to components and hooks.
+- ❌ Do NOT create god-components that do multiple things.
+- ❌ Do NOT skip creating a custom hook when logic is reusable.
+- ❌ Do NOT use raw HTML elements (`<input>`, `<button>`) — use project wrapper components.
+- ❌ Do NOT concatenate class strings — use `cn()`.
+- ❌ Do NOT add dependencies without explicit approval.
+
+---
+
+## 11. Checklist Before Submitting Code
+
+- [ ] Every reusable piece of logic is extracted into a custom hook in `src/hooks/`.
+- [ ] Global state uses a Zustand store in `src/stores/`.
+- [ ] Forms use TanStack Form + Zod validation.
+- [ ] UI uses DaisyUI classes + Tailwind utilities via `cn()`.
+- [ ] Animations use Framer Motion.
+- [ ] Route files are thin composition layers.
+- [ ] Each component has a single responsibility.
+- [ ] All imports use the `@/` alias.
+- [ ] The code is responsive (mobile-first).
+- [ ] TypeScript strict mode passes with no errors.
+- [ ] No competing libraries were introduced.
