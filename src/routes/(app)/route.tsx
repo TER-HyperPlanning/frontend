@@ -10,9 +10,7 @@ export const Route = createFileRoute('/(app)')({
 function RouteComponent() {
   return (
     <MainMenuContainer>
-        <MainNavigator>
-            Hello
-        </MainNavigator>
+      <MainNavigator />
       <MainPageContainer>
         <Outlet />
       </MainPageContainer>

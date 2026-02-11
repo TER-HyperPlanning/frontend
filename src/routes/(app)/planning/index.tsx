@@ -5,5 +5,5 @@ export const Route = createFileRoute('/(app)/planning/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/(app)/planning/"!</div>
+  return <div className='size-full flex justify-center items-center text-secondary-600 text-3xl'>Hello "/(app)/planning/"!</div>
 }
