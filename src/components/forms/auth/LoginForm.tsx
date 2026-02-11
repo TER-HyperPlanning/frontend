@@ -3,7 +3,7 @@ import { z } from 'zod';
 import Button from '../../Button';
 import TextField from '../../TextField';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 // Schéma de validation Zod
 const loginSchema = z.object({
@@ -12,6 +12,7 @@ const loginSchema = z.object({
 });
 
 function LoginForm() {
+  const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
       email: '',
@@ -21,6 +22,7 @@ function LoginForm() {
       // Gérer la soumission du formulaire
       console.log('Formulaire soumis:', value);
       // Ajoutez votre logique de connexion ici
+      navigate({ to: '/planning' });
     },
   });
 
