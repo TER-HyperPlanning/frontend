@@ -10,20 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
-import { Route as authRouteRouteImport } from './routes/(auth)/route'
+import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
-import { Route as authLoginIndexRouteImport } from './routes/(auth)/login/index'
+import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authRouteRoute = authRouteRouteImport.update({
-  id: '/(auth)',
+const appRouteRoute = appRouteRouteImport.update({
+  id: '/(app)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -46,16 +46,16 @@ const AuthForgetPwdIndexRoute = AuthForgetPwdIndexRouteImport.update({
   path: '/forget-pwd/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const authLoginIndexRoute = authLoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => authRouteRoute,
+const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
+  id: '/planning/',
+  path: '/planning/',
+  getParentRoute: () => appRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
-  '/login/': typeof authLoginIndexRoute
+  '/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
@@ -63,7 +63,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
-  '/login': typeof authLoginIndexRoute
+  '/planning': typeof appPlanningIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
   '/auth/login': typeof AuthLoginIndexRoute
@@ -71,9 +71,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/(auth)': typeof authRouteRouteWithChildren
+  '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
-  '/(auth)/login/': typeof authLoginIndexRoute
+  '/(app)/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
@@ -83,7 +83,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/login/'
+    | '/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
@@ -91,16 +91,16 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/login'
+    | '/planning'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
     | '/auth/login'
   id:
     | '__root__'
     | '/'
-    | '/(auth)'
+    | '/(app)'
     | '/auth'
-    | '/(auth)/login/'
+    | '/(app)/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
@@ -108,7 +108,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  authRouteRoute: typeof authRouteRouteWithChildren
+  appRouteRoute: typeof appRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
 }
 
@@ -121,11 +121,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(auth)': {
-      id: '/(auth)'
+    '/(app)': {
+      id: '/(app)'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof authRouteRouteImport
+      preLoaderRoute: typeof appRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -156,26 +156,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgetPwdIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/(auth)/login/': {
-      id: '/(auth)/login/'
-      path: '/login'
-      fullPath: '/login/'
-      preLoaderRoute: typeof authLoginIndexRouteImport
-      parentRoute: typeof authRouteRoute
+    '/(app)/planning/': {
+      id: '/(app)/planning/'
+      path: '/planning'
+      fullPath: '/planning/'
+      preLoaderRoute: typeof appPlanningIndexRouteImport
+      parentRoute: typeof appRouteRoute
     }
   }
 }
 
-interface authRouteRouteChildren {
-  authLoginIndexRoute: typeof authLoginIndexRoute
+interface appRouteRouteChildren {
+  appPlanningIndexRoute: typeof appPlanningIndexRoute
 }
 
-const authRouteRouteChildren: authRouteRouteChildren = {
-  authLoginIndexRoute: authLoginIndexRoute,
+const appRouteRouteChildren: appRouteRouteChildren = {
+  appPlanningIndexRoute: appPlanningIndexRoute,
 }
 
-const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
-  authRouteRouteChildren,
+const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
+  appRouteRouteChildren,
 )
 
 interface AuthRouteRouteChildren {
@@ -196,7 +196,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  authRouteRoute: authRouteRouteWithChildren,
+  appRouteRoute: appRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
