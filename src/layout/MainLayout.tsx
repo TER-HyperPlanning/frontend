@@ -5,7 +5,7 @@ interface Props {
 
 function MainLayout({ children }: Props) {
   return (
-    <div className="w-screen h-screen">{children}</div>
+    <div className="w-screen h-screen bg-white text-black">{children}</div>
   )
 }
 
