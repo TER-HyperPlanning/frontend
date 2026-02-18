@@ -1,3 +1,8 @@
+import { useState } from 'react'
+import PlanningHeader from '@/components/planning/PlanningHeader'
+import DateStrip from '@/components/planning/DateStrip'
+import PlanningCalendar from '@/components/planning/PlanningCalendar'
+import PageLayout from '@/layout/PageLayout'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(app)/planning/')({
@@ -5,5 +10,13 @@ export const Route = createFileRoute('/(app)/planning/')({
 })
 
 function RouteComponent() {
-  return <div className='size-full flex justify-center items-center text-secondary-600 text-3xl'>Hello "/(app)/planning/"!</div>
+  const [selectedDate, setSelectedDate] = useState(new Date())
+
+  return (
+    <PageLayout className="flex flex-col">
+      <PlanningHeader />
+      <DateStrip selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      <PlanningCalendar selectedDate={selectedDate} />
+    </PageLayout>
+  )
 }

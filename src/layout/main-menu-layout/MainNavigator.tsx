@@ -21,7 +21,7 @@ export default function MainNavigator() {
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       className="h-full flex flex-col py-4 overflow-hidden shrink-0"
     >
-      <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center flex-col gap-4 flex-col-reverse'}`}>
+      <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center  gap-4 flex-col-reverse'}`}>
         
         
         <Logo showText={false} className="h-8 w-auto text-primary-700" />
