@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
   { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tableau de bord' },
   { to: '/teachers', icon: <Users size={20} />, label: 'Enseignants' },
+  { to: '/modules', icon: <LayoutDashboard size={20} />, label: 'Modules' },//AJOUT ROSANE
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 
