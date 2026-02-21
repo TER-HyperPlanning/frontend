@@ -1,5 +1,10 @@
 @import "tailwindcss";
-@plugin "daisyui";
+/* @plugin "daisyui"; */
+
+
+ @plugin "daisyui" {
+   themes: light --default;
+ }
 
 body {
   @apply m-0 w-screen h-screen p-0;
@@ -14,6 +19,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* DaisyUI plugin */
+@plugin "daisyui" {
+  themes: light --default;
+}
+
 
 @theme {
 
