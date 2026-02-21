@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import RequestCard from '@/components/RequestCard'
+import RequestCard from '@/components/requests/RequestCard'
 import { Clock, CheckCircle, XCircle } from 'lucide-react'
+import StatsCard from '@/components/requests/StatsCard'
+import PageLayout from '@/layout/PageLayout'
 
 type RequestStatus = 'En attente' | 'Approuvé' | 'Refusé'
 type RequestType =
@@ -53,25 +55,38 @@ export const Route = createFileRoute('/(app)/requests/')({
   component: RequestsPage,
 })
 
+function PageHeader() {
+  return (
+    <div className="mb-12">
+      <h1 className="text-4xl font-bold text-[#003A68]">
+        Gestion des demandes
+      </h1>
+      <p className="text-gray-500 mt-2">
+        Consultez et gérez les demandes des enseignants.
+      </p>
+    </div>
+  )
+}
+
 function RequestsPage() {
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<RequestStatus | ''>('')
   const [filterType, setFilterType] = useState<RequestType | ''>('')
 
   const filteredRequests = mockRequests.filter((req) => {
-  const searchLower = search.toLowerCase()
+    const searchLower = search.toLowerCase()
 
-  const matchesSearch =
-    req.teacher.toLowerCase().includes(searchLower) ||
-    req.subject.toLowerCase().includes(searchLower) ||
-    req.formation.toLowerCase().includes(searchLower) ||
-    req.type.toLowerCase().includes(searchLower)
+    const matchesSearch =
+      req.teacher.toLowerCase().includes(searchLower) ||
+      req.subject.toLowerCase().includes(searchLower) ||
+      req.formation.toLowerCase().includes(searchLower) ||
+      req.type.toLowerCase().includes(searchLower)
 
-  return (
-    matchesSearch &&
-    (filterStatus === '' || req.status === filterStatus) &&
-    (filterType === '' || req.type === filterType)
-  )
+    return (
+      matchesSearch &&
+      (filterStatus === '' || req.status === filterStatus) &&
+      (filterType === '' || req.type === filterType)
+    )
   })
 
   const pendingCount = mockRequests.filter(
@@ -85,56 +100,38 @@ function RequestsPage() {
   ).length
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <PageLayout className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-6">
 
-      
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-[#003A68]">
-            Gestion des demandes
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Consultez et gérez les demandes des enseignants.
-          </p>
-        </div>
+        <PageHeader />
 
-        
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          
-          <div className="bg-[#F4F6F8] rounded-2xl p-6 flex items-center justify-between transition hover:scale-[1.02]">
-            <div>
-              <p className="text-gray-500 text-sm">En attente</p>
-              <h2 className="text-3xl font-bold text-yellow-500">
-                {pendingCount}
-              </h2>
-            </div>
-            <Clock className="w-10 h-10 text-yellow-400" />
-          </div>
+          <StatsCard
+            label="En attente"
+            value={pendingCount}
+            valueColor="text-yellow-500"
+            iconColor="text-yellow-400"
+            icon={<Clock className="w-10 h-10" />}
+          />
 
-          <div className="bg-[#F4F6F8] rounded-2xl p-6 flex items-center justify-between transition hover:scale-[1.02]">
-            <div>
-              <p className="text-gray-500 text-sm">Approuvées</p>
-              <h2 className="text-3xl font-bold text-green-500">
-                {approvedCount}
-              </h2>
-            </div>
-            <CheckCircle className="w-10 h-10 text-green-400" />
-          </div>
+          <StatsCard
+            label="Approuvées"
+            value={approvedCount}
+            valueColor="text-green-500"
+            iconColor="text-green-400"
+            icon={<CheckCircle className="w-10 h-10" />}
+          />
 
-          <div className="bg-[#F4F6F8] rounded-2xl p-6 flex items-center justify-between transition hover:scale-[1.02]">
-            <div>
-              <p className="text-gray-500 text-sm">Refusées</p>
-              <h2 className="text-3xl font-bold text-red-500">
-                {refusedCount}
-              </h2>
-            </div>
-            <XCircle className="w-10 h-10 text-red-400" />
-          </div>
+          <StatsCard
+            label="Refusées"
+            value={refusedCount}
+            valueColor="text-red-500"
+            iconColor="text-red-400"
+            icon={<XCircle className="w-10 h-10" />}
+          />
         </div>
 
-        
         <div className="bg-[#F4F6F8] rounded-2xl p-6 mb-10 flex flex-col md:flex-row gap-4">
-
           <input
             type="text"
             placeholder="Rechercher un professeur, matiére, formation..."
@@ -151,15 +148,9 @@ function RequestsPage() {
             className="px-4 py-3 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#003A68]"
           >
             <option value="">Tous les types</option>
-            <option value="Changement de salle">
-              Changement de salle
-            </option>
-            <option value="Changement de statut">
-              Changement de statut
-            </option>
-            <option value="Récupération de séance">
-              Récupération de séance
-            </option>
+            <option value="Changement de salle">Changement de salle</option>
+            <option value="Changement de statut">Changement de statut</option>
+            <option value="Récupération de séance">Récupération de séance</option>
           </select>
 
           <select
@@ -176,7 +167,6 @@ function RequestsPage() {
           </select>
         </div>
 
-        
         <div className="flex flex-col gap-6">
           {filteredRequests.length > 0 ? (
             filteredRequests.map((req, index) => (
@@ -190,6 +180,6 @@ function RequestsPage() {
         </div>
 
       </div>
-    </div>
+    </PageLayout>
   )
 }

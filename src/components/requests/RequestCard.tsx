@@ -75,8 +75,8 @@ export default function RequestCard({
 
           
           <div className="text-sm text-gray-500 mt-2 space-y-1">
-            <p>🕒 {sessionTime}</p>
-            <p>📅 Demande envoyée le {requestDate}</p>
+            <p>{sessionTime}</p>
+            <p>Demande envoyée le {requestDate}</p>
           </div>
         </div>
 
