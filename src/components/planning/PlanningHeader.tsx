@@ -11,13 +11,12 @@ function PlanningHeader() {
       <div className="flex items-center gap-2 ml-4 flex-1">
         <Select
           items={[
-            { id: 'weekly', value: 'Semaine' },
-            { id: 'daily', value: 'Jour' },
-            { id: 'monthly', value: 'Mois' },
+            { id: 'weekly', value: 'Groupe' },
+            { id: 'daily', value: 'Module' },
           ]}
           defaultValue="weekly"
           placeholder="Mode"
-          className="select-sm rounded-full min-w-[120px]"
+          className="select-sm rounded-full max-w-[150px]"
         />
         <Select
           items={[
@@ -25,7 +24,7 @@ function PlanningHeader() {
             { id: 2, value: 'Mathématiques' },
           ]}
           placeholder="Filiere"
-          className="select-sm rounded-full min-w-[120px]"
+          className="select-sm rounded-full max-w-[150px]"
         />
         <Select
           items={[
@@ -34,7 +33,7 @@ function PlanningHeader() {
             { id: 3, value: 'L3' },
           ]}
           placeholder="Formation"
-          className="select-sm rounded-full min-w-[140px]"
+          className="select-sm rounded-full max-w-[150px]"
         />
       </div>
 
