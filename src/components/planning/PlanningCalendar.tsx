@@ -1,6 +1,7 @@
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
+import frLocale from '@fullcalendar/core/locales/fr'
 import type { EventContentArg } from '@fullcalendar/core'
 import './planning-calendar.css'
 
@@ -135,6 +136,7 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
     <div className="planning-calendar flex-1 overflow-auto px-1">
       <FullCalendar
         plugins={[timeGridPlugin, interactionPlugin]}
+        locale={frLocale}
         initialView="timeGridWeek"
         initialDate={selectedDate}
         headerToolbar={false}
@@ -145,7 +147,6 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
         slotLabelFormat={{
           hour: 'numeric',
           minute: '2-digit',
-          meridiem: 'short',
         }}
         dayHeaderFormat={{
           weekday: 'long',
