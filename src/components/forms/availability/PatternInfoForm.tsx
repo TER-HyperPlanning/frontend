@@ -1,23 +1,33 @@
 import React from 'react'
+import TextField from '../../TextField'
 
-export const PatternInfoForm = () => {
+interface PatternInfoFormProps{
+  className?: string
+}
+
+export const PatternInfoForm = ({className}: PatternInfoFormProps) => {
   return (
-            <div>
-              <fieldset className='fieldset'>
-                <label className='label'>
-                  Sélectionner un nombre de jours pour appliqué un motif :
-                </label>
-                <input
-                  type="number"
-                  required
-                  placeholder="Entrer un nombre de jours"
-                  className="input validator" />
-                <label className="label">
-                  Sélectionner la date à laquelle arrêter le motif :
-                </label>
-                <input type="date" className="input" />
-              </fieldset>
-              <button className="btn btn-primary">Appliquer le motif</button>
+            <div className={className}>
+                <div className='flex flex-col gap-2'>
+                  <TextField
+                  label='Sélectionner un nombre de jours pour appliqué le motif :'
+                  name='nb jours'
+                  type='number'
+                  className='text-black'
+                  required={true}
+                  placeholder='Entrer un nombre de jours'
+                  ></TextField>
+                                  <TextField
+                  label='Sélectionner un nombre de jours pour appliqué le motif :'
+                  name='date'
+                  type='date'
+                  className='text-black'
+                  required={true}
+                  placeholder='Entrer un nombre de jours'
+                  ></TextField>
+                                
+                                <button className="btn btn-primary">Appliquer le motif</button>
+                </div>
             </div>
     
   )

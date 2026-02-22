@@ -3,6 +3,8 @@ import { DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
 import type { DateAvailability, DayActions } from "../../interfaces/date";
+import { AvailabilityButtons } from "./AvailabilityButtons";
+import { twMerge } from "tailwind-merge";
 
 
 interface AvailabilityCalendarProps {
@@ -11,13 +13,22 @@ interface AvailabilityCalendarProps {
     selectedMonth: RefObject<number>
     selectedYear: RefObject<number>
     className?: string
+    calendarClasName?: string
+    selectedGroupNumber: number
 }
 
-export const AvailabilityCalendar = ({ dispatchSelectedDays, selectedDays, selectedMonth, selectedYear, className }: AvailabilityCalendarProps) => {
+export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, dispatchSelectedDays, selectedDays, selectedMonth, selectedYear, className }: AvailabilityCalendarProps) => {
     const isMouseDown = useRef(false);
     const lockSelectedMode = useRef(false)
     const isModeSelected = useRef(true)
     const hoveredDayWithNoClick = useRef<Date | null>(null)
+
+    const defaultDayPickerClassName = "place-self-center h-[344px]"
+    const defaultClassName = "inline-flex flex-col gap-2"
+    const mergedDaysPickerClassName = twMerge(
+        defaultDayPickerClassName,
+        calendarClasName
+    )
 
     // follow states of Mouse to see if it pressed or not
     useEffect(() => {
@@ -63,54 +74,70 @@ export const AvailabilityCalendar = ({ dispatchSelectedDays, selectedDays, selec
 
             //add selected days if use the mode to select
             if (isModeSelected.current && !dayAlreadySelected && hoveredDayWithNoClick.current) {
-                dispatchSelectedDays({ type: "addEditable", value: [day, hoveredDayWithNoClick.current] })
+                dispatchSelectedDays({ type: "addEditable", groupNumber: selectedGroupNumber, value: [day, hoveredDayWithNoClick.current] })
             }
             //remove days if the mode to select is disabled
             else if (!isModeSelected.current) {
-                dispatchSelectedDays({ type: "removeDays", value: hoveredDayWithNoClick.current ? [day, hoveredDayWithNoClick.current] : [day] })
+                dispatchSelectedDays({ type: "removeDays", groupNumber: selectedGroupNumber, value: hoveredDayWithNoClick.current ? [day, hoveredDayWithNoClick.current] : [day] })
             }
         }
     };
 
     return (
-        <DayPicker
-        startMonth={new Date(2026,0)}
-        endMonth={new Date(2026,11)}
-        className={className}
-            onMonthChange={(date) => {
-                selectedYear.current = date.getFullYear()
-                selectedMonth.current = date.getMonth()
-            }}
-            mode="multiple"
+        <div className={className} >
+            <div className={defaultClassName}>
+                <DayPicker
 
-            locale={fr}
+                    className={mergedDaysPickerClassName}
+                    onMonthChange={(date) => {
+                        selectedYear.current = date.getFullYear()
+                        selectedMonth.current = date.getMonth()
+                    }}
+                    mode="multiple"
+                    locale={fr}
+                    onSelect={() => undefined}
+                    modifiers={{
+                        //modifier for element selected but not editable
+                        selectedOnly: selectedDays.reduce((acc: Date[], day) => {
+                            !day.canModify && acc.push(new Date(day.dateMs))
+                            return acc
+                        }, []),
 
-            onSelect={() => undefined}
-            modifiers={{
-                // selectedOnly : testMemo.selectedOnlyTab
-                selectedOnly: selectedDays.reduce((acc: Date[], day) => {
-                    !day.canModify && acc.push(new Date(day.dateMs))
-                    return acc
-                }, []),
-            }
-            }
+                        selectedSeveralGroup: selectedDays.reduce((acc: Date[], day) => {
+                            day.group?.groupNumber !== selectedGroupNumber && acc.push(new Date(day.dateMs))
+                            return acc
+                        }, []),
 
-            //keep only modifiable items in selected
-            selected={ 
-                selectedDays.reduce((acc: Date[], day) => {
-                day.canModify && acc.push(new Date(day.dateMs))
-                return acc
-            }, [])
-            }
-
-            onDayClick={(day) => dispatchSelectedDays({ type: "setDatesForDayPicker", value: day })}
-
-            modifiersClassNames={{
-                selected: "bg-green-400 rounded-2xl",
-                selectedOnly: "bg-green-200 rounded-2xl"
-            }}
-            onDayMouseEnter={handleDayMouseEnter}
-        />
+                        //modifier for element selected in another group
+                        selectedOtherGroup: selectedDays.reduce((acc: Date[], day) => {
+                            day.group?.groupNumber !== selectedGroupNumber && acc.push(new Date(day.dateMs))
+                            return acc
+                        }, [])
+                    }
+                    }
+                    //keep only modifiable items in selected
+                    selected={
+                        selectedDays.reduce((acc: Date[], day) => {
+                            day.canModify && day.group?.groupNumber === selectedGroupNumber && acc.push(new Date(day.dateMs))
+                            return acc
+                        }, [])
+                    }
+                    onDayClick={(day) => dispatchSelectedDays({ type: "setDatesForDayPicker", groupNumber: selectedGroupNumber, value: day })}
+                    modifiersClassNames={{
+                        selected: "bg-green-400 rounded-2xl",
+                        selectedOnly: "bg-green-200 rounded-2xl",
+                        selectedOtherGroup: "bg-red-200 rounded-2xl"
+                    }}
+                    onDayMouseEnter={handleDayMouseEnter}
+                />
+                <AvailabilityButtons
+                    selectedGroupNumber={selectedGroupNumber}
+                    dispatchSelectedDays={dispatchSelectedDays}
+                    selectedMonth={selectedMonth}
+                    selectedYear={selectedYear}
+                />
+            </div>
+        </div>
     );
 
 }

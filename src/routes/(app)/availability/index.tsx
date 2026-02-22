@@ -2,11 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useReducer, useRef, useState } from 'react'
 import { AvailabilityCalendar } from '../../../components/availability/AvailabilityCalendar'
 import { GroupNav } from '../../../components/availability/GroupNav'
-import { availabilityReducer } from './availabilityReducer'
-import { AvailabilityButtons } from '../../../components/availability/AvailabilityButtons'
+import { AvailabilityHoursForm } from '../../../components/forms/availability/AvailabilityHoursForm'
 import { AvailabilityTypeCheckbox } from '../../../components/forms/availability/AvailabilityTypeCheckbox'
 import { PatternInfoForm } from '../../../components/forms/availability/PatternInfoForm'
-import { AvailabilityHoursForm } from '../../../components/forms/availability/AvailabilityHoursForm'
+import { availabilityReducer } from './availabilityReducer'
 
 export const Route = createFileRoute('/(app)/availability/')({
   component: RouteComponent,
@@ -29,25 +28,35 @@ function RouteComponent() {
 
   return (
     <div>
-      <div className='flex justify-around'>
-        <div className='flex flex-col'>
-          <AvailabilityCalendar className='place-self-center' selectedYear={selectedYear} selectedMonth={selectedMonth} selectedDays={selectedDays} dispatchSelectedDays={dispatchSelectedDays} />
-          <AvailabilityButtons selectedMonth={selectedMonth} selectedYear={selectedYear} dispatchSelectedDays={dispatchSelectedDays}></AvailabilityButtons>
+      <div className="m-8">
+        <div className="grid grid-cols-3">
+          <AvailabilityCalendar
+            selectedGroupNumber={selectedGroupNumber}
+            className='row-span-2'
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            selectedDays={selectedDays}
+            dispatchSelectedDays={dispatchSelectedDays} />
+
+          <AvailabilityTypeCheckbox className='flex flex-col justify-around h-full '
+            partialAvailability={partialAvailability}
+            availableAllDay={availableAllDay}
+            setPartialAvailability={setPartialAvailability}
+            setAvailableAllDay={setAvailableAllDay} />
+          <PatternInfoForm />
+
+          <GroupNav
+            selectedGroupNumber={selectedGroupNumber}
+            className='flex justify-around col-span-2 mr-15'
+            groups={groups}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            setGroups={setGroups}
+            setSelectedGroupNumber={setSelectedGroupNumber} />
         </div>
-        <AvailabilityTypeCheckbox partialAvailability={partialAvailability} availableAllDay={availableAllDay} setPartialAvailability={setPartialAvailability} setAvailableAllDay={setAvailableAllDay}></AvailabilityTypeCheckbox>
-      <PatternInfoForm/>
-
+        {!availableAllDay &&
+          <AvailabilityHoursForm></AvailabilityHoursForm>}
       </div>
-        <GroupNav selectedGroupNumber={selectedGroupNumber}
-        className="flex flex-col items-center gap-4"
-         groups={groups}
-         currentPage={currentPage}
-         setCurrentPage={setCurrentPage}
-        setGroups={setGroups}
-        setSelectedGroupNumber={setSelectedGroupNumber}/>
-    
-    <AvailabilityHoursForm></AvailabilityHoursForm>
-    </div>
-  )
-
+      </div>
+)
 }

@@ -1,105 +1,174 @@
-import type { DateAvailability, DayActions } from "../../../interfaces/date";
+import type { DateAvailability, DayActions } from '../../../interfaces/date'
 
-export const availabilityReducer = (prevState: DateAvailability[], action: DayActions): DateAvailability[] => {
+export const availabilityReducer = (
+  prevState: DateAvailability[],
+  action: DayActions,
+): DateAvailability[] => {
   switch (action.type) {
-    case "addEditable":
-      {
-        const prevStateCopy = [...prevState]
-        const prevStateSet = new Set(prevState.map((day) => day.dateMs));
-        action.value.forEach((day) => {
-          if (!prevStateSet.has(day.getTime())) {
-            prevStateCopy.push({
-              dateMs: day.getTime(),
-              canModify: true
-            });
-          }
-        }
-        )
-
-        return prevStateCopy;
-      }
-
-    case "resetEditableOnly":
-      { return prevState.map((day) => ({ ...day, canModify: false })) }
-    case "removeDays":
-      {
-        const daysParamSet = new Set(action.value.map((day) => day.getTime()));
-        return prevState.filter((day) => !daysParamSet.has(day.dateMs))
-      }
-    case "resetYear":
-      {
-        const firstOfYear = new Date(action.value, 0, 1).getTime()
-        const lastOfYear = new Date(action.value + 1, 0, 0).getTime()
-        return prevState.filter((day) => day.dateMs < firstOfYear || day.dateMs > lastOfYear);
-
-      }
-
-    case "resetMonth": {
-      const firstOfMonth = new Date(action.value.year, action.value.month, 1).getTime()
-      const lastOfMonth = new Date(action.value.year, action.value.month + 1, 0).getTime()
-
-      return prevState.filter((day) => day.dateMs < firstOfMonth || day.dateMs > lastOfMonth)
-    }
-
-    case "setDatesForDayPicker":
-      {
-
-        const index = prevState.findIndex((day: DateAvailability) => day.dateMs === action.value.getTime())
-        if (index === -1) {
-          return [...prevState, { dateMs: action.value.getTime(), canModify: true }]
-        }
-        const prevStateCopy = [...prevState]
-        prevStateCopy.splice(index, 1)
-        return prevStateCopy
-        // if (action.value.length > prevState.length) {
-        //   return [...prevState, { date: action.value[action.value.length - 1], canModify: true }]
-        // }
-        // else {
-        //   const dayParam = new Set(action.value.map((day) => day.getTime()));
-        //   return prevState.filter((day) => dayParam.has(day.date.getTime()))
-        // }
-      }
-
-    case 'addYearToEditable':
-      {
-        const dates: DateAvailability[] = [];
-        const prevStateSet = new Set(prevState.map((day) => day.dateMs));
-        let currentDate = new Date(action.value, 0, 1);
-
-        // Tant qu'on est dans la même année
-        while (currentDate.getFullYear() === action.value) {
-          dates.push({ dateMs: currentDate.getTime(), canModify: true });
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-        return dates;
-      }
-    case "addMonthToEditable": {
-      const firstOfMonth = new Date(action.value.year, action.value.month, 1).getTime()
-      const lastOfMonth = new Date(action.value.year, action.value.month + 1, 0).getTime()
-
-      const datesToAdd: DateAvailability[] = [];
-      let currentMonth = new Date(action.value.year, action.value.month, 1);
-      while (currentMonth.getTime() >= firstOfMonth && currentMonth.getTime() <= lastOfMonth
-      ) {
-        datesToAdd.push({ dateMs: currentMonth.getTime(), canModify: true });
-        currentMonth.setDate(currentMonth.getDate() + 1);
-      }
-
-      const prevStateCopy = [...prevState]
-
-      const prevStateSet = new Set(prevState.map((day) => day.dateMs));
-      datesToAdd.forEach((dateToAdd) => {
-        if (!prevStateSet.has(dateToAdd.dateMs)) {
-          prevStateCopy.push(dateToAdd);
-        }
-      }
+    case 'addEditable': {
+      const newItems: DateAvailability[] = []
+      const prevStateSet = new Set(
+        prevState.flatMap((day) =>
+          action.groupNumber === day.group?.groupNumber ? [day.dateMs] : [],
+        ),
       )
-      return prevStateCopy;
+      action.value.forEach((day) => {
+        if (!prevStateSet.has(day.getTime())) {
+          prevStateSet.add(day.getTime())
+          newItems.push({
+            dateMs: day.getTime(),
+            canModify: true,
+            group: {
+              groupNumber: action.groupNumber,
+            },
+          })
+        }
+      })
+
+      return [...prevState, ...newItems]
     }
 
+    case 'resetEditableOnly': {
+      return prevState.map((day) => {
+        if (day.group?.groupNumber === action.groupNumber) {
+          return { ...day, canModify: false }
+        } else {
+          return day
+        }
+      })
+    }
+    case 'removeDays': {
+      const daysParamSet = new Set(action.value.map((day) => day.getTime()))
+      return prevState.filter(
+        (day) =>
+          !daysParamSet.has(day.dateMs) ||
+          action.groupNumber !== day.group?.groupNumber,
+      )
+    }
+    case 'resetYear': {
+      const firstOfYear = new Date(action.value, 0, 1).getTime()
+      const lastOfYear = new Date(action.value + 1, 0, 0).getTime()
+      return prevState.filter(
+        (day) =>
+          day.dateMs < firstOfYear ||
+          day.dateMs > lastOfYear ||
+          day.group?.groupNumber !== action.groupNumber,
+      )
+    }
+
+    case 'resetMonth': {
+      const firstOfMonth = new Date(
+        action.value.year,
+        action.value.month,
+        1,
+      ).getTime()
+      const lastOfMonth = new Date(
+        action.value.year,
+        action.value.month + 1,
+        0,
+      ).getTime()
+
+      return prevState.filter(
+        (day) =>
+          day.dateMs < firstOfMonth ||
+          day.dateMs > lastOfMonth ||
+          day.group?.groupNumber !== action.groupNumber,
+      )
+    }
+
+    //remove the day if it exist on state or add it if not exist
+    case 'setDatesForDayPicker': {
+      const time = action.value.getTime()
+      const index = prevState.findIndex(
+        (day: DateAvailability) => day.dateMs === time,
+      )
+      if (index === -1) {
+        return [
+          ...prevState,
+          {
+            dateMs: time,
+            canModify: true,
+            group: {
+              groupNumber: action.groupNumber,
+            },
+          },
+        ]
+      }
+      const prevStateCopy = [...prevState]
+      prevStateCopy.splice(index, 1)
+      return prevStateCopy
+      // if (action.value.length > prevState.length) {
+      //   return [...prevState, { date: action.value[action.value.length - 1], canModify: true }]
+      // }
+      // else {
+      //   const dayParam = new Set(action.value.map((day) => day.getTime()));
+      //   return prevState.filter((day) => dayParam.has(day.date.getTime()))
+      // }
+    }
+
+    case 'addYearToEditable': {
+     const newTab= addEditableBetweenDates(
+        new Date(action.value, 0, 1),
+        new Date(action.value + 1, 0, 0),
+        prevState,
+        action.groupNumber,
+      )
+      return prevState
+    }
+    case 'addMonthToEditable': {
+      const firstOfMonth = new Date(
+        action.value.year,
+        action.value.month,
+        1,
+      )
+      const lastOfMonth = new Date(
+        action.value.year,
+        action.value.month + 1,
+        0,
+      )
+
+     return addEditableBetweenDates(
+        firstOfMonth,
+        lastOfMonth,
+        prevState,
+        action.groupNumber,
+      )
+    }
 
     default:
-      return prevState;
+      return prevState
   }
+}
+
+function addEditableBetweenDates(
+  startDate: Date,
+  endDate: Date,
+  availabilityTab: DateAvailability[],
+  groupNumber: number,
+) {
+  let currentDate = startDate
+  const availabilityTabCopy = [...availabilityTab]
+
+  while (currentDate.getTime() <= endDate.getTime()) {
+    const objectToAdd = {
+      dateMs: currentDate.getTime(),
+      canModify: true,
+      group: {
+        groupNumber: groupNumber,
+      },
+    }
+    const findedIndexOfCurrentDate = availabilityTabCopy.findIndex(
+      (day: DateAvailability) =>
+        day.dateMs === currentDate.getTime() &&
+        groupNumber === day.group?.groupNumber,
+    )
+    if (findedIndexOfCurrentDate === -1) {
+      availabilityTabCopy.push(objectToAdd)
+    } else {
+      availabilityTabCopy[findedIndexOfCurrentDate] = objectToAdd
+    }
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  return availabilityTabCopy
 
 }
