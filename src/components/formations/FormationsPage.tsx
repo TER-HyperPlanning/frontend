@@ -13,10 +13,6 @@ export default function FormationsPage() {
     formations,
     searchQuery,
     setSearchQuery,
-    filiereFilter,
-    setFiliereFilter,
-    niveauFilter,
-    setNiveauFilter,
     isAddModalOpen,
     openAddModal,
     closeAddModal,
@@ -41,10 +37,6 @@ export default function FormationsPage() {
         <FormationsSearchBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          filiereFilter={filiereFilter}
-          onFiliereChange={setFiliereFilter}
-          niveauFilter={niveauFilter}
-          onNiveauChange={setNiveauFilter}
         />
 
         <FormationsTable
@@ -54,7 +46,6 @@ export default function FormationsPage() {
         />
       </div>
 
-      {/* Add formation modal */}
       <AddFormationModal
         isOpen={isAddModalOpen}
         onClose={closeAddModal}
@@ -64,7 +55,6 @@ export default function FormationsPage() {
         }}
       />
 
-      {/* Edit formation modal */}
       <EditFormationModal
         isOpen={!!editTarget}
         formation={editTarget}
@@ -77,7 +67,6 @@ export default function FormationsPage() {
         }}
       />
 
-      {/* Delete confirmation modal */}
       <DeleteFormationModal
         isOpen={!!deleteTarget}
         formation={deleteTarget}
@@ -90,7 +79,6 @@ export default function FormationsPage() {
         }}
       />
 
-      {/* Toast notifications */}
       <Toast toast={toast} onClose={hideToast} />
     </div>
   )

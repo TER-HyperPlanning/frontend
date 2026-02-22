@@ -34,7 +34,6 @@ export default function DeleteFormationModal({
             className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
             <div className="flex justify-end">
               <button
                 onClick={onClose}
@@ -44,30 +43,28 @@ export default function DeleteFormationModal({
               </button>
             </div>
 
-            {/* Content */}
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
                 Confirmer la suppression de la formation
               </h3>
               <p className="text-gray-500 mt-1">
-                {formation.nom} {formation.filiere} {formation.niveau}
+                {formation.nom} — {formation.filiere.nom}
               </p>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3">
               <Button
                 variant="outlined"
                 onClick={onClose}
                 className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-800"
               >
-                Reject
+                Annuler
               </Button>
               <Button
                 onClick={onConfirm}
-                className="flex-1 bg-primary-900 hover:bg-primary-800"
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
               >
-                Accept
+                Supprimer
               </Button>
             </div>
           </motion.div>

@@ -6,9 +6,14 @@ import {
   type EditFormationValues,
 } from '@/hooks/formations/useEditFormationForm'
 import TextField from '@/components/TextField'
+import TextAreaField from '@/components/TextAreaField'
 import SelectField from '@/components/SelectField'
 import Button from '@/components/Button'
-import { type Formation, FILIERE_OPTIONS, NIVEAU_OPTIONS } from '@/types/formation'
+import {
+  type Formation,
+  FILIERE_OPTIONS,
+  ENSEIGNANT_OPTIONS,
+} from '@/types/formation'
 
 interface EditFormationModalProps {
   isOpen: boolean
@@ -38,7 +43,7 @@ export default function EditFormationModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6"
+            className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <EditFormationContent
@@ -53,8 +58,6 @@ export default function EditFormationModal({
     </AnimatePresence>
   )
 }
-
-/* ── Private sub-component that owns the form hook ── */
 
 interface EditFormationContentProps {
   formation: Formation
@@ -73,7 +76,6 @@ function EditFormationContent({
 
   return (
     <>
-      {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold text-gray-900">
           Modifier la Formation
@@ -95,7 +97,6 @@ function EditFormationContent({
           }}
           className="space-y-4"
         >
-          {/* Nom de la formation */}
           <form.Field
             name="nom"
             validators={{ onChange: editFormationSchema.shape.nom }}
@@ -113,6 +114,7 @@ function EditFormationContent({
                   name={field.name}
                   placeholder="Ex: Ingénierie logicielle pour le web"
                   value={field.state.value}
+                  maxLength={150}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
@@ -120,14 +122,18 @@ function EditFormationContent({
                     .map((err) => (err ? err.message : ''))
                     .join(', ')}
                 />
+                <p className="text-xs text-gray-400 text-right">
+                  {field.state.value.length}/150
+                </p>
               </div>
             )}
           </form.Field>
 
-          {/* Responsable */}
           <form.Field
-            name="responsable"
-            validators={{ onChange: editFormationSchema.shape.responsable }}
+            name="enseignantId"
+            validators={{
+              onChange: editFormationSchema.shape.enseignantId,
+            }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -135,15 +141,17 @@ function EditFormationContent({
                   htmlFor={field.name}
                   className="text-sm font-semibold text-primary-900"
                 >
-                  Responsable <span className="text-red-500">*</span>
+                  Enseignant responsable{' '}
+                  <span className="text-red-500">*</span>
                 </label>
-                <TextField
+                <SelectField
                   name={field.name}
-                  placeholder="Ex: Jean DUPONT"
+                  placeholder="Sélectionner un enseignant"
+                  options={ENSEIGNANT_OPTIONS}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                  className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
+                  onBlur={() => field.handleBlur()}
+                  className="bg-white text-gray-900 border-gray-300"
                   error={field.state.meta.errors
                     .map((err) => (err ? err.message : ''))
                     .join(', ')}
@@ -152,10 +160,72 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          {/* Filière */}
           <form.Field
-            name="filiere"
-            validators={{ onChange: editFormationSchema.shape.filiere }}
+            name="programme"
+            validators={{ onChange: editFormationSchema.shape.programme }}
+          >
+            {(field) => (
+              <div className="space-y-1">
+                <label
+                  htmlFor={field.name}
+                  className="text-sm font-semibold text-primary-900"
+                >
+                  Programme <span className="text-red-500">*</span>
+                </label>
+                <TextAreaField
+                  name={field.name}
+                  placeholder="Décrivez le programme de la formation…"
+                  value={field.state.value}
+                  rows={4}
+                  maxLength={500}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
+                  error={field.state.meta.errors
+                    .map((err) => (err ? err.message : ''))
+                    .join(', ')}
+                />
+                <p className="text-xs text-gray-400 text-right">
+                  {field.state.value.length}/500
+                </p>
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="lieu"
+            validators={{ onChange: editFormationSchema.shape.lieu }}
+          >
+            {(field) => (
+              <div className="space-y-1">
+                <label
+                  htmlFor={field.name}
+                  className="text-sm font-semibold text-primary-900"
+                >
+                  Lieu <span className="text-red-500">*</span>
+                </label>
+                <TextField
+                  name={field.name}
+                  placeholder="Ex: Campus Évry, Bâtiment IBGBI"
+                  value={field.state.value}
+                  maxLength={150}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
+                  error={field.state.meta.errors
+                    .map((err) => (err ? err.message : ''))
+                    .join(', ')}
+                />
+                <p className="text-xs text-gray-400 text-right">
+                  {field.state.value.length}/150
+                </p>
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="filiereId"
+            validators={{ onChange: editFormationSchema.shape.filiereId }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -181,37 +251,15 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          {/* Niveau */}
-          <form.Field
-            name="niveau"
-            validators={{ onChange: editFormationSchema.shape.niveau }}
-          >
-            {(field) => (
-              <div className="space-y-1">
-                <label
-                  htmlFor={field.name}
-                  className="text-sm font-semibold text-primary-900"
-                >
-                  Niveau <span className="text-red-500">*</span>
-                </label>
-                <SelectField
-                  name={field.name}
-                  placeholder="Sélectionner un niveau"
-                  options={NIVEAU_OPTIONS}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={() => field.handleBlur()}
-                  className="bg-white text-gray-900 border-gray-300"
-                  error={field.state.meta.errors
-                    .map((err) => (err ? err.message : ''))
-                    .join(', ')}
-                />
-              </div>
-            )}
-          </form.Field>
-
-          {/* Submit button */}
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={onClose}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-800"
+            >
+              Annuler
+            </Button>
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
@@ -221,7 +269,7 @@ function EditFormationContent({
                   disabled={!canSubmit}
                   className="bg-primary-900 hover:bg-primary-800"
                 >
-                  {isSubmitting ? 'Modification...' : 'Modifier'}
+                  {isSubmitting ? 'Modification…' : 'Modifier'}
                 </Button>
               )}
             </form.Subscribe>

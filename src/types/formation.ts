@@ -1,9 +1,15 @@
+export interface Filiere {
+  id: string
+  nom: string
+}
+
 export interface Formation {
   id: string
   nom: string
-  filiere: string
-  niveau: string
-  responsable: string
+  enseignantResponsable: string
+  programme: string
+  lieu: string
+  filiere: Filiere
 }
 
 export interface SelectOption {
@@ -16,10 +22,10 @@ export const FILIERE_OPTIONS: SelectOption[] = [
   { value: 'INFO', label: 'INFO' },
 ]
 
-export const NIVEAU_OPTIONS: SelectOption[] = [
-  { value: 'L1', label: 'L1' },
-  { value: 'L2', label: 'L2' },
-  { value: 'L3', label: 'L3' },
-  { value: 'M1', label: 'M1' },
-  { value: 'M2', label: 'M2' },
+export const ENSEIGNANT_OPTIONS: SelectOption[] = [
+  { value: '1', label: 'Guillaume POSTIC' },
+  { value: '2', label: 'Nathalie DAVID' },
+  { value: '3', label: 'Hanna KLAUDEL' },
+  { value: '4', label: 'Jean DUPONT' },
+  { value: '5', label: 'Marie MARTIN' },
 ]
