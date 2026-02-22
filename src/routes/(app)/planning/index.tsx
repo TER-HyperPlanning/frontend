@@ -3,6 +3,7 @@ import PlanningHeader from '@/components/planning/PlanningHeader'
 import DateStrip from '@/components/planning/DateStrip'
 import PlanningCalendar from '@/components/planning/PlanningCalendar'
 import PageLayout from '@/layout/PageLayout'
+import { getInitialDate } from '@/utils/date.utils'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(app)/planning/')({
@@ -10,7 +11,7 @@ export const Route = createFileRoute('/(app)/planning/')({
 })
 
 function RouteComponent() {
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(getInitialDate)
 
   return (
     <PageLayout className="flex flex-col">

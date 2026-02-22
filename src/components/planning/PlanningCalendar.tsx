@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
@@ -132,9 +133,18 @@ function renderEventContent(eventInfo: EventContentArg) {
 }
 
 function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
+  const calendarRef = useRef<FullCalendar>(null)
+
+  useEffect(() => {
+    if (calendarRef.current) {
+      calendarRef.current.getApi().gotoDate(selectedDate)
+    }
+  }, [selectedDate])
+
   return (
     <div className="planning-calendar flex-1 overflow-auto px-1">
       <FullCalendar
+        ref={calendarRef}
         plugins={[timeGridPlugin, interactionPlugin]}
         locale={frLocale}
         initialView="timeGridWeek"
