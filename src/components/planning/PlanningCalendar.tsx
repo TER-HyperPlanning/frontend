@@ -3,7 +3,7 @@ import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import frLocale from '@fullcalendar/core/locales/fr'
-import type { EventContentArg } from '@fullcalendar/core'
+import type { EventContentArg, DayHeaderContentArg } from '@fullcalendar/core'
 import './planning-calendar.css'
 
 interface PlanningCalendarProps {
@@ -132,6 +132,19 @@ function renderEventContent(eventInfo: EventContentArg) {
   )
 }
 
+function renderDayHeader(arg: DayHeaderContentArg) {
+  return (
+    <div className="flex flex-col items-center w-full">
+      <span className="text-xs font-semibold day-name capitalize tracking-wide">
+        {arg.date.toLocaleDateString('fr-FR', { weekday: 'long' })}
+      </span>
+      <span className="text-2xl font-bold leading-none mt-1 day-number">
+        {arg.date.getDate()}
+      </span>
+    </div>
+  )
+}
+
 function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
   const calendarRef = useRef<FullCalendar>(null)
 
@@ -158,10 +171,7 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
           hour: 'numeric',
           minute: '2-digit',
         }}
-        dayHeaderFormat={{
-          weekday: 'long',
-          day: 'numeric',
-        }}
+        dayHeaderContent={renderDayHeader}
         allDaySlot={false}
         weekends={false}
         nowIndicator={true}

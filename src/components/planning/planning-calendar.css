@@ -2,7 +2,8 @@
 
 .planning-calendar .fc {
   --fc-border-color: #e5e7eb;
-  --fc-today-bg-color: #fefce8; /* very light yellow */
+  --fc-today-bg-color: #fefce8;
+  /* very light yellow */
   --fc-now-indicator-color: #7c5cbf;
   font-family: inherit;
 }
@@ -15,27 +16,40 @@
 /* Day header styling */
 .planning-calendar .fc .fc-col-header-cell {
   border: none;
-  padding: 8px 4px;
+  padding: 6px;
 }
 
 .planning-calendar .fc .fc-col-header-cell-cushion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 12px;
+  display: block;
+  padding: 10px 8px;
   border-radius: 12px;
+  background-color: #f8fafc;
   text-decoration: none;
-  color: #6b7280;
-  font-size: 0.75rem;
-  text-transform: capitalize;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+/* Inner elements styling */
+.planning-calendar .fc .day-name {
+  color: #64748b;
+}
+
+.planning-calendar .fc .day-number {
+  color: #0f172a;
 }
 
 /* Today's header highlight */
 .planning-calendar .fc .fc-day-today .fc-col-header-cell-cushion {
-  background-color: #1f2937;
+  background-color: #27272a;
+}
+
+.planning-calendar .fc .fc-day-today .day-name {
+  color: #a1a1aa;
+}
+
+.planning-calendar .fc .fc-day-today .day-number {
   color: white;
-  font-weight: 600;
 }
 
 /* Slot / time label styling */
@@ -88,11 +102,11 @@
   border-right: none;
 }
 
-.planning-calendar .fc .fc-scrollgrid-section > td {
+.planning-calendar .fc .fc-scrollgrid-section>td {
   border-bottom: none;
 }
 
 /* Header row bottom border */
-.planning-calendar .fc .fc-scrollgrid-section-header > td {
+.planning-calendar .fc .fc-scrollgrid-section-header>td {
   border-bottom: 1px solid #e5e7eb;
 }
