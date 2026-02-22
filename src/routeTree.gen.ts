@@ -16,6 +16,8 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appBuildingsIndexRouteImport } from './routes/(app)/buildings/index'
+import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -51,10 +53,22 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appBuildingsIndexRoute = appBuildingsIndexRouteImport.update({
+  id: '/buildings/',
+  path: '/buildings/',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appBuildingsBuildingIdRoute = appBuildingsBuildingIdRouteImport.update({
+  id: '/buildings/$buildingId',
+  path: '/buildings/$buildingId',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/buildings/': typeof appBuildingsIndexRoute
   '/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -63,6 +77,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/buildings': typeof appBuildingsIndexRoute
   '/planning': typeof appPlanningIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
@@ -73,6 +89,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(app)/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/(app)/buildings/': typeof appBuildingsIndexRoute
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -83,6 +101,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/buildings/$buildingId'
+    | '/buildings/'
     | '/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -91,6 +111,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/buildings/$buildingId'
+    | '/buildings'
     | '/planning'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
@@ -100,6 +122,8 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/(app)/buildings/$buildingId'
+    | '/(app)/buildings/'
     | '/(app)/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -163,14 +187,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/buildings/': {
+      id: '/(app)/buildings/'
+      path: '/buildings'
+      fullPath: '/buildings/'
+      preLoaderRoute: typeof appBuildingsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/buildings/$buildingId': {
+      id: '/(app)/buildings/$buildingId'
+      path: '/buildings/$buildingId'
+      fullPath: '/buildings/$buildingId'
+      preLoaderRoute: typeof appBuildingsBuildingIdRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
+  appBuildingsBuildingIdRoute: typeof appBuildingsBuildingIdRoute
+  appBuildingsIndexRoute: typeof appBuildingsIndexRoute
   appPlanningIndexRoute: typeof appPlanningIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+  appBuildingsBuildingIdRoute: appBuildingsBuildingIdRoute,
+  appBuildingsIndexRoute: appBuildingsIndexRoute,
   appPlanningIndexRoute: appPlanningIndexRoute,
 }
 
