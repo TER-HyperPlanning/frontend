@@ -16,6 +16,7 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -51,10 +52,16 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appGroupesIndexRoute = appGroupesIndexRouteImport.update({
+  id: '/groupes/',
+  path: '/groupes/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/groupes/': typeof appGroupesIndexRoute
   '/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/groupes': typeof appGroupesIndexRoute
   '/planning': typeof appPlanningIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(app)/groupes/': typeof appGroupesIndexRoute
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -83,6 +92,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/groupes/'
     | '/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -91,6 +101,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/groupes'
     | '/planning'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
@@ -100,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/(app)/groupes/'
     | '/(app)/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -163,14 +175,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/groupes/': {
+      id: '/(app)/groupes/'
+      path: '/groupes'
+      fullPath: '/groupes/'
+      preLoaderRoute: typeof appGroupesIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
+  appGroupesIndexRoute: typeof appGroupesIndexRoute
   appPlanningIndexRoute: typeof appPlanningIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+  appGroupesIndexRoute: appGroupesIndexRoute,
   appPlanningIndexRoute: appPlanningIndexRoute,
 }
 
