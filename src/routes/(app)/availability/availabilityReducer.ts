@@ -97,13 +97,6 @@ export const availabilityReducer = (
       const prevStateCopy = [...prevState]
       prevStateCopy.splice(index, 1)
       return prevStateCopy
-      // if (action.value.length > prevState.length) {
-      //   return [...prevState, { date: action.value[action.value.length - 1], canModify: true }]
-      // }
-      // else {
-      //   const dayParam = new Set(action.value.map((day) => day.getTime()));
-      //   return prevState.filter((day) => dayParam.has(day.date.getTime()))
-      // }
     }
 
     case 'addYearToEditable': {

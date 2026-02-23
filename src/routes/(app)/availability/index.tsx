@@ -24,7 +24,8 @@ function RouteComponent() {
   const [selectedGroupNumber, setSelectedGroupNumber] = useState(1);
   const [groups, setGroups] = useState([1]);
   const [currentPage, setCurrentPage] = useState(0);
-
+  const [numberOfDayPattern, setNumberOfDayPattern] = useState(0);
+  const [endOfDatePattern, setEndOfDatePattern] = useState("")
 
   return (
     <div>
@@ -43,7 +44,11 @@ function RouteComponent() {
             availableAllDay={availableAllDay}
             setPartialAvailability={setPartialAvailability}
             setAvailableAllDay={setAvailableAllDay} />
-          <PatternInfoForm />
+          <PatternInfoForm 
+          setEndOfDatePattern={setEndOfDatePattern}
+          endOfDatePattern={endOfDatePattern}
+          numberOfDayPattern={numberOfDayPattern}
+          setNumberOfDayPattern={setNumberOfDayPattern} />
 
           <GroupNav
             selectedGroupNumber={selectedGroupNumber}
@@ -55,8 +60,8 @@ function RouteComponent() {
             setSelectedGroupNumber={setSelectedGroupNumber} />
         </div>
         {!availableAllDay &&
-          <AvailabilityHoursForm></AvailabilityHoursForm>}
+          <AvailabilityHoursForm ></AvailabilityHoursForm>}
       </div>
-      </div>
-)
+    </div>
+  )
 }
