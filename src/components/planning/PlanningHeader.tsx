@@ -8,7 +8,7 @@ function PlanningHeader() {
     <PageHeader>
       <Logo showText={true} className="h-10 w-auto text-primary-700" />
 
-      <div className="flex items-center gap-2 ml-4 flex-1">
+      <div className="flex flex-wrap items-center justify-end md:justify-start gap-2 ml-2 md:ml-4 flex-1">
         <Select
           items={[
             { id: 'weekly', value: 'Groupe' },

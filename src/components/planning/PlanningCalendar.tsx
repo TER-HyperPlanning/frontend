@@ -156,31 +156,33 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
 
   return (
     <div className="planning-calendar flex-1 overflow-auto px-1">
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[timeGridPlugin, interactionPlugin]}
-        locale={frLocale}
-        initialView="timeGridWeek"
-        initialDate={selectedDate}
-        headerToolbar={false}
-        slotMinTime="08:00:00"
-        slotMaxTime="20:00:00"
-        slotDuration="01:00:00"
-        slotLabelInterval="01:00:00"
-        slotLabelFormat={{
-          hour: 'numeric',
-          minute: '2-digit',
-        }}
-        dayHeaderContent={renderDayHeader}
-        allDaySlot={false}
-        weekends={false}
-        nowIndicator={true}
-        height="auto"
-        events={SAMPLE_EVENTS}
-        eventContent={renderEventContent}
-        editable={false}
-        selectable={false}
-      />
+      <div className="min-w-[700px] h-full">
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[timeGridPlugin, interactionPlugin]}
+          locale={frLocale}
+          initialView="timeGridWeek"
+          initialDate={selectedDate}
+          headerToolbar={false}
+          slotMinTime="08:00:00"
+          slotMaxTime="20:00:00"
+          slotDuration="01:00:00"
+          slotLabelInterval="01:00:00"
+          slotLabelFormat={{
+            hour: 'numeric',
+            minute: '2-digit',
+          }}
+          dayHeaderContent={renderDayHeader}
+          allDaySlot={false}
+          weekends={false}
+          nowIndicator={true}
+          height="auto"
+          events={SAMPLE_EVENTS}
+          eventContent={renderEventContent}
+          editable={false}
+          selectable={false}
+        />
+      </div>
     </div>
   )
 }
