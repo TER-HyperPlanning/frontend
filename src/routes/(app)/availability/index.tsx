@@ -44,11 +44,14 @@ function RouteComponent() {
             availableAllDay={availableAllDay}
             setPartialAvailability={setPartialAvailability}
             setAvailableAllDay={setAvailableAllDay} />
-          <PatternInfoForm 
-          setEndOfDatePattern={setEndOfDatePattern}
-          endOfDatePattern={endOfDatePattern}
-          numberOfDayPattern={numberOfDayPattern}
-          setNumberOfDayPattern={setNumberOfDayPattern} />
+          <PatternInfoForm
+          selectedGroupNumber={selectedGroupNumber}
+            selectedDays={selectedDays}
+            dispatchSelectedDays={dispatchSelectedDays}
+            setEndOfDatePattern={setEndOfDatePattern}
+            endOfDatePattern={endOfDatePattern}
+            numberOfDayPattern={numberOfDayPattern}
+            setNumberOfDayPattern={setNumberOfDayPattern} />
 
           <GroupNav
             selectedGroupNumber={selectedGroupNumber}

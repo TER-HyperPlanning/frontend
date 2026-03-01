@@ -92,7 +92,7 @@ export type TimeString = `${Hours}:${Minutes}`
 export interface DateAvailability {
   dateMs: number
   canModify: boolean
-  group?: {
+  group: {
     groupNumber: number
     numberOfDayOfAvailabilities?: number
     timeOfAvailability?: {

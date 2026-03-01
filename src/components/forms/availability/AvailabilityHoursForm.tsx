@@ -1,5 +1,4 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import React from 'react'
 import { HorizontalTextField } from '../../HorizontalTextField'
 
 export const AvailabilityHoursForm = () => {

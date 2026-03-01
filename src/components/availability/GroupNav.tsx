@@ -1,6 +1,4 @@
-import { ArrowBigLeft, ArrowBigRight, ArrowLeft, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
-import { set } from 'zod';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const pageSize = 2
 

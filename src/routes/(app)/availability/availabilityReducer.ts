@@ -106,7 +106,7 @@ export const availabilityReducer = (
         prevState,
         action.groupNumber,
       )
-      return prevState
+      return newTab
     }
     case 'addMonthToEditable': {
       const firstOfMonth = new Date(
