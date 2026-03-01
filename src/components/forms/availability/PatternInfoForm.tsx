@@ -18,27 +18,28 @@ export const PatternInfoForm = ({ selectedGroupNumber, selectedDays, dispatchSel
   const applyPattern = useCallback(() => {
     if (endOfDatePattern && selectedDays.length > 0) {
       const endDate = new Date(endOfDatePattern)
-      const bornDays = selectedDays.reduce((acc, day) => {
+      const minMaxDays = selectedDays.reduce((acc, day) => {
         acc.min = day.dateMs < acc.min ? day.dateMs : acc.min
         acc.max = day.dateMs > acc.max ? day.dateMs : acc.max
         return acc
       }, { max: selectedDays[0].dateMs, min: selectedDays[0].dateMs })
-      const difDays = calculateDifDays(bornDays.min, bornDays.max)
-
+      const difDays = calculateDifDays(minMaxDays.min, minMaxDays.max)
+    
       let daysToAdd: Date[] = []
-      for (let i = 0; i<selectedDays.length; i++) {
-        let dateToAdd = new Date(selectedDays[i].dateMs)
-        dateToAdd.setDate((dateToAdd.getDate() + numberOfDayPattern + difDays + 1))
-        if (dateToAdd > endDate) {
-          break
+      loop1:
+      for (let i = 0; true; i++) {
+        for (let j = 0; j < selectedDays.length; j++) {
+          let dateToAdd = new Date(selectedDays[j].dateMs)
+          dateToAdd.setDate((dateToAdd.getDate() + (numberOfDayPattern + difDays + 1) * (i+1)))
+          if (dateToAdd > endDate) {
+            break loop1
+          }
+          daysToAdd.push(dateToAdd)
         }
-        daysToAdd.push(dateToAdd)
       }
       dispatchSelectedDays({ type: "addEditable", groupNumber: selectedGroupNumber, value: daysToAdd })
     }
-
-
-  }, [selectedDays, selectedDays, endOfDatePattern, dispatchSelectedDays, numberOfDayPattern, selectedGroupNumber])
+  }, [selectedDays, endOfDatePattern, dispatchSelectedDays, numberOfDayPattern, selectedGroupNumber])
 
   return (
 

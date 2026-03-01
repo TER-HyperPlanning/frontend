@@ -128,6 +128,21 @@ export const availabilityReducer = (
       )
     }
 
+    case "setHours": {
+      return prevState.map(day => {
+        if (day.group?.groupNumber === action.groupNumber) {
+          return {
+            ...day,
+            group: {
+              ...day.group,
+              timeOfAvailability: action.value
+            }
+          }
+        }
+        return day
+      })
+    }
+
     default:
       return prevState
   }
