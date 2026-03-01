@@ -79,20 +79,20 @@ export const availabilityReducer = (
     //remove the day if it exist on state or add it if not exist
     case 'setDatesForDayPicker': {
       const time = action.value.getTime()
-      const index = prevState.findIndex(
-        (day: DateAvailability) => day.dateMs === time,
-      )
-      if (index === -1) {
-        return [
-          ...prevState,
-          {
-            dateMs: time,
-            canModify: true,
-            group: {
-              groupNumber: action.groupNumber,
-            },
-          },
-        ]
+      let index: number = -1
+      let alreadyInOtherGroup = false
+      for (let i = 0; i < prevState.length; i++) {
+        if (prevState[i].dateMs === time &&
+          prevState[i].group?.groupNumber !== action.groupNumber) {
+          alreadyInOtherGroup = true
+          break
+        }
+        if (
+          prevState[i].dateMs === time &&
+          prevState[i].group?.groupNumber === action.groupNumber
+        ) {
+          index = i
+        }
       }
       const prevStateCopy = [...prevState]
       prevStateCopy.splice(index, 1)
@@ -100,7 +100,7 @@ export const availabilityReducer = (
     }
 
     case 'addYearToEditable': {
-     const newTab= addEditableBetweenDates(
+      const newTab = addEditableBetweenDates(
         new Date(action.value, 0, 1),
         new Date(action.value + 1, 0, 0),
         prevState,
@@ -109,18 +109,10 @@ export const availabilityReducer = (
       return newTab
     }
     case 'addMonthToEditable': {
-      const firstOfMonth = new Date(
-        action.value.year,
-        action.value.month,
-        1,
-      )
-      const lastOfMonth = new Date(
-        action.value.year,
-        action.value.month + 1,
-        0,
-      )
+      const firstOfMonth = new Date(action.value.year, action.value.month, 1)
+      const lastOfMonth = new Date(action.value.year, action.value.month + 1, 0)
 
-     return addEditableBetweenDates(
+      return addEditableBetweenDates(
         firstOfMonth,
         lastOfMonth,
         prevState,
@@ -178,5 +170,4 @@ function addEditableBetweenDates(
     currentDate.setDate(currentDate.getDate() + 1)
   }
   return availabilityTabCopy
-
 }
