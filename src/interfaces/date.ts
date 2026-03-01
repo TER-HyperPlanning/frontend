@@ -95,15 +95,12 @@ export interface DateAvailability {
   group: {
     groupNumber: number
     numberOfDayOfAvailabilities?: number
-    timeOfAvailability?: timeOfAvailability[]
+    timeOfAvailability?: {
+      start: TimeString
+      end: TimeString
+    }[]
   }
 }
-
-export type timeOfAvailability = {
-  start: TimeString
-  end: TimeString
-}
-
 
 export type DayActions =
   | { type: 'addEditable' | 'removeDays'; value: Date[]; groupNumber: number }
@@ -119,10 +116,5 @@ export type DayActions =
       value: { month: number; year: number }
       groupNumber: number
     }
-  |{
-    type : "setHours",
-    groupNumber: number,
-    value: timeOfAvailability[]
-  }
 // type: "setDatesForDayPicker" | "addModifiable" | "resetModifiableOnly" | "resetAll" | "removeDays",
 // value: Date[],
