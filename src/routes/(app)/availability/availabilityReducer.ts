@@ -7,11 +7,7 @@ export const availabilityReducer = (
   switch (action.type) {
     case 'addEditable': {
       const newItems: DateAvailability[] = []
-      const prevStateSet = new Set(
-        prevState.flatMap((day) =>
-          action.groupNumber === day.group?.groupNumber ? [day.dateMs] : [],
-        ),
-      )
+      const prevStateSet = new Set(prevState.map((day) => day.dateMs))
       action.value.forEach((day) => {
         if (!prevStateSet.has(day.getTime())) {
           prevStateSet.add(day.getTime())
@@ -80,13 +76,15 @@ export const availabilityReducer = (
     case 'setDatesForDayPicker': {
       const time = action.value.getTime()
       let index: number = -1
-      let alreadyInOtherGroup = false
       for (let i = 0; i < prevState.length; i++) {
-        if (prevState[i].dateMs === time &&
-          prevState[i].group?.groupNumber !== action.groupNumber) {
-          alreadyInOtherGroup = true
-          break
+        //if the day in action is in another group, we dont change days
+        if (
+          prevState[i].dateMs === time &&
+          prevState[i].group?.groupNumber !== action.groupNumber
+        ) {
+          return prevState
         }
+
         if (
           prevState[i].dateMs === time &&
           prevState[i].group?.groupNumber === action.groupNumber
@@ -94,6 +92,20 @@ export const availabilityReducer = (
           index = i
         }
       }
+      //if the day was not found in the group, we add it
+      if (index === -1) {
+        return [
+          ...prevState,
+          {
+            dateMs: time,
+            canModify: true,
+            group: {
+              groupNumber: action.groupNumber,
+            },
+          },
+        ]
+      }
+      //if the day was found in the group, we remove it
       const prevStateCopy = [...prevState]
       prevStateCopy.splice(index, 1)
       return prevStateCopy
@@ -118,6 +130,21 @@ export const availabilityReducer = (
         prevState,
         action.groupNumber,
       )
+    }
+
+    case 'setHours': {
+      return prevState.map((day) => {
+        if (day.group?.groupNumber === action.groupNumber) {
+          return {
+            ...day,
+            group: {
+              ...day.group,
+              timeOfAvailability: action.value,
+            },
+          }
+        }
+        return day
+      })
     }
 
     default:
