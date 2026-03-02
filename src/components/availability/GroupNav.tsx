@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useMemo } from 'react';
 import type { DayActions } from '../../interfaces/date';
-import { useEffect, useMemo } from 'react';
 
 const pageSize: number = 2
 
@@ -18,9 +18,7 @@ export const GroupNav = ({ selectedGroupNumber, groups, currentPage, setCurrentP
     const startIndex = currentPage * pageSize
     const totalPages = Math.ceil(groups.length / pageSize)
 
-    // useEffect(() => {
 
-    // }, [groups]);
     function navLeft() {
         if (currentPage - 1 >= 0) {
             setCurrentPage(currentPage - 1)
@@ -59,12 +57,16 @@ export const GroupNav = ({ selectedGroupNumber, groups, currentPage, setCurrentP
                                         e.stopPropagation();
                                         setGroups((prev) => prev.filter((group) => group !== groupNumber))
                                         dispatchSelectedDays({ type: "resetGroup", groupNumber: groupNumber })
-                                        if (selectedGroupNumber > 1 && selectedGroupNumber === groupNumber) {
-                                            setSelectedGroupNumber((prev) => prev - 1)
-                                        }
-                                        console.log("index", index)
-                                        console.log("startindex", startIndex)
 
+                                        // if an element is selected and there is an element before it, select it
+                                        if (groups[startIndex + index -1 ] && selectedGroupNumber === groupNumber) {
+                                            setSelectedGroupNumber((prev) => prev - 1)
+                                        // if an element is selected and there is no element before it, select the nex group    
+                                        } else if (groups[startIndex + index -1 ] === undefined && selectedGroupNumber === groupNumber){
+                                            setSelectedGroupNumber((prev) => prev + 1)
+                                        }
+
+                                        // back to previous page if the current page is empty
                                         if (slicedGroups[index-1]===undefined && slicedGroups[index+1]===undefined) {
                                             setCurrentPage((prev) => prev - 1)
                                         }

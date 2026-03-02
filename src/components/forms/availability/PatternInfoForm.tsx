@@ -16,21 +16,24 @@ interface PatternInfoFormProps {
 
 export const PatternInfoForm = ({ selectedGroupNumber, selectedDays, dispatchSelectedDays, className, numberOfDayPattern, endOfDatePattern, setNumberOfDayPattern, setEndOfDatePattern }: PatternInfoFormProps) => {
   const applyPattern = useCallback(() => {
-    if (endOfDatePattern && selectedDays.length > 0) {
+    const selectedDaysOfGroup = selectedDays.filter(day => day.group?.groupNumber === selectedGroupNumber)
+
+    if (endOfDatePattern && selectedDaysOfGroup.length > 0) {
+
       const endDate = new Date(endOfDatePattern)
-      const minMaxDays = selectedDays.reduce((acc, day) => {
+      const minMaxDays = selectedDaysOfGroup.reduce((acc, day) => {
         acc.min = day.dateMs < acc.min ? day.dateMs : acc.min
         acc.max = day.dateMs > acc.max ? day.dateMs : acc.max
         return acc
-      }, { max: selectedDays[0].dateMs, min: selectedDays[0].dateMs })
+      }, { max: selectedDaysOfGroup[0].dateMs, min: selectedDaysOfGroup[0].dateMs })
       const difDays = calculateDifDays(minMaxDays.min, minMaxDays.max)
-    
+
       let daysToAdd: Date[] = []
       loop1:
       for (let i = 0; true; i++) {
-        for (let j = 0; j < selectedDays.length; j++) {
-          let dateToAdd = new Date(selectedDays[j].dateMs)
-          dateToAdd.setDate((dateToAdd.getDate() + (numberOfDayPattern + difDays + 1) * (i+1)))
+        for (let j = 0; j < selectedDaysOfGroup.length; j++) {
+          let dateToAdd = new Date(selectedDaysOfGroup[j].dateMs)
+          dateToAdd.setDate((dateToAdd.getDate() + (numberOfDayPattern + difDays + 1) * (i + 1)))
           if (dateToAdd > endDate) {
             break loop1
           }
