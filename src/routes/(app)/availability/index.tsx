@@ -63,7 +63,7 @@ function RouteComponent() {
             setSelectedGroupNumber={setSelectedGroupNumber} />
         </div>
         {!availableAllDay &&
-          <AvailabilityHoursForm ></AvailabilityHoursForm>}
+          <AvailabilityHoursForm selectedGroupNumber={selectedGroupNumber} dispatchSelectedDays={dispatchSelectedDays} ></AvailabilityHoursForm>}
       </div>
     </div>
   )

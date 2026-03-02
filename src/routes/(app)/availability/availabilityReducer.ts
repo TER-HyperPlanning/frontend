@@ -1,4 +1,4 @@
-import type { DateAvailability, DayActions } from '../../../interfaces/date'
+import type { DateAvailability, DayActions, TimeOfAvailability } from '../../../interfaces/date'
 
 export const availabilityReducer = (
   prevState: DateAvailability[],
@@ -133,15 +133,18 @@ export const availabilityReducer = (
     }
 
     case 'setHours': {
+      const hasEmptyTimeInGroup = action.value.some((availability)=>{
+        return availability.start===""||availability.end===""
+      })
+      if (hasEmptyTimeInGroup) {
+        return prevState
+      }
       return prevState.map((day) => {
         if (day.group?.groupNumber === action.groupNumber) {
           return {
             ...day,
-            group: {
-              ...day.group,
-              timeOfAvailability: action.value,
-            },
-          }
+            timeOfAvailability: action.value.map((avail)=>{return {...avail}}) as TimeOfAvailability[],
+          } satisfies DateAvailability
         }
         return day
       })

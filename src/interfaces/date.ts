@@ -95,14 +95,21 @@ export interface DateAvailability {
   group: {
     groupNumber: number
     numberOfDayOfAvailabilities?: number
-    timeOfAvailability?: timeOfAvailability[]
   }
+  timeOfAvailability?: TimeOfAvailability[]
 }
 
-export type timeOfAvailability = {
+export type TimeOfAvailability = {
   start: TimeString
-  end: TimeString
+  end: TimeString 
 }
+
+
+export type TimeOfAvailabilityWithVoidString = {
+  start: TimeString | ""
+  end: TimeString | ""
+}
+
 
 
 export type DayActions =
@@ -122,7 +129,10 @@ export type DayActions =
   |{
     type : "setHours",
     groupNumber: number,
-    value: timeOfAvailability[]
+    emptyTimeCallBack? : () => void,
+    value: TimeOfAvailabilityWithVoidString[]
   }
+
+
 // type: "setDatesForDayPicker" | "addModifiable" | "resetModifiableOnly" | "resetAll" | "removeDays",
 // value: Date[],

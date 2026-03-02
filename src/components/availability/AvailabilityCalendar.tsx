@@ -41,13 +41,12 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
             isModeSelected.current = true
             hoveredDayWithNoClick.current = null
         };
-
         window.addEventListener("mousedown", handleMouseDown);
         window.addEventListener("mouseup", handleMouseUp);
-
         return () => {
             window.removeEventListener("mousedown", handleMouseDown);
             window.removeEventListener("mouseup", handleMouseUp);
+            
         };
     }, []);
 
@@ -86,8 +85,7 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
     return (
         <div className={className} >
             <div className={defaultClassName}>
-                <DayPicker
-
+                <DayPicker 
                     className={mergedDaysPickerClassName}
                     onMonthChange={(date) => {
                         selectedYear.current = date.getFullYear()
@@ -103,10 +101,6 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
                             return acc
                         }, []),
 
-                        selectedSeveralGroup: selectedDays.reduce((acc: Date[], day) => {
-                            day.group?.groupNumber !== selectedGroupNumber && acc.push(new Date(day.dateMs))
-                            return acc
-                        }, []),
 
                         //modifier for element selected in another group
                         selectedOtherGroup: selectedDays.reduce((acc: Date[], day) => {

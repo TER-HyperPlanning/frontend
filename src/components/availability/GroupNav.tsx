@@ -30,7 +30,6 @@ export const GroupNav = ({ selectedGroupNumber, groups, currentPage, setCurrentP
 
 
 
-    //[0,1] [2;3] [4] page 2 groupe 5 current page 2
     return (
         <div className={className}>
             <div className="flex flex-col gap-4">
@@ -42,7 +41,7 @@ export const GroupNav = ({ selectedGroupNumber, groups, currentPage, setCurrentP
                         const styleNotSelected = "btn rounded-2xl relative pr-12"
                         return (
                             <div
-                                className={isSelected ? styleSelected : styleNotSelected} // On ajoute du padding à droite pour la croix
+                                className={isSelected ? styleSelected : styleNotSelected} 
                                 key={groupNumber}
                                 onClick={() => { setSelectedGroupNumber(groupNumber) }}
                             >
