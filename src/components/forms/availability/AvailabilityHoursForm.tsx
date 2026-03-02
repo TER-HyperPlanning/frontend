@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
-import type { DayActions, TimeOfAvailabilityWithVoidString } from '../../../interfaces/date'
+import type { DayActions, TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
 import { HorizontalTextField } from '../../HorizontalTextField'
 
 
@@ -13,7 +13,7 @@ interface AvailabilityHoursFormProps {
 
 export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumber }: AvailabilityHoursFormProps) => {
     const [currentPage, setCurrentPage] = useState(0);
-    const [timeOfAvailability, setTimeOfAvailability] = useState<TimeOfAvailabilityWithVoidString[]>([{
+    const [timeOfAvailability, setTimeOfAvailability] = useState<TimeOfAvailabilityWithEmptyString[]>([{
         start: "",
         end: "",
 
@@ -33,19 +33,13 @@ export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumbe
     }
 
     function deleteItem() {
+        setTimeOfAvailability((prev) => {
+            const newTab = [...prev]
+            newTab.splice(currentPage, 1)
+            return newTab
+        })
         if (currentPage > 0) {
-            setTimeOfAvailability((prev) => {
-                const newTab = [...prev]
-                newTab.splice(currentPage, 1)
-                return newTab
-            })
             navLeft()
-        } else{
-               setTimeOfAvailability((prev) => {
-                const newTab = [...prev]
-                newTab.splice(currentPage, 1)
-                return newTab
-            })
         }
 
     }
@@ -89,7 +83,7 @@ export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumbe
                             ✕</div>}
                     <ArrowRight onClick={() => { navRight() }}></ArrowRight>
                 </div>
-                    <div>page {currentPage + 1} / {timeOfAvailability.length}</div>
+                <div>page {currentPage + 1} / {timeOfAvailability.length}</div>
                 <div className="flex gap-4">
                     <button onClick={() => {
                         setTimeOfAvailability((prev) => {

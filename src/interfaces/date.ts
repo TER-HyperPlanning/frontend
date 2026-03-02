@@ -105,7 +105,7 @@ export type TimeOfAvailability = {
 }
 
 
-export type TimeOfAvailabilityWithVoidString = {
+export type TimeOfAvailabilityWithEmptyString = {
   start: TimeString | ""
   end: TimeString | ""
 }
@@ -114,7 +114,7 @@ export type TimeOfAvailabilityWithVoidString = {
 
 export type DayActions =
   | { type: 'addEditable' | 'removeDays'; value: Date[]; groupNumber: number }
-  | { type: 'resetEditableOnly'; groupNumber: number }
+  | { type: 'resetEditableOnly' | 'resetGroup'; groupNumber: number }
   | { type: 'setDatesForDayPicker'; value: Date; groupNumber: number }
   | {
       type: 'addYearToEditable' | 'resetYear'
@@ -130,7 +130,7 @@ export type DayActions =
     type : "setHours",
     groupNumber: number,
     emptyTimeCallBack? : () => void,
-    value: TimeOfAvailabilityWithVoidString[]
+    value: TimeOfAvailabilityWithEmptyString[]
   }
 
 

@@ -150,6 +150,9 @@ export const availabilityReducer = (
       })
     }
 
+    case "resetGroup":
+      return prevState.filter((day) => day.group?.groupNumber !== action.groupNumber)
+
     default:
       return prevState
   }

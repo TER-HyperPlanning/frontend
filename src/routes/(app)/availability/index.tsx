@@ -45,7 +45,7 @@ function RouteComponent() {
             setPartialAvailability={setPartialAvailability}
             setAvailableAllDay={setAvailableAllDay} />
           <PatternInfoForm
-          selectedGroupNumber={selectedGroupNumber}
+            selectedGroupNumber={selectedGroupNumber}
             selectedDays={selectedDays}
             dispatchSelectedDays={dispatchSelectedDays}
             setEndOfDatePattern={setEndOfDatePattern}
@@ -54,6 +54,7 @@ function RouteComponent() {
             setNumberOfDayPattern={setNumberOfDayPattern} />
 
           <GroupNav
+            dispatchSelectedDays={dispatchSelectedDays}
             selectedGroupNumber={selectedGroupNumber}
             className='flex justify-around col-span-2 mr-15'
             groups={groups}
