@@ -47,7 +47,9 @@ export const GroupNav = ({ selectedGroupNumber, groups, currentPage, setCurrentP
                             <div
                                 className={isSelected ? styleSelected : styleNotSelected}
                                 key={groupNumber}
-                                onClick={() => { setSelectedGroupNumber(groupNumber) }}
+                                onClick={() => { 
+                                    dispatchSelectedDays({ type: "resetEditableOnly", groupNumber: selectedGroupNumber })
+                                    setSelectedGroupNumber(groupNumber) }}
                             >
                                 <span>Groupe {groupNumber}</span>
                                 {/* Cross to remove Group */}
@@ -61,7 +63,7 @@ export const GroupNav = ({ selectedGroupNumber, groups, currentPage, setCurrentP
                                         // if an element is selected and there is an element before it, select it
                                         if (groups[startIndex + index -1 ] && selectedGroupNumber === groupNumber) {
                                             setSelectedGroupNumber((prev) => prev - 1)
-                                        // if an element is selected and there is no element before it, select the nex group    
+                                        // if an element is selected and there is no element before it, select the next group    
                                         } else if (groups[startIndex + index -1 ] === undefined && selectedGroupNumber === groupNumber){
                                             setSelectedGroupNumber((prev) => prev + 1)
                                         }

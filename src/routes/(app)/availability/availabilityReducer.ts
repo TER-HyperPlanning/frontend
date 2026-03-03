@@ -1,4 +1,9 @@
-import type { DateAvailability, DayActions, TimeOfAvailability } from '../../../interfaces/date'
+import type {
+  DateAvailability,
+  DayActions,
+  TimeOfAvailability,
+  TimeOfAvailabilityWithEmptyString,
+} from '../../../interfaces/date'
 
 export const availabilityReducer = (
   prevState: DateAvailability[],
@@ -8,16 +13,19 @@ export const availabilityReducer = (
     case 'addEditable': {
       const newItems: DateAvailability[] = []
       const prevStateSet = new Set(prevState.map((day) => day.dateMs))
+
       action.value.forEach((day) => {
-        if (!prevStateSet.has(day.getTime())) {
-          prevStateSet.add(day.getTime())
-          newItems.push({
-            dateMs: day.getTime(),
-            canModify: true,
-            group: {
-              groupNumber: action.groupNumber,
-            },
-          })
+        const dayTime = day.getTime()
+        if (!prevStateSet.has(dayTime)) {
+          prevStateSet.add(dayTime)
+          newItems.push(
+            getDayWithHours(
+              action.availableAllDay,
+              action.timeOfAvailability,
+              dayTime,
+              action.groupNumber,
+            ),
+          )
         }
       })
 
@@ -96,13 +104,12 @@ export const availabilityReducer = (
       if (index === -1) {
         return [
           ...prevState,
-          {
-            dateMs: time,
-            canModify: true,
-            group: {
-              groupNumber: action.groupNumber,
-            },
-          },
+          getDayWithHours(
+            action.availableAllDay,
+            action.timeOfAvailability,
+            time,
+            action.groupNumber,
+          ),
         ]
       }
       //if the day was found in the group, we remove it
@@ -117,6 +124,8 @@ export const availabilityReducer = (
         new Date(action.value + 1, 0, 0),
         prevState,
         action.groupNumber,
+        action.availableAllDay,
+        action.timeOfAvailability,
       )
       return newTab
     }
@@ -129,29 +138,35 @@ export const availabilityReducer = (
         lastOfMonth,
         prevState,
         action.groupNumber,
+        action.availableAllDay,
+        action.timeOfAvailability,
       )
     }
 
     case 'setHours': {
-      const hasEmptyTimeInGroup = action.value.some((availability)=>{
-        return availability.start===""||availability.end===""
+      const hasEmptyTime = action.value.some((availability) => {
+        return availability.start === '' || availability.end === ''
       })
-      if (hasEmptyTimeInGroup) {
+      if (hasEmptyTime) {
         return prevState
       }
       return prevState.map((day) => {
-        if (day.group?.groupNumber === action.groupNumber) {
+        if (day.group?.groupNumber === action.groupNumber && day.canModify) {
           return {
             ...day,
-            timeOfAvailability: action.value.map((avail)=>{return {...avail}}) as TimeOfAvailability[],
+            timeOfAvailability: action.value.map((avail) => {
+              return { ...avail }
+            }) as TimeOfAvailability[],
           } satisfies DateAvailability
         }
         return day
       })
     }
 
-    case "resetGroup":
-      return prevState.filter((day) => day.group?.groupNumber !== action.groupNumber)
+    case 'resetGroup':
+      return prevState.filter(
+        (day) => day.group?.groupNumber !== action.groupNumber,
+      )
 
     default:
       return prevState
@@ -163,22 +178,23 @@ function addEditableBetweenDates(
   endDate: Date,
   availabilityTab: DateAvailability[],
   groupNumber: number,
+  availableAllDay: boolean,
+  timeOfAvailability: TimeOfAvailabilityWithEmptyString[],
 ) {
   let currentDate = startDate
   const availabilityTabCopy = [...availabilityTab]
 
   while (currentDate.getTime() <= endDate.getTime()) {
-    const objectToAdd = {
-      dateMs: currentDate.getTime(),
-      canModify: true,
-      group: {
-        groupNumber: groupNumber,
-      },
-    }
+    const currentTime = currentDate.getTime()
+    const objectToAdd = getDayWithHours(
+      availableAllDay,
+      timeOfAvailability,
+      currentTime,
+      groupNumber,
+    )
     const findedIndexOfCurrentDate = availabilityTabCopy.findIndex(
       (day: DateAvailability) =>
-        day.dateMs === currentDate.getTime() &&
-        groupNumber === day.group?.groupNumber,
+        day.dateMs === currentTime && groupNumber === day.group?.groupNumber,
     )
     if (findedIndexOfCurrentDate === -1) {
       availabilityTabCopy.push(objectToAdd)
@@ -188,4 +204,41 @@ function addEditableBetweenDates(
     currentDate.setDate(currentDate.getDate() + 1)
   }
   return availabilityTabCopy
+}
+
+function getDayWithHours(
+  availableAllDay: boolean,
+  timeOfAvailability: TimeOfAvailabilityWithEmptyString[],
+  dateMs: number,
+  groupNumber: number,
+): DateAvailability {
+  const dayBase: DateAvailability = {
+    dateMs,
+    canModify: true,
+    group: {
+      groupNumber,
+    },
+  }
+
+  if (availableAllDay) {
+    return {
+      ...dayBase,
+      timeOfAvailability: [{ start: '00:00', end: '23:59' }],
+    }
+  }
+
+  const hasEmptyTime = timeOfAvailability.some((availability) => {
+    return availability.start === '' || availability.end === ''
+  })
+
+  if (hasEmptyTime) {
+    return dayBase
+  }
+
+  return {
+    ...dayBase,
+    timeOfAvailability: timeOfAvailability.map((availability) => {
+      return { ...availability }
+    }) as TimeOfAvailability[],
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import type { DateAvailability } from '../../../interfaces/date'
+import type { DateAvailability, DayActions, TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
 import TextField from '../../TextField'
 
 interface PatternInfoFormProps {
@@ -9,12 +9,13 @@ interface PatternInfoFormProps {
   setNumberOfDayPattern: React.Dispatch<React.SetStateAction<number>>
   setEndOfDatePattern: React.Dispatch<React.SetStateAction<string>>
   selectedDays: DateAvailability[]
-  dispatchSelectedDays: React.ActionDispatch<[action: import('../../../interfaces/date').DayActions]>,
+  dispatchSelectedDays: React.ActionDispatch<[action: DayActions]>,
   selectedGroupNumber: number,
-
+  availableAllDay: boolean,
+  timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
 }
 
-export const PatternInfoForm = ({ selectedGroupNumber, selectedDays, dispatchSelectedDays, className, numberOfDayPattern, endOfDatePattern, setNumberOfDayPattern, setEndOfDatePattern }: PatternInfoFormProps) => {
+export const PatternInfoForm = ({ selectedGroupNumber, availableAllDay, timeOfAvailability,selectedDays, dispatchSelectedDays, className, numberOfDayPattern, endOfDatePattern, setNumberOfDayPattern, setEndOfDatePattern }: PatternInfoFormProps) => {
   const applyPattern = useCallback(() => {
     const selectedDaysOfGroup = selectedDays.filter(day => day.group?.groupNumber === selectedGroupNumber)
 
@@ -40,7 +41,7 @@ export const PatternInfoForm = ({ selectedGroupNumber, selectedDays, dispatchSel
           daysToAdd.push(dateToAdd)
         }
       }
-      dispatchSelectedDays({ type: "addEditable", groupNumber: selectedGroupNumber, value: daysToAdd })
+      dispatchSelectedDays({ type: "addEditable", availableAllDay:availableAllDay,timeOfAvailability:timeOfAvailability, groupNumber: selectedGroupNumber, value: daysToAdd })
     }
   }, [selectedDays, endOfDatePattern, dispatchSelectedDays, numberOfDayPattern, selectedGroupNumber])
 

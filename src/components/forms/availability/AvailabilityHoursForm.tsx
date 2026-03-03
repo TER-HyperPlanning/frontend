@@ -7,17 +7,18 @@ import { HorizontalTextField } from '../../HorizontalTextField'
 
 interface AvailabilityHoursFormProps {
     dispatchSelectedDays: React.ActionDispatch<[action: DayActions]>,
-    selectedGroupNumber: number
+    selectedGroupNumber: number,
+    timeOfAvailability: TimeOfAvailabilityWithEmptyString[],
+    setTimeOfAvailability: React.Dispatch<React.SetStateAction<TimeOfAvailabilityWithEmptyString[]>>
 }
 
 
-export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumber }: AvailabilityHoursFormProps) => {
-    const [currentPage, setCurrentPage] = useState(0);
-    const [timeOfAvailability, setTimeOfAvailability] = useState<TimeOfAvailabilityWithEmptyString[]>([{
-        start: "",
-        end: "",
 
-    }]);
+
+
+export const AvailabilityHoursForm = ({ timeOfAvailability, setTimeOfAvailability, dispatchSelectedDays, selectedGroupNumber }: AvailabilityHoursFormProps) => {
+    const [currentPage, setCurrentPage] = useState(0);
+
 
     function navLeft() {
         if (currentPage - 1 >= 0) {
@@ -54,11 +55,10 @@ export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumbe
                             label='Heure de début'
                             type="time"
                             onChange={(e) => {
-                                setTimeOfAvailability((prev) => {
-                                    const newTab = [...prev]
-                                    newTab[currentPage].start = e.target.value as any
-                                    return newTab
-                                })
+                                const newTab = [...timeOfAvailability]
+                                newTab[currentPage].start = e.target.value as any
+                                dispatchSelectedDays({ type: "setHours", value: newTab, groupNumber: selectedGroupNumber })
+                                setTimeOfAvailability(newTab)
                             }}
                             value={timeOfAvailability[currentPage].start}
                         ></HorizontalTextField>
@@ -66,11 +66,10 @@ export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumbe
                             label='Heure de fin'
                             type='time'
                             onChange={(e) => {
-                                setTimeOfAvailability((prev) => {
-                                    const newTab = [...prev]
-                                    newTab[currentPage].end = e.target.value as any
-                                    return newTab
-                                })
+                                const newTab = [...timeOfAvailability]
+                                newTab[currentPage].end = e.target.value as any
+                                dispatchSelectedDays({ type: "setHours", value: newTab, groupNumber: selectedGroupNumber })
+                                setTimeOfAvailability(newTab)
                             }}
                             value={timeOfAvailability[currentPage].end}
                         ></HorizontalTextField>
@@ -91,7 +90,6 @@ export const AvailabilityHoursForm = ({ dispatchSelectedDays, selectedGroupNumbe
                         }
                         )
                     }} className='btn btn-primary'>Ajouter une disponibilité</button>
-                    <button onClick={() => { dispatchSelectedDays({ type: "setHours", value: timeOfAvailability, groupNumber: selectedGroupNumber }) }} className='btn btn-success text-white'>Enregistrer les horaires</button>
                 </div>
             </div>
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, type ActionDispatch, type RefObject } from "react";
 import { DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
-import type { DateAvailability, DayActions } from "../../interfaces/date";
+import type { DateAvailability, DayActions, TimeOfAvailabilityWithEmptyString } from "../../interfaces/date";
 import { AvailabilityButtons } from "./AvailabilityButtons";
 import { twMerge } from "tailwind-merge";
 
@@ -15,9 +15,11 @@ interface AvailabilityCalendarProps {
     className?: string
     calendarClasName?: string
     selectedGroupNumber: number
+    timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
+    availableAllDay: boolean
 }
 
-export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, dispatchSelectedDays, selectedDays, selectedMonth, selectedYear, className }: AvailabilityCalendarProps) => {
+export const AvailabilityCalendar = ({timeOfAvailability, availableAllDay, selectedGroupNumber, calendarClasName, dispatchSelectedDays, selectedDays, selectedMonth, selectedYear, className }: AvailabilityCalendarProps) => {
     const isMouseDown = useRef(false);
     const lockSelectedMode = useRef(false)
     const isModeSelected = useRef(true)
@@ -46,7 +48,7 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
         return () => {
             window.removeEventListener("mousedown", handleMouseDown);
             window.removeEventListener("mouseup", handleMouseUp);
-            
+
         };
     }, []);
 
@@ -73,7 +75,7 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
 
             //add selected days if use the mode to select
             if (isModeSelected.current && !dayAlreadySelected && hoveredDayWithNoClick.current) {
-                dispatchSelectedDays({ type: "addEditable", groupNumber: selectedGroupNumber, value: [day, hoveredDayWithNoClick.current] })
+                dispatchSelectedDays({ type: "addEditable", groupNumber: selectedGroupNumber, timeOfAvailability:timeOfAvailability, availableAllDay:availableAllDay,value: [day, hoveredDayWithNoClick.current] })
             }
             //remove days if the mode to select is disabled
             else if (!isModeSelected.current) {
@@ -85,7 +87,7 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
     return (
         <div className={className} >
             <div className={defaultClassName}>
-                <DayPicker 
+                <DayPicker
                     className={mergedDaysPickerClassName}
                     onMonthChange={(date) => {
                         selectedYear.current = date.getFullYear()
@@ -116,7 +118,9 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
                             return acc
                         }, [])
                     }
-                    onDayClick={(day) => dispatchSelectedDays({ type: "setDatesForDayPicker", groupNumber: selectedGroupNumber, value: day })}
+                    onDayClick={(day) => {
+                        dispatchSelectedDays({ type: "setDatesForDayPicker", groupNumber: selectedGroupNumber, value: day, availableAllDay:availableAllDay,timeOfAvailability:timeOfAvailability })
+                    }}
                     modifiersClassNames={{
                         selected: "bg-green-400 rounded-2xl",
                         selectedOnly: "bg-green-200 rounded-2xl",
@@ -125,6 +129,8 @@ export const AvailabilityCalendar = ({ selectedGroupNumber, calendarClasName, di
                     onDayMouseEnter={handleDayMouseEnter}
                 />
                 <AvailabilityButtons
+                    availableAllDay={availableAllDay}
+                    timeOfAvailability={timeOfAvailability}
                     selectedGroupNumber={selectedGroupNumber}
                     dispatchSelectedDays={dispatchSelectedDays}
                     selectedMonth={selectedMonth}

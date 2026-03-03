@@ -113,16 +113,16 @@ export type TimeOfAvailabilityWithEmptyString = {
 
 
 export type DayActions =
-  | { type: 'addEditable' | 'removeDays'; value: Date[]; groupNumber: number }
+  | { type:'removeDays'; value: Date[]; groupNumber: number }
   | { type: 'resetEditableOnly' | 'resetGroup'; groupNumber: number }
-  | { type: 'setDatesForDayPicker'; value: Date; groupNumber: number }
+  | { type: 'setDatesForDayPicker'; value: Date; groupNumber: number; availableAllDay:boolean; timeOfAvailability : TimeOfAvailabilityWithEmptyString[] }
   | {
-      type: 'addYearToEditable' | 'resetYear'
+      type: 'resetYear'
       value: number
       groupNumber: number
     }
   | {
-      type: 'addMonthToEditable' | 'resetMonth'
+      type:'resetMonth'
       value: { month: number; year: number }
       groupNumber: number
     }
@@ -132,6 +132,22 @@ export type DayActions =
     emptyTimeCallBack? : () => void,
     value: TimeOfAvailabilityWithEmptyString[]
   }
+  |{ type: 'addEditable'; value: Date[]; groupNumber: number;availableAllDay:boolean; timeOfAvailability : TimeOfAvailabilityWithEmptyString[] }
+  | {
+      type: 'addYearToEditable'
+      value: number
+      groupNumber: number
+      availableAllDay:boolean;
+      timeOfAvailability : TimeOfAvailabilityWithEmptyString[]
+    }
+
+    | {
+      type: 'addMonthToEditable'
+      value: { month: number; year: number }
+      groupNumber: number
+      availableAllDay:boolean;
+      timeOfAvailability : TimeOfAvailabilityWithEmptyString[]
+    }
 
 
 // type: "setDatesForDayPicker" | "addModifiable" | "resetModifiableOnly" | "resetAll" | "removeDays",
