@@ -96,59 +96,71 @@ export interface DateAvailability {
     groupNumber: number
     numberOfDayOfAvailabilities?: number
   }
-  timeOfAvailability?: TimeOfAvailability[]
+  timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
 }
 
 export type TimeOfAvailability = {
   start: TimeString
-  end: TimeString 
+  end: TimeString
 }
-
 
 export type TimeOfAvailabilityWithEmptyString = {
-  start: TimeString | ""
-  end: TimeString | ""
+  start: TimeString | ''
+  end: TimeString | ''
 }
 
-
-
 export type DayActions =
-  | { type:'removeDays'; value: Date[]; groupNumber: number }
+  | { type: 'removeDays'; value: Date[]; groupNumber: number }
   | { type: 'resetEditableOnly' | 'resetGroup'; groupNumber: number }
-  | { type: 'setDatesForDayPicker'; value: Date; groupNumber: number; availableAllDay:boolean; timeOfAvailability : TimeOfAvailabilityWithEmptyString[] }
+  | {
+      type: 'setDatesForDayPicker'
+      value: Date
+      groupNumber: number
+      availableAllDay: boolean
+      timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
+    }
   | {
       type: 'resetYear'
       value: number
       groupNumber: number
     }
   | {
-      type:'resetMonth'
+      type: 'resetMonth'
       value: { month: number; year: number }
       groupNumber: number
     }
-  |{
-    type : "setHours",
-    groupNumber: number,
-    emptyTimeCallBack? : () => void,
-    value: TimeOfAvailabilityWithEmptyString[]
-  }
-  |{ type: 'addEditable'; value: Date[]; groupNumber: number;availableAllDay:boolean; timeOfAvailability : TimeOfAvailabilityWithEmptyString[] }
+  | {
+      type: 'setHours'
+      groupNumber: number
+      availableAllDay: boolean
+      value: TimeOfAvailabilityWithEmptyString[]
+    }
+  | {
+      type: 'addEditable'
+      value: Date[]
+      groupNumber: number
+      availableAllDay: boolean
+      timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
+    }
   | {
       type: 'addYearToEditable'
       value: number
       groupNumber: number
-      availableAllDay:boolean;
-      timeOfAvailability : TimeOfAvailabilityWithEmptyString[]
+      availableAllDay: boolean
+      timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
     }
-
-    | {
+  | {
       type: 'addMonthToEditable'
       value: { month: number; year: number }
       groupNumber: number
-      availableAllDay:boolean;
-      timeOfAvailability : TimeOfAvailabilityWithEmptyString[]
+      availableAllDay: boolean
+      timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
     }
-
+    | {
+      type: 'setHoursForOneDay'
+      dateMs: number
+      value: TimeOfAvailabilityWithEmptyString[]
+    }
 
 // type: "setDatesForDayPicker" | "addModifiable" | "resetModifiableOnly" | "resetAll" | "removeDays",
 // value: Date[],

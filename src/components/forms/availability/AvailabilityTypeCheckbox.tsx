@@ -19,10 +19,10 @@ export const AvailabilityTypeCheckbox = ({dispatchSelectedDays, selectedGroupNum
     //if availableAllDay is false, it will switch to true so we verify if it false
     //to change availability in case where it true
     if(!availableAllDay){
-      dispatchSelectedDays({type:"setHours", groupNumber:selectedGroupNumber, value:[{start:"00:00", end:"23:59"}]})
+      dispatchSelectedDays({type:"setHours", groupNumber:selectedGroupNumber,availableAllDay:!availableAllDay, value:[{start:"00:00", end:"23:59"}]})
       
     } else{
-      dispatchSelectedDays({type:"setHours", groupNumber:selectedGroupNumber, value:timeOfAvailability})
+      dispatchSelectedDays({type:"setHours", groupNumber:selectedGroupNumber,availableAllDay:!availableAllDay, value:timeOfAvailability})
     }
     setAvailableAllDay((prev) => !prev)
   }

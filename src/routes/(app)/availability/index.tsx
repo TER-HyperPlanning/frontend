@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useReducer, useRef, useState } from 'react'
 import { AvailabilityCalendar } from '../../../components/availability/AvailabilityCalendar'
 import { GroupNav } from '../../../components/availability/GroupNav'
-import { AvailabilityHoursForm } from '../../../components/forms/availability/AvailabilityHoursForm'
+import { AvailabilityHoursForm } from '../../../components/forms/availability/AvailabilityHoursForms/AvailabilityHoursForm'
 import { AvailabilityTypeCheckbox } from '../../../components/forms/availability/AvailabilityTypeCheckbox'
 import { PatternInfoForm } from '../../../components/forms/availability/PatternInfoForm'
 import type { TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
@@ -12,10 +12,6 @@ export const Route = createFileRoute('/(app)/availability/')({
   component: RouteComponent,
 })
 
-
-
-
-//0,[0,1] 1,[2,3] 2,[4,5] 3,[6,7] 4
 function RouteComponent() {
   const [selectedDays, dispatchSelectedDays] = useReducer(availabilityReducer, [])
   const selectedMonth = useRef(new Date().getMonth())
@@ -77,6 +73,7 @@ function RouteComponent() {
 
             {!availableAllDay &&
               <AvailabilityHoursForm
+              availableAllDay={availableAllDay}
                 timeOfAvailability={timeOfAvailability}
                 setTimeOfAvailability={setTimeOfAvailability}
                 selectedGroupNumber={selectedGroupNumber}
