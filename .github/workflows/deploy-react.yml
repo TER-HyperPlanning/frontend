@@ -13,7 +13,7 @@ jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
     env:
-      REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+      REACT_APP_API_URL: ${{ secrets.VITE_API_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
