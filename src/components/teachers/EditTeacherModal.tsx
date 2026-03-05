@@ -21,15 +21,26 @@ export default function EditTeacherModal({
   teacher,
   onEdit,
 }: EditTeacherModalProps) {
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [statut, setStatut] = useState("");
   const [showStatutMenu, setShowStatutMenu] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; telephone?: string; statut?: string }>({});
 
   // Pré-remplir les champs quand le modal s'ouvre
+  const [errors, setErrors] = useState<{
+    nom?: string;
+    prenom?: string;
+    email?: string;
+    telephone?: string;
+    statut?: string;
+  }>({});
+
   useEffect(() => {
     if (teacher) {
+      setNom(teacher.nom);
+      setPrenom(teacher.prenom);
       setEmail(teacher.email);
       setTelephone(teacher.telephone);
       setStatut(teacher.statut);
@@ -39,6 +50,10 @@ export default function EditTeacherModal({
 
   const validate = () => {
     const newErrors: typeof errors = {};
+
+    if (!nom) newErrors.nom = "Nom obligatoire";
+    if (!prenom) newErrors.prenom = "Prénom obligatoire";
+
     if (!email) newErrors.email = "Email obligatoire";
     else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = "Email invalide";
 
@@ -57,6 +72,8 @@ export default function EditTeacherModal({
 
     onEdit({
       ...teacher,
+      nom,
+      prenom,
       email,
       telephone,
       statut,
@@ -81,6 +98,30 @@ export default function EditTeacherModal({
         <h2 className="text-xl font-semibold text-center text-[#003366]">
           Modifier {teacher.nom} {teacher.prenom}
         </h2>
+
+        {/* Nom */}
+        <TextField
+          name="nom"
+          placeholder={teacher.nom}
+          value={nom}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setNom(e.target.value)
+          }
+          error={errors.nom}
+          className="h-12 placeholder:text-gray-600 text-gray-800"
+        />
+
+        {/* Prénom */}
+        <TextField
+          name="prenom"
+          placeholder={teacher.prenom}
+          value={prenom}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPrenom(e.target.value)
+          }
+          error={errors.prenom}
+          className="h-12 placeholder:text-gray-600 text-gray-800"
+        />
 
         {/* Email */}
         <TextField
