@@ -3,7 +3,8 @@ import { z } from 'zod';
 import Button from '../../Button';
 import TextField from '../../TextField';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { useAuth } from '@/hooks/api/useAuth';
 
 // Schéma de validation Zod
 const loginSchema = z.object({
@@ -12,21 +13,32 @@ const loginSchema = z.object({
 });
 
 function LoginForm() {
+  const navigate = useNavigate();
+  const { login, isLoading, error: authError } = useAuth();
+
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
     onSubmit: async ({ value }) => {
-      // Gérer la soumission du formulaire
-      console.log('Formulaire soumis:', value);
-      // Ajoutez votre logique de connexion ici
+      const success = await login(value);
+      if (success) {
+        navigate({ to: '/' });
+      }
     },
   });
 
   return (
     <div className="w-full max-w-md mx-auto p-4 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">connectez vous !</h2>
+
+      {authError && (
+        <div className="mb-4 p-3 rounded-md bg-red-700 text-red-200 text-sm text-center">
+          {authError}
+        </div>
+      )}
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -92,10 +104,10 @@ function LoginForm() {
           {([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || isLoading}
               className="w-full"
             >
-              {isSubmitting ? 'Connexion en cours...' : 'Se connecter'}
+              {isSubmitting || isLoading ? 'Connexion en cours...' : 'Se connecter'}
             </Button>
           )}
         </form.Subscribe>
