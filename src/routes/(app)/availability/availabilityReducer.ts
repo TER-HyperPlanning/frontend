@@ -150,7 +150,7 @@
         && day.canModify
           ? getDayWithHours(
             action.availableAllDay,
-            action.value,
+            action.timeOfAvailability,
             day.dateMs,
             day.group?.groupNumber as number,
           )
@@ -168,6 +168,9 @@
         return prevState.filter(
           (day) => day.group?.groupNumber !== action.groupNumber,
         )
+
+      case 'setSelectedToEditable':
+        return prevState.map((day) => day.group.groupNumber === action.groupNumber ? {...day, canModify: true} : day)
 
       default:
         return prevState
@@ -229,13 +232,6 @@
       }
     }
 
-    // const hasEmptyTime = timeOfAvailability.some((availability) => {
-    //   return availability.start === '' || availability.end === ''
-    // })
-
-    // if (hasEmptyTime) {
-    //   return dayBase
-    // }
 
     return {
       ...dayBase,

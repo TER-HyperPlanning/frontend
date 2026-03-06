@@ -20,14 +20,18 @@ code {
     monospace;
 }
 
-/* DaisyUI plugin */
-@plugin "daisyui" {
-  themes: light --default;
+@utility btn-blue {
+  @apply bg-dark-blue text-white hover:brightness-94;
 }
 
 
-@theme {
 
+
+
+
+
+@theme {
+  --color-dark-blue: #003A68;
   --color-primary-50: oklch(0.853 0.072 264.08);
   --color-primary-100: oklch(0.821 0.089 262.1);
   --color-primary-200: oklch(0.76 0.123 259.17);

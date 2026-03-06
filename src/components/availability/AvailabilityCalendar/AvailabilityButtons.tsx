@@ -1,5 +1,5 @@
 import type { ActionDispatch, RefObject } from "react"
-import type { DayActions, TimeOfAvailabilityWithEmptyString } from "../../interfaces/date"
+import type { DayActions, TimeOfAvailabilityWithEmptyString } from "../../../interfaces/date"
 
 interface AvailabilityButtonsProps {
   dispatchSelectedDays: ActionDispatch<[action: DayActions]>
@@ -57,8 +57,11 @@ export const AvailabilityButtons = ({selectedGroupNumber, availableAllDay, timeO
                 },
                 groupNumber:selectedGroupNumber
               })
-            }} className='btn btn-warning btn-sm p-8'>
+            }} className='btn btn-blue btn-sm p-8'>
               Retirer tout les jours du mois
+            </button>
+            <button onClick={()=>{dispatchSelectedDays({type:"setSelectedToEditable", groupNumber:selectedGroupNumber})}} className="btn btn-blue btn-sm p-8">
+              Rendre les éléments sélectionner modifiable
             </button>
           </div>
   )

@@ -55,6 +55,7 @@ export const PatternInfoForm = ({ selectedGroupNumber, availableAllDay, timeOfAv
           type='number'
           className='text-black'
           required={true}
+          min={0}
           onChange={(e) => { setNumberOfDayPattern(parseInt(e.target.value)) }}
           value={numberOfDayPattern}
           placeholder='Entrer un nombre de jours'
@@ -70,7 +71,7 @@ export const PatternInfoForm = ({ selectedGroupNumber, availableAllDay, timeOfAv
           placeholder='Entrer un nombre de jours'
         ></TextField>
 
-        <button onClick={() => { applyPattern() }} className="btn btn-primary">Appliquer le motif</button>
+        <button onClick={() => { applyPattern() }} className="btn btn-blue">Appliquer le motif</button>
       </div>
     </div>
 

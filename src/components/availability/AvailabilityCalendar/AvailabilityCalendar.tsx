@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ActionDispatch, type RefObject } from "react";
-import { DayPicker } from "react-day-picker";
+import { Chevron, DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
 import { twMerge } from "tailwind-merge";
-import type { DateAvailability, DayActions, TimeOfAvailabilityWithEmptyString } from "../../interfaces/date";
 import { AvailabilityButtons } from "./AvailabilityButtons";
 import { DayInfoPopUp } from "./DayInfoPopUp";
+import { CurrentMonthAndYear } from "./CalendarSelector/CurrentMonthAndYear";
+import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from "../../../interfaces/date";
+
 
 
 interface AvailabilityCalendarProps {
@@ -14,6 +16,7 @@ interface AvailabilityCalendarProps {
     selectedMonth: RefObject<number>
     selectedYear: RefObject<number>
     className?: string
+    groups: GroupProps[]
     calendarClasName?: string
     selectedGroupNumber: number
     timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
@@ -25,19 +28,19 @@ interface StyledDays {
     editable: Date[],
     selectedOnly: Date[],
     selectedOtherGroup: Date[],
-    emptyHoursEditable: Date[],
-    emptyHoursOtherGroup: Date[],
-    emptyHoursSelectedOnly: Date[]
+    invalidDataEditable: Date[],
+    invalidDataOtherGroup: Date[],
+    invalidDataSelectedOnly: Date[]
 
 }
 
-export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, selectedGroupNumber, calendarClasName, dispatchSelectedDays, selectedDays, selectedMonth, selectedYear, className }: AvailabilityCalendarProps) => {
+export const AvailabilityCalendar = ({ groups, timeOfAvailability, availableAllDay, selectedGroupNumber, calendarClasName, dispatchSelectedDays, selectedDays, selectedMonth, selectedYear, className }: AvailabilityCalendarProps) => {
     const isMouseDown = useRef(false);
     const lockSelectedMode = useRef(false)
     const isModeSelected = useRef(true)
     const calendarRef = useRef<null | HTMLDivElement>(null)
     const hoveredDayWithNoClick = useRef<Date | null>(null)
-    const [popUpProps, setPopUpProps] = useState<{ posX: number, posY: number, visible: boolean, day: DateAvailability | null }>({ posX: 0, posY: 0, visible: false,day:null })
+    const [popUpProps, setPopUpProps] = useState<{ posX: number, posY: number, visible: boolean, day: DateAvailability | null }>({ posX: 0, posY: 0, visible: false, day: null })
     const defaultDayPickerClassName = "place-self-center h-[344px]"
     const defaultClassName = "inline-flex flex-col gap-2"
     const mergedDaysPickerClassName = twMerge(
@@ -68,7 +71,7 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
                 hoveredDayWithNoClick.current = null
             }
         };
-          const handleRightClick = (e: MouseEvent) => {
+        const handleRightClick = (e: MouseEvent) => {
             e.preventDefault()
             e.stopPropagation()
 
@@ -95,10 +98,15 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
     const styledDays = useMemo(() => {
         const styledDays = selectedDays.reduce((acc: StyledDays, day) => {
             const hasEmptyHours = day.timeOfAvailability?.some((avail) => avail.start === "" || avail.end === "")
-
+            const selectedGroupLength = selectedDays.filter(d => d.group.groupNumber === day.group.groupNumber).length
+            const selectedGroupProps = groups.find(group => group.number === day.group.groupNumber)
+            const invalidDate = hasEmptyHours || (selectedGroupProps?.numberOfDayOfAvailability !== undefined && (isNaN(selectedGroupProps?.numberOfDayOfAvailability) || selectedGroupProps?.numberOfDayOfAvailability >= selectedGroupLength || selectedGroupProps?.numberOfDayOfAvailability <= 0))
             if (day.group.groupNumber !== selectedGroupNumber) {
-                if (hasEmptyHours) {
-                    acc.emptyHoursOtherGroup.push(new Date(day.dateMs))
+                //data is invalid if hours are empty. It also invalid if we added a number of availability with empty value or if it greater or equal 
+                //than the number of day in that group. if numberOfDayOfAvailability is undefined, it mean we didnt try to enter a value so
+                //it's not a partial availability                                                                                                               
+                if (invalidDate) {
+                    acc.invalidDataOtherGroup.push(new Date(day.dateMs))
                     return acc
                 }
                 acc.selectedOtherGroup.push(new Date(day.dateMs))
@@ -107,16 +115,16 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
 
 
             if (day.canModify) {
-                if (hasEmptyHours) {
-                    acc.emptyHoursEditable.push(new Date(day.dateMs))
+                if (invalidDate) {
+                    acc.invalidDataEditable.push(new Date(day.dateMs))
                     return acc
                 }
                 acc.editable.push(new Date(day.dateMs))
                 return acc
             }
 
-            if (hasEmptyHours) {
-                acc.emptyHoursSelectedOnly.push(new Date(day.dateMs))
+            if (invalidDate) {
+                acc.invalidDataSelectedOnly.push(new Date(day.dateMs))
                 return acc
             }
             acc.selectedOnly.push(new Date(day.dateMs))
@@ -124,13 +132,13 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
         }, {
             editable: [],
             selectedOnly: [],
-            emptyHoursOtherGroup: [],
+            invalidDataOtherGroup: [],
             selectedOtherGroup: [],
-            emptyHoursEditable: [],
-            emptyHoursSelectedOnly: []
+            invalidDataEditable: [],
+            invalidDataSelectedOnly: []
         } satisfies StyledDays)
         return styledDays
-    }, [selectedDays, selectedGroupNumber])
+    }, [selectedDays, selectedGroupNumber, groups])
 
 
     const handleDayMouseEnter = (day: Date) => {
@@ -172,7 +180,9 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
             <div className={defaultClassName}>
                 <div ref={calendarRef}>
                     <DayPicker
-
+                        components={{
+                            MonthCaption: CurrentMonthAndYear,
+                        }}
                         className={mergedDaysPickerClassName}
                         onMonthChange={(date) => {
                             selectedYear.current = date.getFullYear()
@@ -186,9 +196,9 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
                             selectedOnly: styledDays.selectedOnly,
                             //modifier for element selected in another group
                             selectedOtherGroup: styledDays.selectedOtherGroup,
-                            emptyHoursOtherGroup: styledDays.emptyHoursOtherGroup,
-                            emptyHoursEditable: styledDays.emptyHoursEditable,
-                            emptyHoursSelectedOnly: styledDays.emptyHoursSelectedOnly,
+                            emptyHoursOtherGroup: styledDays.invalidDataOtherGroup,
+                            emptyHoursEditable: styledDays.invalidDataEditable,
+                            emptyHoursSelectedOnly: styledDays.invalidDataSelectedOnly,
                         }
                         }
                         //keep only editable items in selected
@@ -229,3 +239,5 @@ export const AvailabilityCalendar = ({ timeOfAvailability,  availableAllDay, sel
 
 
 }
+
+

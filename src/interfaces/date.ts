@@ -111,7 +111,7 @@ export type TimeOfAvailabilityWithEmptyString = {
 
 export type DayActions =
   | { type: 'removeDays'; value: Date[]; groupNumber: number }
-  | { type: 'resetEditableOnly' | 'resetGroup'; groupNumber: number }
+  | { type: 'resetEditableOnly' | 'resetGroup' | 'setSelectedToEditable'; groupNumber: number }
   | {
       type: 'setDatesForDayPicker'
       value: Date
@@ -133,7 +133,7 @@ export type DayActions =
       type: 'setHours'
       groupNumber: number
       availableAllDay: boolean
-      value: TimeOfAvailabilityWithEmptyString[]
+      timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
     }
   | {
       type: 'addEditable'
@@ -162,5 +162,13 @@ export type DayActions =
       value: TimeOfAvailabilityWithEmptyString[]
     }
 
-// type: "setDatesForDayPicker" | "addModifiable" | "resetModifiableOnly" | "resetAll" | "removeDays",
-// value: Date[],
+export interface GroupProps{
+  number: number,
+  /**
+   * if this param is absent, the availability will be
+   * complete and not partial. If it NaN, it's an invalid
+   * value so user must change it.
+   */
+  numberOfDayOfAvailability?:number
+}
+

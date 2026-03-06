@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useReducer, useRef, useState } from 'react'
-import { AvailabilityCalendar } from '../../../components/availability/AvailabilityCalendar'
 import { GroupNav } from '../../../components/availability/GroupNav'
 import { AvailabilityHoursForm } from '../../../components/forms/availability/AvailabilityHoursForms/AvailabilityHoursForm'
 import { AvailabilityTypeCheckbox } from '../../../components/forms/availability/AvailabilityTypeCheckbox'
 import { PatternInfoForm } from '../../../components/forms/availability/PatternInfoForm'
-import type { TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
+import type { GroupProps, TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
 import { availabilityReducer } from './availabilityReducer'
+import { AvailabilityCalendar } from '../../../components/availability/AvailabilityCalendar/AvailabilityCalendar'
 
 export const Route = createFileRoute('/(app)/availability/')({
   component: RouteComponent,
@@ -16,10 +16,9 @@ function RouteComponent() {
   const [selectedDays, dispatchSelectedDays] = useReducer(availabilityReducer, [])
   const selectedMonth = useRef(new Date().getMonth())
   const selectedYear = useRef(new Date().getFullYear())
-  const [partialAvailability, setPartialAvailability] = useState(false)
   const [availableAllDay, setAvailableAllDay] = useState(true)
   const [selectedGroupNumber, setSelectedGroupNumber] = useState(1);
-  const [groups, setGroups] = useState([1]);
+  const [groups, setGroups] = useState<GroupProps[]>([{number:1}]);
   const [currentPage, setCurrentPage] = useState(0);
   const [numberOfDayPattern, setNumberOfDayPattern] = useState(0);
   const [endOfDatePattern, setEndOfDatePattern] = useState("");
@@ -37,6 +36,7 @@ function RouteComponent() {
       <div className="m-8">
         <div className="grid grid-cols-3">
           <AvailabilityCalendar
+          groups={groups}
             timeOfAvailability={timeOfAvailability}
             availableAllDay={availableAllDay}
             selectedGroupNumber={selectedGroupNumber}
@@ -48,12 +48,13 @@ function RouteComponent() {
 
           <div className="flex justify-center">
             <AvailabilityTypeCheckbox className='flex flex-col justify-around  h-full '
-              partialAvailability={partialAvailability}
+              selectedDays={selectedDays}
+              groups={groups}
               timeOfAvailability={timeOfAvailability}
               availableAllDay={availableAllDay}
               selectedGroupNumber={selectedGroupNumber}
               dispatchSelectedDays={dispatchSelectedDays}
-              setPartialAvailability={setPartialAvailability}
+              setGroups={setGroups}
               setAvailableAllDay={setAvailableAllDay} />
           </div>
 
