@@ -16,6 +16,7 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appAvailabilityIndexRouteImport } from './routes/(app)/availability/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -51,10 +52,16 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appAvailabilityIndexRoute = appAvailabilityIndexRouteImport.update({
+  id: '/availability/',
+  path: '/availability/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/availability/': typeof appAvailabilityIndexRoute
   '/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/availability': typeof appAvailabilityIndexRoute
   '/planning': typeof appPlanningIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(app)/availability/': typeof appAvailabilityIndexRoute
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -83,6 +92,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/availability/'
     | '/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -91,6 +101,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/availability'
     | '/planning'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
@@ -100,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/(app)/availability/'
     | '/(app)/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -163,14 +175,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/availability/': {
+      id: '/(app)/availability/'
+      path: '/availability'
+      fullPath: '/availability/'
+      preLoaderRoute: typeof appAvailabilityIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
+  appAvailabilityIndexRoute: typeof appAvailabilityIndexRoute
   appPlanningIndexRoute: typeof appPlanningIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+  appAvailabilityIndexRoute: appAvailabilityIndexRoute,
   appPlanningIndexRoute: appPlanningIndexRoute,
 }
 
