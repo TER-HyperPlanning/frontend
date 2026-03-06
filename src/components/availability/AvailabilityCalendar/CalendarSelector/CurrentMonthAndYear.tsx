@@ -1,4 +1,3 @@
-import React from 'react'
 import { CurrentMonth } from './CurrentMonth'
 import { CurrentYear } from './CurrentYear'
 

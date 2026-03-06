@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ActionDispatch, type RefObject } from "react";
-import { Chevron, DayPicker } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
 import { twMerge } from "tailwind-merge";
-import { AvailabilityButtons } from "./AvailabilityButtons";
-import { DayInfoPopUp } from "./DayInfoPopUp";
-import { CurrentMonthAndYear } from "./CalendarSelector/CurrentMonthAndYear";
 import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from "../../../interfaces/date";
+import { AvailabilityButtons } from "./AvailabilityButtons";
+import { CurrentMonthAndYear } from "./CalendarSelector/CurrentMonthAndYear";
+import { DayInfoPopUp } from "./DayInfoPopUp";
 
 
 
