@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, BookOpen } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
   { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tableau de bord' },
   { to: '/teachers', icon: <Users size={20} />, label: 'Enseignants' },
+  { to: '/formations', icon: <BookOpen size={20} />, label: 'Formations' },
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 

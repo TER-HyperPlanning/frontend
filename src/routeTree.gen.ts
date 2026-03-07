@@ -16,6 +16,7 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appFormationsIndexRouteImport } from './routes/(app)/formations/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -51,10 +52,16 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appFormationsIndexRoute = appFormationsIndexRouteImport.update({
+  id: '/formations/',
+  path: '/formations/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/formations/': typeof appFormationsIndexRoute
   '/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/formations': typeof appFormationsIndexRoute
   '/planning': typeof appPlanningIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(app)/formations/': typeof appFormationsIndexRoute
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -83,6 +92,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/formations/'
     | '/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -91,6 +101,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/formations'
     | '/planning'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
@@ -100,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/(app)/formations/'
     | '/(app)/planning/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -163,14 +175,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/formations/': {
+      id: '/(app)/formations/'
+      path: '/formations'
+      fullPath: '/formations/'
+      preLoaderRoute: typeof appFormationsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
+  appFormationsIndexRoute: typeof appFormationsIndexRoute
   appPlanningIndexRoute: typeof appPlanningIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+  appFormationsIndexRoute: appFormationsIndexRoute,
   appPlanningIndexRoute: appPlanningIndexRoute,
 }
 
