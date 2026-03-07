@@ -18,12 +18,10 @@ function ForgotPasswordForm() {
       email: '',
     },
     onSubmit: async ({ value }) => {
-      // Gérer la soumission du formulaire
+      // TODO: Remplacer par l'appel API quand l'endpoint sera disponible
+      // await publicAxios.post('/Auth/forgot-password', value);
       console.log('Demande de réinitialisation pour:', value);
-      // Ajoutez votre logique de réinitialisation ici
-      // Simuler un délai pour l'envoi de l'email
       await new Promise(resolve => setTimeout(resolve, 1000));
-      // Redirection vers la page de réinitialisation
       navigate({ to: '/auth/init-pwd' });
     },
   });
