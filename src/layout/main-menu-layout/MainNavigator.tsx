@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useMatchRoute } from '@tanstack/react-router'
 import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
+
+const TEACHER_NAME = 'Yassine'
 
 const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
@@ -13,6 +16,14 @@ const NAV_ITEMS = [
 ]
 
 export default function MainNavigator() {
+  const matchRoute = useMatchRoute()
+  const isPlanningPage = !!matchRoute({ to: '/planning', fuzzy: false })
+
+  // Masquer complètement le menu principal sur la page Planning
+  if (isPlanningPage) {
+    return null
+  }
+
   const [isOpen, setIsOpen] = useState(true)
 
   return (
@@ -21,10 +32,12 @@ export default function MainNavigator() {
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       className="h-full flex flex-col py-4 overflow-hidden shrink-0"
     >
-      <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center flex-col gap-4 flex-col-reverse'}`}>
-        
-        
-        <Logo showText={false} className="h-8 w-auto text-primary-700" />
+      <div
+        className={`flex items-center mb-6 px-4 ${
+          isOpen ? 'justify-between' : 'justify-center flex-col gap-4 flex-col-reverse'
+        }`}
+      >
+        <Logo showText className="h-8 w-auto text-primary-700" />
         <button
           onClick={() => setIsOpen((prev) => !prev)}
           className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200/60 hover:text-gray-700 transition-colors"
@@ -36,7 +49,6 @@ export default function MainNavigator() {
             {isOpen ? <X size={20} /> : <Menu size={20} />}
           </motion.div>
         </button>
-        
       </div>
 
       {/* Navigation links */}
@@ -54,7 +66,7 @@ export default function MainNavigator() {
 
       {/* Bottom: User avatar */}
       <div className="border-none mt-2 pt-2">
-        <UserAvatar fullName="John Doe" isOpen={isOpen} />
+        <UserAvatar fullName={TEACHER_NAME} isOpen={isOpen} />
       </div>
     </motion.nav>
   )
