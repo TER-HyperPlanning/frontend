@@ -4,11 +4,13 @@ import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X } from 'lucide-
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
+import { HiOutlineOfficeBuilding } from 'react-icons/hi'
 
 const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
   { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tableau de bord' },
   { to: '/teachers', icon: <Users size={20} />, label: 'Enseignants' },
+  { to: '/buildings', icon: <HiOutlineOfficeBuilding size={20} />, label: 'Bâtiments et salles' },
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 
