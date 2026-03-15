@@ -17,6 +17,7 @@ import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/ind
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appAdminAccountsIndexRouteImport } from './routes/(app)/admin/accounts/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -57,6 +58,11 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appAdminAccountsIndexRoute = appAdminAccountsIndexRouteImport.update({
+  id: '/admin/accounts/',
+  path: '/admin/accounts/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
+  '/admin/accounts/': typeof appAdminAccountsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
   '/auth/login': typeof AuthLoginIndexRoute
+  '/admin/accounts': typeof appAdminAccountsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
+  '/(app)/admin/accounts/': typeof appAdminAccountsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
+    | '/admin/accounts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
     | '/auth/login'
+    | '/admin/accounts'
   id:
     | '__root__'
     | '/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
+    | '/(app)/admin/accounts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,17 +194,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/admin/accounts/': {
+      id: '/(app)/admin/accounts/'
+      path: '/admin/accounts'
+      fullPath: '/admin/accounts/'
+      preLoaderRoute: typeof appAdminAccountsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
   appPlanningIndexRoute: typeof appPlanningIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
+  appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
   appPlanningIndexRoute: appPlanningIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
+  appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
