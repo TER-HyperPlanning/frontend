@@ -100,7 +100,19 @@ function BuildingsPage() {
 
           </div>
 
+
           <div className="flex items-center gap-4 w-full lg:w-auto">
+
+            {/* BOUTON IMPORT CSV */}
+            <button
+              onClick={() => console.log('Import CSV')}
+              className="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center p-3 rounded-xl shadow-sm"
+              title="Importer CSV (format CSV uniquement)"
+            >
+              <HiOutlineCloudUpload size={20} />
+            </button>
+
+            {/* BOUTON AJOUT - reste inchangé car c'est un composant */}
             <Button
               onClick={() => setIsAddModalOpen(true)}
               className="bg-[#003366] hover:bg-[#002244] text-white flex items-center gap-2 px-8 h-12 flex-1 lg:flex-none rounded-xl transition-all shadow-md"
@@ -109,81 +121,103 @@ function BuildingsPage() {
               <span className="whitespace-nowrap font-semibold">Nouveau bâtiment</span>
             </Button>
 
-            <button className="btn btn-ghost btn-circle bg-white shadow-sm shrink-0 h-12 w-12 border border-gray-100">
+            {/* BOUTON NOTIFICATIONS */}
+            <button
+              className="btn btn-ghost btn-circle bg-white shadow-sm shrink-0 h-12 w-12 border border-gray-100"
+              title="Notifications"
+            >
               <HiOutlineBell size={24} className="text-gray-600" />
             </button>
+
           </div>
         </div>
 
         {/* CONTENU : Scrollable avec espacement */}
         <div className="flex-1 overflow-y-auto space-y-8 pr-2 custom-scrollbar">
-
-          {/* ZONE IMPORT CSV */}
-          <div className="flex">
-            <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl p-8 w-64 text-center cursor-pointer hover:bg-blue-50 transition-all group shadow-sm">
-              <div className="p-3 bg-white rounded-full shadow-sm text-blue-500 group-hover:scale-110 transition-transform">
-                <HiOutlineCloudUpload size={32} />
-              </div>
-              <p className="text-sm text-blue-900 font-semibold mt-4 leading-tight">
-                Importer des données <br />
-                <span className="text-xs font-normal text-blue-400">Format CSV uniquement</span>
-              </p>
-            </div>
-          </div>
-
           {/* TABLEAU */}
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="text-gray-400 text-[12px] uppercase tracking-[0.1em] border-b border-gray-50">
-                    <th className="font-bold py-6 px-8 text-left">Liste des Bâtiments</th>
-                    <th className="font-bold py-6 px-8 text-right">Actions</th>
+            <div className="w-full">
+              <table className="w-full">
+
+                {/* HEADER */}
+                <thead className="bg-[#0B3C5D] text-white text-sm">
+                  <tr>
+                    <th className="text-left px-6 py-4 font-semibold uppercase tracking-wider">
+                      Liste des Bâtiments
+                    </th>
+
+                    <th className="text-right px-6 py-4 font-semibold uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+
+                {/* BODY */}
+                <tbody className="divide-y divide-gray-100 bg-white">
+
                   {currentData.length > 0 ? (
                     currentData.map((building) => (
-                      <tr key={building.id} className="hover:bg-gray-50/80 transition-colors group">
-                        <td className="py-6 px-8">
-                          <span className="font-bold text-[#003366] text-lg uppercase tracking-tight">
-                            {building.name}
-                          </span>
+                      <tr
+                        key={building.id}
+                        className="hover:bg-gray-50 transition group"
+                      >
+
+                        {/* NOM BATIMENT */}
+                        <td className="px-6 py-5 font-medium text-gray-700">
+                          {building.name}
                         </td>
-                        <td className="py-6 px-8">
-                          <div className="flex justify-end gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
+
+                        {/* ACTIONS */}
+                        <td className="px-6 py-5">
+                          <div className="flex justify-end items-center gap-4">
+
+                            {/* DETAILS */}
                             <button
-                              onClick={() => navigate({ to: `/buildings/${building.id}` })}
-                              className="p-2.5 hover:bg-blue-50 rounded-xl text-gray-400 hover:text-blue-600 transition-all"
-                              title="Voir détails"
+                              onClick={() =>
+                                navigate({ to: `/buildings/${building.id}` })
+                              }
+                              className="text-gray-400 hover:text-blue-600 transition tooltip"
+                              data-tip="Détails du bâtiment"
                             >
                               <HiOutlineSearch size={20} />
                             </button>
+
+                            {/* EDIT */}
                             <button
-                              onClick={() => { setSelectedBuilding(building); setIsEditModalOpen(true); }}
-                              className="p-2.5 hover:bg-orange-50 rounded-xl text-gray-400 hover:text-orange-500 transition-all"
-                              title="Modifier"
+                              onClick={() => {
+                                setSelectedBuilding(building);
+                                setIsEditModalOpen(true);
+                              }}
+                              className="text-gray-400 hover:text-orange-500 transition tooltip"
+                              data-tip="Modifier bâtiment"
                             >
                               <HiOutlinePencil size={20} />
                             </button>
+
+                            {/* DELETE */}
                             <button
-                              onClick={() => { setSelectedBuilding(building); setIsDeleteModalOpen(true); }}
-                              className="p-2.5 hover:bg-red-50 rounded-xl text-gray-400 hover:text-red-500 transition-all"
-                              title="Supprimer"
+                              onClick={() => {
+                                setSelectedBuilding(building);
+                                setIsDeleteModalOpen(true);
+                              }}
+                              className="text-gray-400 hover:text-red-500 transition tooltip"
+                              data-tip="Supprimer bâtiment"
                             >
                               <HiOutlineTrash size={20} />
                             </button>
+
                           </div>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={2} className="py-16 text-center">
-                        <p className="text-gray-400 font-medium">Aucun bâtiment ne correspond à votre recherche.</p>
+                      <td colSpan={2} className="text-center py-10 text-gray-400">
+                        Aucun bâtiment trouvé
                       </td>
                     </tr>
                   )}
+
                 </tbody>
               </table>
             </div>
@@ -216,7 +250,6 @@ function BuildingsPage() {
         </div>
 
         {/* MODALS */}
-        <AddBuildingModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
         <EditBuildingModal
           isOpen={isEditModalOpen}
           onClose={() => { setIsEditModalOpen(false); setSelectedBuilding(null); }}
@@ -227,6 +260,11 @@ function BuildingsPage() {
           isOpen={isDeleteModalOpen}
           onClose={() => { setIsDeleteModalOpen(false); setSelectedBuilding(null); }}
           building={selectedBuilding}
+          onSuccess={showSuccess}
+        />
+        <AddBuildingModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
           onSuccess={showSuccess}
         />
       </div>

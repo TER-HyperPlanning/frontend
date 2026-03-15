@@ -30,16 +30,18 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validation
+
     if (buildingName.trim().length < 3) {
       setError('Le nom du bâtiment doit contenir au moins 3 caractères.');
       return;
     }
+    if (buildingName.length > 50) {
+      setError("Le nom du bâtiment ne peut pas dépasser 50 caractères.");
+      return;
+    }
 
-    // Ici la logique d'appel API (TanStack Query ou autre)
     console.log("Modification du bâtiment ID:", building.id, "Nouveau nom:", buildingName);
-    
+
     onSuccess(`Le bâtiment a été renommé en "${buildingName}" avec succès !`);
     onClose();
   };
@@ -48,8 +50,8 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
     <div className="modal modal-open">
       <div className="modal-box max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100">
         {/* Bouton Fermer */}
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-gray-400"
         >
           <HiX size={20} />
@@ -65,9 +67,8 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
             <input
               type="text"
               placeholder="Ex: Bâtiment IBGBI"
-              className={`input bg-gray-50 border-none focus:ring-2 ${
-                error ? 'ring-2 ring-red-500' : 'focus:ring-blue-500'
-              } w-full text-[#003366] font-medium`}
+              className={`input bg-gray-50 border-none focus:ring-2 ${error ? 'ring-2 ring-red-500' : 'focus:ring-blue-500'
+                } w-full text-[#003366] font-medium`}
               value={buildingName}
               onChange={(e) => {
                 setBuildingName(e.target.value);
@@ -83,15 +84,15 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
           </div>
 
           <div className="modal-action flex gap-3 mt-2">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="btn btn-ghost text-gray-500 flex-1 border border-gray-200 hover:bg-gray-100"
             >
               Annuler
             </button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="bg-[#003366] hover:bg-[#002244] text-white flex-1 shadow-lg"
             >
               Enregistrer
@@ -101,8 +102,8 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
       </div>
 
       {/* Overlay de fond */}
-      <div 
-        className="modal-backdrop bg-black/30 backdrop-blur-sm" 
+      <div
+        className="modal-backdrop bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       ></div>
     </div>

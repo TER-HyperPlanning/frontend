@@ -39,9 +39,13 @@ export default function EditRoomModal({ isOpen, onClose, room, onSuccess }: Edit
       setError('Le numéro de salle est requis.');
       return;
     }
-    onSuccess(`La salle "${roomNumber}" a été mise à jour !`);
-    onClose();
-  };
+    if (!/^[A-Za-z0-9\- ]+$/.test(roomNumber)) {
+      setError("Le numéro contient des caractères invalides");
+      return;
+      onSuccess(`La salle "${roomNumber}" a été mise à jour !`);
+      onClose();
+    }
+  }
 
   return (
     <div className="modal modal-open">
@@ -74,7 +78,7 @@ export default function EditRoomModal({ isOpen, onClose, room, onSuccess }: Edit
             </div>
             <div className="form-control flex-1">
               <label className="label text-xs font-bold text-gray-500 uppercase">Type</label>
-              <select 
+              <select
                 className="select bg-gray-50 border-none w-full h-12"
                 value={type}
                 onChange={(e) => setType(e.target.value)}

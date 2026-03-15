@@ -8,14 +8,16 @@ interface Room {
   type: string;
 }
 
+
 interface AddBuildingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (message: string) => void;
 }
 
 const ROOM_TYPES = ['TD', 'Info', 'Amphi', 'Labo'];
 
-export default function AddBuildingModal({ isOpen, onClose }: AddBuildingModalProps) {
+export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuildingModalProps) {
   const [buildingName, setBuildingName] = useState('');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [errors, setErrors] = useState<{ buildingName?: string; rooms?: string[] }>({});
@@ -50,35 +52,52 @@ export default function AddBuildingModal({ isOpen, onClose }: AddBuildingModalPr
     if (!buildingName.trim()) {
       newErrors.buildingName = "Le nom du bâtiment est obligatoire";
     }
+    if (!buildingName.trim()) {
+      newErrors.buildingName = "Le nom du bâtiment est obligatoire";
+    } else if (!/^[A-Za-z0-9\- ]+$/.test(buildingName)) {
+      newErrors.buildingName = "Le nom du bâtiment contient des caractères invalides";
+    } else if (buildingName.length < 3) {
+      newErrors.buildingName = "Le nom du bâtiment doit faire au moins 3 caractères";
+    } else if (buildingName.length > 50) {
+      newErrors.buildingName = "Le nom du bâtiment ne peut pas dépasser 50 caractères";
+    }
 
-    if (rooms.length === 0) {
-      newErrors.rooms = ["Au moins une salle doit être ajoutée"];
-    } else {
+    if (rooms.length > 0) {
       newErrors.rooms = rooms.map(room => {
-        if (!room.number.trim()) return "Numéro obligatoire";
-        if (!room.capacity || Number(room.capacity) <= 0) return "Capacité > 0";
+        if (!room.number.trim()) return "Salle obligatoire";
+        if (!/^[A-Za-z0-9\- ]+$/.test(room.number)) return "Numéro invalide";
+        if (!room.capacity || Number(room.capacity) <= 0) return "Capacité requise";
+        if (!Number.isInteger(Number(room.capacity))) return "Capacité doit être un entier";
+        if (Number(room.capacity) > 500) return "Capacité max 500";
         if (!ROOM_TYPES.includes(room.type)) return "Type invalide";
         return "";
       });
+      if (newErrors.rooms.every(e => e === "")) {
+        delete newErrors.rooms;
+      }
     }
 
     setErrors(newErrors);
 
     // Retourne true si pas d'erreurs
-    return !newErrors.buildingName && !newErrors.rooms?.some(e => e);
+    return !newErrors.buildingName && (!newErrors.rooms || newErrors.rooms.every(e => e === ""));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return; // Arrête si erreur
+    if (!validate()) return;
+
     console.log({ buildingName, rooms });
+
+    onSuccess?.(`Bâtiment "${buildingName}" ajouté avec succès !`);
+
     onClose();
   };
 
   return (
     <div className="modal modal-open">
       <div className="modal-box max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 relative">
-        <button 
+        <button
           onClick={onClose}
           className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-gray-400"
         >
@@ -107,7 +126,7 @@ export default function AddBuildingModal({ isOpen, onClose }: AddBuildingModalPr
               <p className="text-sm text-blue-600 font-medium">
                 Vous pouvez ajouter les salles de ce bâtiment en cliquant sur
               </p>
-              <button 
+              <button
                 type="button"
                 onClick={addRoom}
                 className="btn btn-circle btn-sm bg-blue-500 hover:bg-blue-600 border-none text-white shadow-md"
@@ -151,7 +170,7 @@ export default function AddBuildingModal({ isOpen, onClose }: AddBuildingModalPr
                     {ROOM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
 
-                  <button 
+                  <button
                     type="button"
                     onClick={() => removeRoom(index)}
                     className="text-gray-400 hover:text-red-500 transition-colors"
@@ -164,14 +183,14 @@ export default function AddBuildingModal({ isOpen, onClose }: AddBuildingModalPr
           </div>
 
           <div className="modal-action flex gap-3">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="btn btn-ghost text-gray-500 flex-1 border border-gray-200"
             >
               Annuler
             </button>
-            <Button 
+            <Button
               type="submit"
               className="bg-[#003366] hover:bg-[#002244] text-white flex-1"
             >
@@ -183,4 +202,5 @@ export default function AddBuildingModal({ isOpen, onClose }: AddBuildingModalPr
       <div className="modal-backdrop bg-black/20 backdrop-blur-sm" onClick={onClose}></div>
     </div>
   );
+
 }

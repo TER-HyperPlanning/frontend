@@ -30,6 +30,10 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
         { id: '2', number: 'Salle 205', capacity: 120, type: 'Amphi' },
         { id: '3', number: 'Salle 004', capacity: 25, type: 'TP' },
         { id: '4', number: 'Salle 110', capacity: 40, type: 'TD' },
+        { id: '3', number: 'Salle 004', capacity: 25, type: 'TP' },
+        { id: '4', number: 'Salle 110', capacity: 40, type: 'TD' },
+        { id: '3', number: 'Salle 004', capacity: 25, type: 'TP' },
+
     ], []);
 
     const filteredRooms = rooms.filter(room =>
@@ -43,41 +47,95 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
 
     return (
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-            <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                    <thead className="bg-gray-50">
-                        <tr className="text-left text-gray-500 text-sm uppercase tracking-wider">
-                            <th className="py-4 px-8 font-semibold">Numéro salle</th>
-                            <th className="py-4 px-8 font-semibold">Capacité</th>
-                            <th className="py-4 px-8 font-semibold">Type</th>
-                            <th className="py-4 px-8 font-semibold text-right">Actions</th>
+            <div className="w-full">
+                <table className="w-full table-fixed">
+                    {/* HEADER */}
+                    <thead className="bg-[#0B3C5D] text-white text-sm">
+                        <tr>
+                            <th className="text-left py-4 px-8 font-semibold uppercase tracking-wider w-[30%]">
+                                Numéro salle
+                            </th>
+
+                            <th className="text-left py-4 px-8 font-semibold uppercase tracking-wider w-[20%]">
+                                Capacité
+                            </th>
+
+                            <th className="text-left py-4 px-8 font-semibold uppercase tracking-wider w-[25%]">
+                                Type
+                            </th>
+
+                            <th className="text-right py-4 px-8 font-semibold uppercase tracking-wider w-[25%]">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+
+                    {/* BODY */}
+                    <tbody className="divide-y divide-gray-100 bg-white">
                         {currentData.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="py-12 text-center text-gray-400 font-medium">
                                     Aucune salle trouvée
                                 </td>
                             </tr>
+
                         ) : currentData.map(room => (
-                            <tr key={room.id} className="hover:bg-gray-50/80 transition-colors group">
-                                <td className="py-6 px-8 font-semibold text-gray-700">{room.number}</td>
-                                <td className="py-6 px-8 text-gray-600 font-medium">{room.capacity} places</td>
-                                <td className="py-6 px-8">
-                                    <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase">{room.type}</span>
+
+                            <tr
+                                key={room.id}
+                                className="hover:bg-gray-50 transition"
+                            >
+
+                                {/* NUMERO SALLE */}
+                                <td className="py-5 px-8 font-medium text-gray-700">
+                                    {room.number}
                                 </td>
-                                <td className="py-6 px-8">
-                                    <div className="flex justify-end gap-3">
-                                        <button onClick={() => { setSelectedRoom(room); setIsEditModalOpen(true); }} className="p-2.5 hover:bg-orange-50 rounded-xl text-gray-400 hover:text-orange-500 transition-all">
+
+                                {/* CAPACITE */}
+                                <td className="py-5 px-8 text-gray-600">
+                                    {room.capacity} places
+                                </td>
+
+                                {/* TYPE */}
+                                <td className="py-5 px-8">
+                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                        {room.type}
+                                    </span>
+                                </td>
+
+                                {/* ACTIONS */}
+                                <td className="py-5 px-8">
+                                    <div className="flex justify-end items-center gap-4">
+
+                                        {/* EDIT */}
+                                        <button
+                                            onClick={() => {
+                                                setSelectedRoom(room);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            className="text-gray-400 hover:text-orange-500 transition tooltip"
+                                            data-tip="Modifier salle"
+                                        >
                                             <HiOutlinePencil size={20} />
                                         </button>
-                                        <button onClick={() => { setRoomToDelete(room); setIsDeleteModalOpen(true); }} className="p-2.5 hover:bg-red-50 rounded-xl text-gray-400 hover:text-red-500 transition-all">
+
+                                        {/* DELETE */}
+                                        <button
+                                            onClick={() => {
+                                                setRoomToDelete(room);
+                                                setIsDeleteModalOpen(true);
+                                            }}
+                                            className="text-gray-400 hover:text-red-500 transition tooltip"
+                                            data-tip="Supprimer salle"
+                                        >
                                             <HiOutlineTrash size={20} />
                                         </button>
+
                                     </div>
                                 </td>
+
                             </tr>
+
                         ))}
                     </tbody>
                 </table>
