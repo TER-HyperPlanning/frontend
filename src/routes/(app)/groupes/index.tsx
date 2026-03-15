@@ -2,12 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/layout/PageLayout'
-import AssignModal from './components/AssignModal'
-import EmptyGroupState from './components/EmptyGroupState'
-import GroupFilters from './components/GroupFilters'
-import GroupTable from './components/GroupTable'
-import { mockGroupes, mockStudents } from './mockData'
-import type { Group, SortKey, Student } from './types'
+import AssignModal from '@/features/groupes/components/AssignModal'
+import EmptyGroupState from '@/features/groupes/components/EmptyGroupState'
+import GroupFilters from '@/features/groupes/components/GroupFilters'
+import GroupTable from '@/features/groupes/components/GroupTable'
+import { mockGroupes, mockStudents } from '@/features/groupes/mockData'
+import type { Group, SortKey, Student } from '@/features/groupes/types'
 
 export const Route = createFileRoute('/(app)/groupes/')({
   component: RouteComponent,
