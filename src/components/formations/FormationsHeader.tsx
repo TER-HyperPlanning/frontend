@@ -1,19 +1,31 @@
 import Logo from '@/components/Logo'
 import Button from '@/components/Button'
+import FormationsSearchBar from '@/components/formations/FormationsSearchBar'
 import { PlusIcon, BellIcon } from '@heroicons/react/24/outline'
 
 interface FormationsHeaderProps {
+  searchQuery: string
+  onSearchChange: (value: string) => void
   onAddClick: () => void
 }
 
-export default function FormationsHeader({ onAddClick }: FormationsHeaderProps) {
+export default function FormationsHeader({
+  searchQuery,
+  onSearchChange,
+  onAddClick,
+}: FormationsHeaderProps) {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-      <div className="flex-1" />
+    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 gap-4">
+      <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
 
-      <Logo showText={true} className="h-10 text-primary-800" />
+      <div className="flex-1 flex justify-center">
+        <FormationsSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+        />
+      </div>
 
-      <div className="flex-1 flex items-center justify-end gap-3">
+      <div className="flex items-center gap-3 shrink-0">
         <Button
           onClick={onAddClick}
           leftIcon={<PlusIcon className="size-5" />}

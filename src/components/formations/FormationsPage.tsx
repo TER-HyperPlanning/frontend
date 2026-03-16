@@ -1,5 +1,4 @@
 import FormationsHeader from '@/components/formations/FormationsHeader'
-import FormationsSearchBar from '@/components/formations/FormationsSearchBar'
 import FormationsTable from '@/components/formations/FormationsTable'
 import AddFormationModal from '@/components/formations/AddFormationModal'
 import EditFormationModal from '@/components/formations/EditFormationModal'
@@ -31,14 +30,13 @@ export default function FormationsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <FormationsHeader onAddClick={openAddModal} />
+      <FormationsHeader
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onAddClick={openAddModal}
+      />
 
       <div className="flex-1 p-6 space-y-6 overflow-auto">
-        <FormationsSearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-
         <FormationsTable
           formations={formations}
           onEdit={openEditModal}

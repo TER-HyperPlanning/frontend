@@ -1,4 +1,5 @@
 import FormationsPage from '@/components/formations/FormationsPage'
+import PageLayout from '@/layout/PageLayout'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(app)/formations/')({
@@ -6,5 +7,9 @@ export const Route = createFileRoute('/(app)/formations/')({
 })
 
 function RouteComponent() {
-  return <FormationsPage />
+  return (
+    <PageLayout>
+      <FormationsPage />
+    </PageLayout>
+  )
 }
