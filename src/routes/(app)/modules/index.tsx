@@ -24,7 +24,7 @@ const formations = [
   { id: "2", name: "CNS" },
 ];
 
-function PageHeader() {
+function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
   return (
     <div className="flex items-center justify-between">
       <img
@@ -33,15 +33,19 @@ function PageHeader() {
         className="h-18"
       />
 
-      <h1 className="text-2xl font-bold text-center flex-1">
-        Gestion des modules
-      </h1>
+      <div className="flex items-center gap-4">
+        <button
+          className="btn bg-blue-900 text-white hover:bg-blue-800 rounded-xl"
+          onClick={onOpenModal}
+        >
+          + Nouveau Module
+        </button>
 
-      <Bell size={26} className="text-gray-700" />
+        <Bell size={26} className="text-gray-700" />
+      </div>
     </div>
   );
 }
-
 
 function ModulesPage() {
   const [selectedFormation, setSelectedFormation] = useState("1");
@@ -56,6 +60,8 @@ function ModulesPage() {
   const [editingModule, setEditingModule] = useState<Module | null>(null);
 
   const [search, setSearch] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddOrUpdate = (data: {
     name: string;
@@ -103,6 +109,7 @@ function ModulesPage() {
 
   const handleEdit = (module: Module) => {
     setEditingModule(module);
+    setIsModalOpen(true);
   };
 
   const filteredModules = modules.filter(
@@ -112,69 +119,96 @@ function ModulesPage() {
   );
 
   return (
-    <PageLayout className="p-4 space-y-4"> {/* MODIFIE */}
+    <div data-theme="light">
 
-      <PageHeader />
+      <PageLayout className="p-4 space-y-4">
 
-      {/* Formation selector */}
-      <div className="card bg-base-100 shadow">
-        <div className="card-body p-4"> {/* MODIFIE */}
-          <label className="font-medium mb-2">
-            Sélectionner une formation
-          </label>
+        <PageHeader onOpenModal={() => setIsModalOpen(true)} />
 
-          <select
-            className="select select-bordered w-full max-w-xs"
-            value={selectedFormation}
-            onChange={(e) => setSelectedFormation(e.target.value)}
-          >
-            {formations.map((formation) => (
-              <option key={formation.id} value={formation.id}>
-                {formation.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+        {/* Recherche + formation */}
+        <div className="flex items-center justify-between mb-4">
 
-      {/* Module Form */}
-      <div className="card bg-base-100 shadow">
-        <div className="card-body p-4"> {/* MODIFIE */}
-          <ModuleForm
-            onSubmit={handleAddOrUpdate}
-            editingModule={editingModule}
-            selectedFormation={selectedFormation}
-          />
-        </div>
-      </div>
+          <div className="relative w-150">
 
-      {/* Barre de recherche */}
-      <div className="relative w-full max-w-md">
   <Search
-    size={20}
-    className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-800"
+    size={22}
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-800 z-10"
   />
 
   <input
     type="text"
-    placeholder="Rechercher un module"
-    className="input input-bordered w-full pl-10 text-blue-800 font-medium text-base"
+    placeholder="Rechercher un module..."
+    className="input input-bordered w-full pl-12 text-blue-950 font-bold text-lg placeholder:text-blue-800 rounded-xl  bg-gray-100 border-none"
     value={search}
     onChange={(e) => setSearch(e.target.value)}
   />
+
 </div>
 
-      {/* Module Table */}
-      <div className="card bg-base-100 shadow">
-        <div className="card-body p-4"> {/* MODIFIE */}
-          <ModuleTable
-            modules={filteredModules}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
-        </div>
-      </div>
+          <div>
+            <label className="mr-2 font-medium">
+              Sélectionner une formation
+            </label>
 
-    </PageLayout>
+            <select
+              className="select select-bordered"
+              value={selectedFormation}
+              onChange={(e) => setSelectedFormation(e.target.value)}
+            >
+              {formations.map((formation) => (
+                <option key={formation.id} value={formation.id}>
+                  {formation.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+        </div>
+
+        {/* Module Table */}
+        <div className="card bg-base-100 shadow">
+          <div className="card-body p-4">
+            <ModuleTable
+              modules={filteredModules}
+              onDelete={handleDelete}
+              onEdit={handleEdit}
+            />
+          </div>
+        </div>
+
+        {/* Modal Nouveau Module */}
+        {isModalOpen && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+
+              <h3 className="font-bold text-lg mb-4">
+                Nouveau Module
+              </h3>
+
+              <ModuleForm
+                onSubmit={(data) => {
+                  handleAddOrUpdate(data);
+                  setIsModalOpen(false);
+                }}
+                editingModule={editingModule}
+                selectedFormation={selectedFormation}
+              />
+
+              <div className="modal-action">
+                <button
+                  className="btn"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Annuler
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+      </PageLayout>
+
+    </div>
   );
 }

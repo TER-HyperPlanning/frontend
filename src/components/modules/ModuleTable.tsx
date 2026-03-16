@@ -7,7 +7,7 @@ type Module = {
   code: string;
   formationId: string;
   volume?: string;
-  teacher?: string; // AJOUT
+  teacher?: string;
 };
 
 type Props = {
@@ -22,62 +22,67 @@ export default function ModuleTable({
   onEdit,
 }: Props) {
   return (
-    <div className="overflow-x-auto bg-base-100 p-6 rounded-xl shadow">
-      <table className="table">
-        <thead className="bg-blue-900 text-white uppercase">
+    <div className="overflow-x-auto bg-gray-100 p-6 rounded-xl">
+
+      <table className="w-full bg-gray-100 border-collapse">
+
+        <thead className="text-blue-900 font-bold text-lg uppercase">
           <tr>
-            <th>Nom</th>
-            <th>Code</th>
-            <th>Volume horaire</th>
-            <th>Intervenant</th>
-            <th>Actions</th>
+            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Nom</th>
+            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Code</th>
+            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Volume horaire</th>
+            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Intervenant</th>
+            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Actions</th>
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="text-blue-900 font-bold text-lg uppercase border-b-2 border-gray-400">
           {modules.map((module) => (
-            <tr key={module.id}>
-              <td className="font-bold uppercase text-black">
+            <tr
+              key={module.id}
+              className="border-b-2 border-gray-300 hover:bg-blue-50 transition"
+            >
+
+              <td className="font-bold text-blue-900 text-lg px-6 py-3 border-b border-gray-400">
                 {module.name}
               </td>
 
-              <td>
-  <span className="badge bg-blue-500 text-white font-bold">
-    {module.code}
-  </span>
-</td>
+              <td className="font-bold text-blue-800 text-lg px-6 py-3 border-b border-gray-400">
+                {module.code}
+              </td>
 
-<td>
-  <span className="badge bg-blue-500 text-white font-bold">
-    {module.volume}
-  </span>
-</td>
+              <td className="font-bold text-blue-800 text-lg px-6 py-3 border-b border-gray-400">
+                {module.volume}
+              </td>
 
-<td>
-  <span className="badge bg-blue-500 text-white font-bold">
-    {module.teacher}
-  </span>
-</td>
+              <td className="font-bold text-blue-800 text-lg px-6 py-3 border-b border-gray-400">
+                {module.teacher}
+              </td>
 
-              <td className="space-x-2">
+              <td className="space-x-2 px-6 py-3">
+
                 <button
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-ghost"
                   onClick={() => onEdit(module)}
                 >
-                  <Pencil size={18} />
+                  <Pencil size={25} />
                 </button>
 
                 <button
-                  className="btn btn-ghost btn-sm text-red-500"
+                  className="btn btn-ghost text-black"
                   onClick={() => onDelete(module.id)}
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={25} />
                 </button>
+
               </td>
+
             </tr>
           ))}
         </tbody>
+
       </table>
+
     </div>
   );
 }
