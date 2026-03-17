@@ -18,10 +18,14 @@ import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
 <<<<<<< HEAD
+import { Route as appFormationsIndexRouteImport } from './routes/(app)/formations/index'
+=======
+<<<<<<< HEAD
 import { Route as appBuildingsIndexRouteImport } from './routes/(app)/buildings/index'
 import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
 =======
 import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
+>>>>>>> develop
 >>>>>>> develop
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -64,6 +68,11 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   getParentRoute: () => appRouteRoute,
 } as any)
 <<<<<<< HEAD
+const appFormationsIndexRoute = appFormationsIndexRouteImport.update({
+  id: '/formations/',
+  path: '/formations/',
+=======
+<<<<<<< HEAD
 const appBuildingsIndexRoute = appBuildingsIndexRouteImport.update({
   id: '/buildings/',
   path: '/buildings/',
@@ -77,6 +86,7 @@ const appGroupesIndexRoute = appGroupesIndexRouteImport.update({
   id: '/groupes/',
   path: '/groupes/',
 >>>>>>> develop
+>>>>>>> develop
   getParentRoute: () => appRouteRoute,
 } as any)
 
@@ -84,10 +94,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
 <<<<<<< HEAD
+  '/formations/': typeof appFormationsIndexRoute
+=======
+<<<<<<< HEAD
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/buildings/': typeof appBuildingsIndexRoute
 =======
   '/groupes/': typeof appGroupesIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   '/planning/': typeof appPlanningIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
@@ -99,10 +113,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
 <<<<<<< HEAD
+  '/formations': typeof appFormationsIndexRoute
+=======
+<<<<<<< HEAD
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/buildings': typeof appBuildingsIndexRoute
 =======
   '/groupes': typeof appGroupesIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   '/planning': typeof appPlanningIndexRoute
   '/teachers': typeof appTeachersIndexRoute
@@ -116,10 +134,14 @@ export interface FileRoutesById {
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
 <<<<<<< HEAD
+  '/(app)/formations/': typeof appFormationsIndexRoute
+=======
+<<<<<<< HEAD
   '/(app)/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/(app)/buildings/': typeof appBuildingsIndexRoute
 =======
   '/(app)/groupes/': typeof appGroupesIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
@@ -133,10 +155,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
 <<<<<<< HEAD
+    | '/formations/'
+=======
+<<<<<<< HEAD
     | '/buildings/$buildingId'
     | '/buildings/'
 =======
     | '/groupes/'
+>>>>>>> develop
 >>>>>>> develop
     | '/planning/'
     | '/teachers/'
@@ -148,10 +174,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
 <<<<<<< HEAD
+    | '/formations'
+=======
+<<<<<<< HEAD
     | '/buildings/$buildingId'
     | '/buildings'
 =======
     | '/groupes'
+>>>>>>> develop
 >>>>>>> develop
     | '/planning'
     | '/teachers'
@@ -164,10 +194,14 @@ export interface FileRouteTypes {
     | '/(app)'
     | '/auth'
 <<<<<<< HEAD
+    | '/(app)/formations/'
+=======
+<<<<<<< HEAD
     | '/(app)/buildings/$buildingId'
     | '/(app)/buildings/'
 =======
     | '/(app)/groupes/'
+>>>>>>> develop
 >>>>>>> develop
     | '/(app)/planning/'
     | '/(app)/teachers/'
@@ -241,6 +275,13 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof appRouteRoute
     }
 <<<<<<< HEAD
+    '/(app)/formations/': {
+      id: '/(app)/formations/'
+      path: '/formations'
+      fullPath: '/formations/'
+      preLoaderRoute: typeof appFormationsIndexRouteImport
+=======
+<<<<<<< HEAD
     '/(app)/buildings/': {
       id: '/(app)/buildings/'
       path: '/buildings'
@@ -260,6 +301,7 @@ declare module '@tanstack/react-router' {
       fullPath: '/groupes/'
       preLoaderRoute: typeof appGroupesIndexRouteImport
 >>>>>>> develop
+>>>>>>> develop
       parentRoute: typeof appRouteRoute
     }
   }
@@ -267,10 +309,14 @@ declare module '@tanstack/react-router' {
 
 interface appRouteRouteChildren {
 <<<<<<< HEAD
+  appFormationsIndexRoute: typeof appFormationsIndexRoute
+=======
+<<<<<<< HEAD
   appBuildingsBuildingIdRoute: typeof appBuildingsBuildingIdRoute
   appBuildingsIndexRoute: typeof appBuildingsIndexRoute
 =======
   appGroupesIndexRoute: typeof appGroupesIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   appPlanningIndexRoute: typeof appPlanningIndexRoute
   appTeachersIndexRoute: typeof appTeachersIndexRoute
@@ -278,10 +324,14 @@ interface appRouteRouteChildren {
 
 const appRouteRouteChildren: appRouteRouteChildren = {
 <<<<<<< HEAD
+  appFormationsIndexRoute: appFormationsIndexRoute,
+=======
+<<<<<<< HEAD
   appBuildingsBuildingIdRoute: appBuildingsBuildingIdRoute,
   appBuildingsIndexRoute: appBuildingsIndexRoute,
 =======
   appGroupesIndexRoute: appGroupesIndexRoute,
+>>>>>>> develop
 >>>>>>> develop
   appPlanningIndexRoute: appPlanningIndexRoute,
   appTeachersIndexRoute: appTeachersIndexRoute,
