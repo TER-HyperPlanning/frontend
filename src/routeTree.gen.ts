@@ -16,7 +16,11 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 <<<<<<< HEAD
+import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
+=======
+<<<<<<< HEAD
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
+>>>>>>> develop
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
 import { Route as appAdminAccountsIndexRouteImport } from './routes/(app)/admin/accounts/index'
 =======
@@ -68,6 +72,11 @@ const AuthForgetPwdIndexRoute = AuthForgetPwdIndexRouteImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 <<<<<<< HEAD
+const appRequestsIndexRoute = appRequestsIndexRouteImport.update({
+  id: '/requests/',
+  path: '/requests/',
+=======
+<<<<<<< HEAD
 const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
   id: '/scolarite/',
   path: '/scolarite/',
@@ -75,6 +84,7 @@ const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
 const appTeachersIndexRoute = appTeachersIndexRouteImport.update({
   id: '/teachers/',
   path: '/teachers/',
+>>>>>>> develop
 >>>>>>> develop
   getParentRoute: () => appRouteRoute,
 } as any)
@@ -137,9 +147,13 @@ export interface FileRoutesByFullPath {
 >>>>>>> develop
   '/planning/': typeof appPlanningIndexRoute
 <<<<<<< HEAD
+  '/requests/': typeof appRequestsIndexRoute
+=======
+<<<<<<< HEAD
   '/scolarite/': typeof appScolariteIndexRoute
 =======
   '/teachers/': typeof appTeachersIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -165,9 +179,13 @@ export interface FileRoutesByTo {
 >>>>>>> develop
   '/planning': typeof appPlanningIndexRoute
 <<<<<<< HEAD
+  '/requests': typeof appRequestsIndexRoute
+=======
+<<<<<<< HEAD
   '/scolarite': typeof appScolariteIndexRoute
 =======
   '/teachers': typeof appTeachersIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
@@ -195,9 +213,13 @@ export interface FileRoutesById {
 >>>>>>> develop
   '/(app)/planning/': typeof appPlanningIndexRoute
 <<<<<<< HEAD
+  '/(app)/requests/': typeof appRequestsIndexRoute
+=======
+<<<<<<< HEAD
   '/(app)/scolarite/': typeof appScolariteIndexRoute
 =======
   '/(app)/teachers/': typeof appTeachersIndexRoute
+>>>>>>> develop
 >>>>>>> develop
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -225,9 +247,13 @@ export interface FileRouteTypes {
 >>>>>>> develop
     | '/planning/'
 <<<<<<< HEAD
+    | '/requests/'
+=======
+<<<<<<< HEAD
     | '/scolarite/'
 =======
     | '/teachers/'
+>>>>>>> develop
 >>>>>>> develop
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -253,9 +279,13 @@ export interface FileRouteTypes {
 >>>>>>> develop
     | '/planning'
 <<<<<<< HEAD
+    | '/requests'
+=======
+<<<<<<< HEAD
     | '/scolarite'
 =======
     | '/teachers'
+>>>>>>> develop
 >>>>>>> develop
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
@@ -282,9 +312,13 @@ export interface FileRouteTypes {
 >>>>>>> develop
     | '/(app)/planning/'
 <<<<<<< HEAD
+    | '/(app)/requests/'
+=======
+<<<<<<< HEAD
     | '/(app)/scolarite/'
 =======
     | '/(app)/teachers/'
+>>>>>>> develop
 >>>>>>> develop
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -343,6 +377,13 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof AuthRouteRoute
     }
 <<<<<<< HEAD
+    '/(app)/requests/': {
+      id: '/(app)/requests/'
+      path: '/requests'
+      fullPath: '/requests/'
+      preLoaderRoute: typeof appRequestsIndexRouteImport
+=======
+<<<<<<< HEAD
     '/(app)/scolarite/': {
       id: '/(app)/scolarite/'
       path: '/scolarite'
@@ -354,6 +395,7 @@ declare module '@tanstack/react-router' {
       path: '/teachers'
       fullPath: '/teachers/'
       preLoaderRoute: typeof appTeachersIndexRouteImport
+>>>>>>> develop
 >>>>>>> develop
       parentRoute: typeof appRouteRoute
     }
@@ -430,10 +472,14 @@ interface appRouteRouteChildren {
 >>>>>>> develop
   appPlanningIndexRoute: typeof appPlanningIndexRoute
 <<<<<<< HEAD
+  appRequestsIndexRoute: typeof appRequestsIndexRoute
+=======
+<<<<<<< HEAD
   appScolariteIndexRoute: typeof appScolariteIndexRoute
   appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
 =======
   appTeachersIndexRoute: typeof appTeachersIndexRoute
+>>>>>>> develop
 >>>>>>> develop
 }
 
@@ -454,10 +500,14 @@ const appRouteRouteChildren: appRouteRouteChildren = {
 >>>>>>> develop
   appPlanningIndexRoute: appPlanningIndexRoute,
 <<<<<<< HEAD
+  appRequestsIndexRoute: appRequestsIndexRoute,
+=======
+<<<<<<< HEAD
   appScolariteIndexRoute: appScolariteIndexRoute,
   appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
 =======
   appTeachersIndexRoute: appTeachersIndexRoute,
+>>>>>>> develop
 >>>>>>> develop
 }
 
