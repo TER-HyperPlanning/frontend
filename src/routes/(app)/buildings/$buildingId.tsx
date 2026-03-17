@@ -13,7 +13,7 @@ export const Route = createFileRoute('/(app)/buildings/$buildingId')({
 });
 
 export default function BuildingDetailsPage() {
-  const { buildingId } = Route.useParams();
+  
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState('');

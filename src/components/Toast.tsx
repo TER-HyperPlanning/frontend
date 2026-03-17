@@ -7,7 +7,7 @@ import {
 import { cn } from '@/utils/cn'
 import { type ToastData } from '@/hooks/useToast'
 
-interface ToastProps {
+export interface ToastProps {
   toast: ToastData | null
   onClose: () => void
 }

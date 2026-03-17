@@ -1,16 +1,15 @@
 import { useState, useCallback } from 'react'
-import type { ToastType } from '@/components/Toast'
 
 interface ToastMessage {
   id: string
   message: string
-  type: ToastType
+  type: string
 }
 
 export function useToast() {
   const [toasts, setToasts] = useState<ToastMessage[]>([])
 
-  const addToast = useCallback((message: string, type: ToastType = 'info', duration?: number) => {
+  const addToast = useCallback((message: string, type: string = 'info', duration?: number) => {
     const id = Date.now().toString()
     setToasts((prev) => [...prev, { id, message, type }])
 

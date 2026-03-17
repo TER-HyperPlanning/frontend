@@ -1,4 +1,4 @@
-import { HiOutlineExclamation, HiX } from 'react-icons/hi';
+import { HiOutlineExclamation } from 'react-icons/hi';
 import Button from '../Button';
 
 interface Building {
