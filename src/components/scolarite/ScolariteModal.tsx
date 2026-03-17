@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FILIERES } from './types'
 import type { ScolariteAccount } from './types'
 
 interface ScolariteModalProps {
     isOpen: boolean
     onClose: () => void
-    onSubmit: (data: { nom: string; prenom: string; email: string; password?: string }) => void
+    onSubmit: (data: { nom: string; prenom: string; email: string; password?: string; filieres: string[] }) => void
     account?: ScolariteAccount | null
 }
 
@@ -16,6 +17,7 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
     const [prenom, setPrenom] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [selectedFilieres, setSelectedFilieres] = useState<string[]>([])
     const [errors, setErrors] = useState<Record<string, string>>({})
 
     useEffect(() => {
@@ -24,11 +26,13 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
             setPrenom(account.prenom)
             setEmail(account.email)
             setPassword('')
+            setSelectedFilieres([...account.filieres])
         } else {
             setNom('')
             setPrenom('')
             setEmail('')
             setPassword('')
+            setSelectedFilieres([])
         }
         setErrors({})
     }, [account, isOpen])
@@ -49,9 +53,21 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
         const errs = validate()
         setErrors(errs)
         if (Object.keys(errs).length === 0) {
-            onSubmit({ nom: nom.trim(), prenom: prenom.trim(), email: email.trim(), password: isEdit ? undefined : password })
+            onSubmit({ 
+                nom: nom.trim(), 
+                prenom: prenom.trim(), 
+                email: email.trim(), 
+                password: isEdit ? undefined : password,
+                filieres: selectedFilieres 
+            })
             onClose()
         }
+    }
+
+    function toggleFiliere(nom: string) {
+        setSelectedFilieres((prev) =>
+            prev.includes(nom) ? prev.filter((f) => f !== nom) : [...prev, nom]
+        )
     }
 
     return (
@@ -139,6 +155,25 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
                                     {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                                 </div>
                             )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Filières gérées</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {FILIERES.map((filiere) => {
+                                        const isSelected = selectedFilieres.includes(filiere.nom)
+                                        return (
+                                            <button
+                                                key={filiere.id}
+                                                type="button"
+                                                onClick={() => toggleFiliere(filiere.nom)}
+                                                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${isSelected ? 'bg-[#0b3b60] text-white border-[#0b3b60]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                                            >
+                                                {filiere.nom}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
 
                             <div className="flex justify-end gap-3 pt-4">
                                 <button

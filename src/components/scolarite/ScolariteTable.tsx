@@ -1,24 +1,23 @@
 import { motion } from 'framer-motion'
-import { Pencil, Link2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import type { ScolariteAccount } from './types'
 
 interface ScolariteTableProps {
     accounts: ScolariteAccount[]
     onEdit: (account: ScolariteAccount) => void
-    onAssignFiliere: (account: ScolariteAccount) => void
 }
 
-export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: ScolariteTableProps) {
+export default function ScolariteTable({ accounts, onEdit }: ScolariteTableProps) {
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <div className="overflow-hidden bg-[#f4f7f9] rounded-xl">
             <table className="w-full">
                 <thead>
-                    <tr className="bg-primary-800 text-white">
-                        <th className="text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider">Nom</th>
-                        <th className="text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider">Prénom</th>
-                        <th className="text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider">Email</th>
-                        <th className="text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider">Filières</th>
-                        <th className="text-center px-6 py-3.5 text-xs font-bold uppercase tracking-wider">Actions</th>
+                    <tr className="bg-[#f4f7f9]">
+                        <th className="text-left px-6 py-4 text-[13px] font-bold text-[#0b3b60] uppercase tracking-wider rounded-tl-xl w-1/5">Nom</th>
+                        <th className="text-left px-6 py-4 text-[13px] font-bold text-[#0b3b60] uppercase tracking-wider w-1/5">Prénom</th>
+                        <th className="text-left px-6 py-4 text-[13px] font-bold text-[#0b3b60] uppercase tracking-wider w-1/5">Email</th>
+                        <th className="text-left px-6 py-4 text-[13px] font-bold text-[#0b3b60] uppercase tracking-wider w-1/5">Filières</th>
+                        <th className="text-center px-6 py-4 text-[13px] font-bold text-[#0b3b60] uppercase tracking-wider rounded-tr-xl">Actions</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -35,12 +34,12 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                                 initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.25, delay: index * 0.04, ease: 'easeOut' }}
-                                className="hover:bg-gray-50/80 transition-colors duration-150"
+                                className="border-b border-gray-100 hover:bg-[#e9ecef] transition-colors duration-150"
                             >
-                                <td className="px-6 py-3.5 text-sm font-medium text-gray-800">{account.nom}</td>
-                                <td className="px-6 py-3.5 text-sm text-gray-600">{account.prenom}</td>
-                                <td className="px-6 py-3.5 text-sm text-gray-600">{account.email}</td>
-                                <td className="px-6 py-3.5">
+                                <td className="px-6 py-5 text-[15px] font-bold text-[#0b3b60]">{account.nom}</td>
+                                <td className="px-6 py-5 text-[14px] font-semibold text-[#0b3b60]">{account.prenom}</td>
+                                <td className="px-6 py-5 text-[14px] font-semibold text-[#0b3b60]">{account.email}</td>
+                                <td className="px-6 py-5 font-bold text-[#0b3b60]">
                                     <div className="flex flex-wrap gap-1.5">
                                         {account.filieres.length > 0 ? account.filieres.map((f) => (
                                             <span
@@ -50,27 +49,27 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                                                 {f}
                                             </span>
                                         )) : (
-                                            <span className="text-xs text-gray-400 italic">Aucune filière</span>
+                                            <span className="text-sm font-medium text-gray-400 italic">Aucune filière</span>
                                         )}
                                     </div>
                                 </td>
-                                <td className="px-6 py-3.5">
-                                    <div className="flex items-center justify-center gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => onAssignFiliere(account)}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
-                                            title="Assigner filières"
-                                        >
-                                            <Link2 size={16} />
-                                        </button>
+                                <td className="px-6 py-5">
+                                    <div className="flex items-center justify-center gap-4">
                                         <button
                                             type="button"
                                             onClick={() => onEdit(account)}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
+                                            className="text-gray-500 hover:text-[#0b3b60] transition-colors"
                                             title="Modifier"
                                         >
-                                            <Pencil size={16} />
+                                            <Pencil size={18} strokeWidth={2.5} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {}}
+                                            className="text-gray-500 hover:text-red-600 transition-colors"
+                                            title="Supprimer"
+                                        >
+                                            <Trash2 size={18} strokeWidth={2.5} />
                                         </button>
                                     </div>
                                 </td>

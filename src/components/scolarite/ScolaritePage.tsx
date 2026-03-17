@@ -6,7 +6,6 @@ import SearchBar from './SearchBar'
 import FilterDropdown from './FilterDropdown'
 import ScolariteTable from './ScolariteTable'
 import ScolariteModal from './ScolariteModal'
-import AssignFiliereModal from './AssignFiliereModal'
 import { MOCK_ACCOUNTS, FILIERES } from './types'
 import type { ScolariteAccount } from './types'
 
@@ -18,7 +17,6 @@ export default function ScolaritePage() {
     // Modal states
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editAccount, setEditAccount] = useState<ScolariteAccount | null>(null)
-    const [assignAccount, setAssignAccount] = useState<ScolariteAccount | null>(null)
 
     // Filter and search
     const filteredAccounts = useMemo(() => {
@@ -37,23 +35,23 @@ export default function ScolaritePage() {
     }, [accounts, search, filiereFilter])
 
     // CRUD handlers
-    function handleCreate(data: { nom: string; prenom: string; email: string }) {
+    function handleCreate(data: { nom: string; prenom: string; email: string; filieres: string[] }) {
         const newAccount: ScolariteAccount = {
             id: String(Date.now()),
             nom: data.nom.toUpperCase(),
             prenom: data.prenom,
             email: data.email,
-            filieres: [],
+            filieres: data.filieres,
         }
         setAccounts((prev) => [...prev, newAccount])
     }
 
-    function handleEdit(data: { nom: string; prenom: string; email: string }) {
+    function handleEdit(data: { nom: string; prenom: string; email: string; filieres: string[] }) {
         if (!editAccount) return
         setAccounts((prev) =>
             prev.map((acc) =>
                 acc.id === editAccount.id
-                    ? { ...acc, nom: data.nom.toUpperCase(), prenom: data.prenom, email: data.email }
+                    ? { ...acc, nom: data.nom.toUpperCase(), prenom: data.prenom, email: data.email, filieres: data.filieres }
                     : acc
             )
         )
@@ -71,19 +69,7 @@ export default function ScolaritePage() {
     const filiereOptions = FILIERES.map((f) => ({ value: f.nom, label: f.nom }))
 
     return (
-        <div className="flex h-full">
-            {/* Left sidebar label */}
-            <div className="flex flex-col w-0 sm:w-auto">
-                <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="bg-primary-800 text-white font-semibold text-sm px-6 py-3 rounded-r-xl mt-6 whitespace-nowrap hidden sm:block"
-                >
-                    Comptes Scolarité
-                </motion.div>
-            </div>
-
+        <div className="flex h-full bg-white">
             {/* Main content area */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Top header bar */}
@@ -91,29 +77,26 @@ export default function ScolaritePage() {
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="flex items-center justify-between px-8 py-4"
+                    className="flex items-center justify-between px-8 py-6"
                 >
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-500">Hello, Admin</span>
+                        <Logo showText={true} className="h-9 w-auto text-[#0b3b60]" />
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Logo showText={false} className="h-10 w-auto" />
-                    </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-6">
                         <button
                             type="button"
                             onClick={() => setIsCreateOpen(true)}
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-800 text-white text-sm font-semibold hover:bg-primary-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0b3b60] text-white text-sm font-medium hover:bg-[#082a45] transition-all duration-200 shadow-sm"
                         >
                             <Plus size={16} />
-                            Nouveau Compte
+                            Nouvelle Formation
                         </button>
                         <button
                             type="button"
-                            className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors relative"
+                            className="text-gray-500 hover:text-gray-700 transition-colors relative"
                         >
-                            <Bell size={20} />
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                            <Bell size={22} className="fill-gray-500/20" />
+                            <span className="absolute top-0 right-0.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                         </button>
                     </div>
                 </motion.div>
@@ -123,7 +106,7 @@ export default function ScolaritePage() {
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-                    className="flex flex-wrap items-center gap-3 px-8 pb-4"
+                    className="flex flex-wrap items-center gap-3 px-8 pb-6"
                 >
                     <SearchBar
                         value={search}
@@ -148,7 +131,6 @@ export default function ScolaritePage() {
                         <ScolariteTable
                             accounts={filteredAccounts}
                             onEdit={(acc) => setEditAccount(acc)}
-                            onAssignFiliere={(acc) => setAssignAccount(acc)}
                         />
                     </motion.div>
 
@@ -177,13 +159,6 @@ export default function ScolaritePage() {
                 onClose={() => setEditAccount(null)}
                 onSubmit={handleEdit}
                 account={editAccount}
-            />
-
-            <AssignFiliereModal
-                isOpen={!!assignAccount}
-                onClose={() => setAssignAccount(null)}
-                onSubmit={handleAssignFilieres}
-                account={assignAccount}
             />
         </div>
     )

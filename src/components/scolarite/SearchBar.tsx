@@ -8,14 +8,14 @@ interface SearchBarProps {
 
 export default function SearchBar({ value, onChange, placeholder = 'Rechercher...' }: SearchBarProps) {
     return (
-        <div className="relative flex-1 max-w-md">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="relative flex-1 max-w-xl">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0b3b60]" />
             <input
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-200"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border-none bg-[#f4f7f9] text-sm text-[#0b3b60] font-medium placeholder:text-[#0b3b60]/70 focus:outline-none focus:ring-2 focus:ring-[#0b3b60]/20 transition-all duration-200"
             />
         </div>
     )
