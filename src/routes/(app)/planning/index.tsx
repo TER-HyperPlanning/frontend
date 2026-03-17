@@ -5,7 +5,6 @@ import PlanningCalendar from '@/components/planning/PlanningCalendar'
 import PageLayout from '@/layout/PageLayout'
 import { getInitialDate } from '@/utils/date.utils'
 import { createFileRoute } from '@tanstack/react-router'
-import PageLayout from '@/layout/PageLayout'
 
 export const Route = createFileRoute('/(app)/planning/')({
   component: RouteComponent,
