@@ -17,6 +17,7 @@ import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/ind
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appAvailabilityIndexRouteImport } from './routes/(app)/availability/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -57,10 +58,16 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appAvailabilityIndexRoute = appAvailabilityIndexRouteImport.update({
+  id: '/availability/',
+  path: '/availability/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/availability/': typeof appAvailabilityIndexRoute
   '/planning/': typeof appPlanningIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/availability': typeof appAvailabilityIndexRoute
   '/planning': typeof appPlanningIndexRoute
   '/teachers': typeof appTeachersIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(app)/availability/': typeof appAvailabilityIndexRoute
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
@@ -92,6 +101,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/availability/'
     | '/planning/'
     | '/teachers/'
     | '/auth/forget-pwd/'
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/availability'
     | '/planning'
     | '/teachers'
     | '/auth/forget-pwd'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/(app)/availability/'
     | '/(app)/planning/'
     | '/(app)/teachers/'
     | '/auth/forget-pwd/'
@@ -182,15 +194,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/availability/': {
+      id: '/(app)/availability/'
+      path: '/availability'
+      fullPath: '/availability/'
+      preLoaderRoute: typeof appAvailabilityIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
 interface appRouteRouteChildren {
+  appAvailabilityIndexRoute: typeof appAvailabilityIndexRoute
   appPlanningIndexRoute: typeof appPlanningIndexRoute
   appTeachersIndexRoute: typeof appTeachersIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+  appAvailabilityIndexRoute: appAvailabilityIndexRoute,
   appPlanningIndexRoute: appPlanningIndexRoute,
   appTeachersIndexRoute: appTeachersIndexRoute,
 }
