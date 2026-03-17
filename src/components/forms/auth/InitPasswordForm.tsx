@@ -10,9 +10,9 @@ function InitPasswordForm() {
       confirmPassword: '',
     },
     onSubmit: async ({ value }) => {
-      // Gérer la soumission du formulaire
+      // TODO: Remplacer par l'appel API quand l'endpoint sera disponible
+      // await publicAxios.post('/Auth/reset-password', { password: value.password });
       console.log('Nouveau mot de passe:', value);
-      // Ajoutez votre logique de réinitialisation ici
     },
   });
 
