@@ -28,12 +28,6 @@ code {
   @apply bg-dark-blue text-white hover:brightness-94;
 }
 
-
-
-
-
-
-
 @theme {
   --color-dark-blue: #003A68;
   --color-primary-50: oklch(0.853 0.072 264.08);
@@ -59,6 +53,4 @@ code {
   --color-secondary-800: oklch(0.41 0.176 301.15);
   --color-secondary-900: oklch(0.318 0.137 301.24);
   --color-secondary-950: oklch(0.282 0.122 301.19);
-
-
 }
