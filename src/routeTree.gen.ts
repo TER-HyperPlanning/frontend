@@ -17,7 +17,12 @@ import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/ind
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+<<<<<<< HEAD
+import { Route as appBuildingsIndexRouteImport } from './routes/(app)/buildings/index'
+import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
+=======
 import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
+>>>>>>> develop
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -58,16 +63,32 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+<<<<<<< HEAD
+const appBuildingsIndexRoute = appBuildingsIndexRouteImport.update({
+  id: '/buildings/',
+  path: '/buildings/',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appBuildingsBuildingIdRoute = appBuildingsBuildingIdRouteImport.update({
+  id: '/buildings/$buildingId',
+  path: '/buildings/$buildingId',
+=======
 const appGroupesIndexRoute = appGroupesIndexRouteImport.update({
   id: '/groupes/',
   path: '/groupes/',
+>>>>>>> develop
   getParentRoute: () => appRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+<<<<<<< HEAD
+  '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/buildings/': typeof appBuildingsIndexRoute
+=======
   '/groupes/': typeof appGroupesIndexRoute
+>>>>>>> develop
   '/planning/': typeof appPlanningIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
@@ -77,7 +98,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+<<<<<<< HEAD
+  '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/buildings': typeof appBuildingsIndexRoute
+=======
   '/groupes': typeof appGroupesIndexRoute
+>>>>>>> develop
   '/planning': typeof appPlanningIndexRoute
   '/teachers': typeof appTeachersIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
@@ -89,7 +115,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+<<<<<<< HEAD
+  '/(app)/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/(app)/buildings/': typeof appBuildingsIndexRoute
+=======
   '/(app)/groupes/': typeof appGroupesIndexRoute
+>>>>>>> develop
   '/(app)/planning/': typeof appPlanningIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
@@ -101,7 +132,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+<<<<<<< HEAD
+    | '/buildings/$buildingId'
+    | '/buildings/'
+=======
     | '/groupes/'
+>>>>>>> develop
     | '/planning/'
     | '/teachers/'
     | '/auth/forget-pwd/'
@@ -111,7 +147,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+<<<<<<< HEAD
+    | '/buildings/$buildingId'
+    | '/buildings'
+=======
     | '/groupes'
+>>>>>>> develop
     | '/planning'
     | '/teachers'
     | '/auth/forget-pwd'
@@ -122,7 +163,12 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+<<<<<<< HEAD
+    | '/(app)/buildings/$buildingId'
+    | '/(app)/buildings/'
+=======
     | '/(app)/groupes/'
+>>>>>>> develop
     | '/(app)/planning/'
     | '/(app)/teachers/'
     | '/auth/forget-pwd/'
@@ -194,24 +240,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+<<<<<<< HEAD
+    '/(app)/buildings/': {
+      id: '/(app)/buildings/'
+      path: '/buildings'
+      fullPath: '/buildings/'
+      preLoaderRoute: typeof appBuildingsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/buildings/$buildingId': {
+      id: '/(app)/buildings/$buildingId'
+      path: '/buildings/$buildingId'
+      fullPath: '/buildings/$buildingId'
+      preLoaderRoute: typeof appBuildingsBuildingIdRouteImport
+=======
     '/(app)/groupes/': {
       id: '/(app)/groupes/'
       path: '/groupes'
       fullPath: '/groupes/'
       preLoaderRoute: typeof appGroupesIndexRouteImport
+>>>>>>> develop
       parentRoute: typeof appRouteRoute
     }
   }
 }
 
 interface appRouteRouteChildren {
+<<<<<<< HEAD
+  appBuildingsBuildingIdRoute: typeof appBuildingsBuildingIdRoute
+  appBuildingsIndexRoute: typeof appBuildingsIndexRoute
+=======
   appGroupesIndexRoute: typeof appGroupesIndexRoute
+>>>>>>> develop
   appPlanningIndexRoute: typeof appPlanningIndexRoute
   appTeachersIndexRoute: typeof appTeachersIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+<<<<<<< HEAD
+  appBuildingsBuildingIdRoute: appBuildingsBuildingIdRoute,
+  appBuildingsIndexRoute: appBuildingsIndexRoute,
+=======
   appGroupesIndexRoute: appGroupesIndexRoute,
+>>>>>>> develop
   appPlanningIndexRoute: appPlanningIndexRoute,
   appTeachersIndexRoute: appTeachersIndexRoute,
 }
