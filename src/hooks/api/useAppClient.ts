@@ -13,7 +13,7 @@ import { useMemo } from 'react';
 export function useAppClient() {
     const api: AxiosInstance = useMemo(() => {
         const instance = axios.create({
-            baseURL: import.meta.env.VITE_API_URL,
+            baseURL: import.meta.env.VITE_API_URL || "https://hyper-planning.fr/api",
             headers: {
                 'Content-Type': 'application/json',
             },
