@@ -79,6 +79,11 @@ function LandingPage() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
+              <Link to="/planning">
+                <Button variant="outlined" className="h-14 px-8 text-lg rounded-full border-stone-700 text-stone-300 hover:bg-stone-800 hover:text-white">
+                  Accéder au planning (invité)
+                </Button>
+              </Link>
               <Link to="/auth/login">
                 <Button variant="outlined" className="h-14 px-8 text-lg rounded-full border-stone-700 text-stone-300 hover:bg-stone-800 hover:text-white">
                   En savoir plus

@@ -20,7 +20,7 @@ function RouteComponent() {
         <Logo showText className='text-white h-16 sm:h-20'/>
         <div 
           key={key}
-          className='w-full flex justify-center animate-[fadeSlideIn_0.5s_ease-out]'
+          className='w-full flex justify-center animate-[fadeSlideIn_0.5s_ease-out] text-slate-300'
           style={{
             animation: 'fadeSlideIn 0.5s ease-out'
           }}
