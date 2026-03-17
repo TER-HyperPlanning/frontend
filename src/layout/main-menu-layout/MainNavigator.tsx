@@ -1,14 +1,20 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
+import { HiOutlineOfficeBuilding } from 'react-icons/hi'
 
 const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
   { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tableau de bord' },
   { to: '/teachers', icon: <Users size={20} />, label: 'Enseignants' },
+  { to: '/groupes', icon: <UsersRound size={20} />, label: 'Groupes' },
+  { to: '/buildings', icon: <HiOutlineOfficeBuilding size={20} />, label: 'Bâtiments et salles' },
+  { to: '/formations', icon: <BookOpen size={20} />, label: 'Formations' },
+  { to: '/modules', icon: <BookOpen size={20} />, label: 'Modules' }, // icône corrigée
+  { to: '/scolarite', icon: <GraduationCap size={20} />, label: 'Scolarité' },
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 
@@ -23,7 +29,6 @@ export default function MainNavigator() {
     >
       <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center flex-col gap-4 flex-col-reverse'}`}>
         
-        
         <Logo showText={false} className="h-8 w-auto text-primary-700" />
         <button
           onClick={() => setIsOpen((prev) => !prev)}
@@ -36,7 +41,7 @@ export default function MainNavigator() {
             {isOpen ? <X size={20} /> : <Menu size={20} />}
           </motion.div>
         </button>
-        
+
       </div>
 
       {/* Navigation links */}
