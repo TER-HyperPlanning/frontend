@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { to: '/groupes', icon: <UsersRound size={20} />, label: 'Groupes' },
   { to: '/buildings', icon: <HiOutlineOfficeBuilding size={20} />, label: 'Bâtiments et salles' },
   { to: '/formations', icon: <BookOpen size={20} />, label: 'Formations' },
+  { to: '/modules', icon: <BookOpen size={20} />, label: 'Modules' }, // icône corrigée
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 
@@ -26,7 +27,6 @@ export default function MainNavigator() {
       className="h-full flex flex-col py-4 overflow-hidden shrink-0"
     >
       <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center flex-col gap-4 flex-col-reverse'}`}>
-        
         
         <Logo showText={false} className="h-8 w-auto text-primary-700" />
         <button
