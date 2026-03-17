@@ -12,13 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlanningIndexRouteImport } from './routes/planning/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
-import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
 import { Route as appModulesIndexRouteImport } from './routes/(app)/modules/index'
 import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
 import { Route as appFormationsIndexRouteImport } from './routes/(app)/formations/index'
@@ -38,6 +38,11 @@ const appRouteRoute = appRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanningIndexRoute = PlanningIndexRouteImport.update({
+  id: '/planning/',
+  path: '/planning/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
@@ -68,11 +73,6 @@ const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
 const appRequestsIndexRoute = appRequestsIndexRouteImport.update({
   id: '/requests/',
   path: '/requests/',
-  getParentRoute: () => appRouteRoute,
-} as any)
-const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
-  id: '/planning/',
-  path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
 const appModulesIndexRoute = appModulesIndexRouteImport.update({
@@ -109,12 +109,12 @@ const appAdminAccountsIndexRoute = appAdminAccountsIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/planning/': typeof PlanningIndexRoute
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/buildings/': typeof appBuildingsIndexRoute
   '/formations/': typeof appFormationsIndexRoute
   '/groupes/': typeof appGroupesIndexRoute
   '/modules/': typeof appModulesIndexRoute
-  '/planning/': typeof appPlanningIndexRoute
   '/requests/': typeof appRequestsIndexRoute
   '/scolarite/': typeof appScolariteIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
@@ -126,12 +126,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/planning': typeof PlanningIndexRoute
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/buildings': typeof appBuildingsIndexRoute
   '/formations': typeof appFormationsIndexRoute
   '/groupes': typeof appGroupesIndexRoute
   '/modules': typeof appModulesIndexRoute
-  '/planning': typeof appPlanningIndexRoute
   '/requests': typeof appRequestsIndexRoute
   '/scolarite': typeof appScolariteIndexRoute
   '/teachers': typeof appTeachersIndexRoute
@@ -145,12 +145,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/planning/': typeof PlanningIndexRoute
   '/(app)/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/(app)/buildings/': typeof appBuildingsIndexRoute
   '/(app)/formations/': typeof appFormationsIndexRoute
   '/(app)/groupes/': typeof appGroupesIndexRoute
   '/(app)/modules/': typeof appModulesIndexRoute
-  '/(app)/planning/': typeof appPlanningIndexRoute
   '/(app)/requests/': typeof appRequestsIndexRoute
   '/(app)/scolarite/': typeof appScolariteIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
@@ -164,12 +164,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/planning/'
     | '/buildings/$buildingId'
     | '/buildings/'
     | '/formations/'
     | '/groupes/'
     | '/modules/'
-    | '/planning/'
     | '/requests/'
     | '/scolarite/'
     | '/teachers/'
@@ -181,12 +181,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/planning'
     | '/buildings/$buildingId'
     | '/buildings'
     | '/formations'
     | '/groupes'
     | '/modules'
-    | '/planning'
     | '/requests'
     | '/scolarite'
     | '/teachers'
@@ -199,12 +199,12 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/planning/'
     | '/(app)/buildings/$buildingId'
     | '/(app)/buildings/'
     | '/(app)/formations/'
     | '/(app)/groupes/'
     | '/(app)/modules/'
-    | '/(app)/planning/'
     | '/(app)/requests/'
     | '/(app)/scolarite/'
     | '/(app)/teachers/'
@@ -218,6 +218,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   appRouteRoute: typeof appRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  PlanningIndexRoute: typeof PlanningIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -241,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planning/': {
+      id: '/planning/'
+      path: '/planning'
+      fullPath: '/planning/'
+      preLoaderRoute: typeof PlanningIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/login/': {
@@ -283,13 +291,6 @@ declare module '@tanstack/react-router' {
       path: '/requests'
       fullPath: '/requests/'
       preLoaderRoute: typeof appRequestsIndexRouteImport
-      parentRoute: typeof appRouteRoute
-    }
-    '/(app)/planning/': {
-      id: '/(app)/planning/'
-      path: '/planning'
-      fullPath: '/planning/'
-      preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
     '/(app)/modules/': {
@@ -343,7 +344,6 @@ interface appRouteRouteChildren {
   appFormationsIndexRoute: typeof appFormationsIndexRoute
   appGroupesIndexRoute: typeof appGroupesIndexRoute
   appModulesIndexRoute: typeof appModulesIndexRoute
-  appPlanningIndexRoute: typeof appPlanningIndexRoute
   appRequestsIndexRoute: typeof appRequestsIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
   appTeachersIndexRoute: typeof appTeachersIndexRoute
@@ -356,7 +356,6 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appFormationsIndexRoute: appFormationsIndexRoute,
   appGroupesIndexRoute: appGroupesIndexRoute,
   appModulesIndexRoute: appModulesIndexRoute,
-  appPlanningIndexRoute: appPlanningIndexRoute,
   appRequestsIndexRoute: appRequestsIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
   appTeachersIndexRoute: appTeachersIndexRoute,
@@ -387,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   appRouteRoute: appRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  PlanningIndexRoute: PlanningIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

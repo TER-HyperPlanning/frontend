@@ -1,9 +1,15 @@
 import Logo from '@/components/Logo'
 import Select from '@/components/ui/Select'
+import { getAccessToken } from '@/auth/storage'
+import { useAuth, useCurrentUser } from '@/hooks/api/useAuth'
 import PageHeader from '@/layout/page-header/PageHeader'
-import { BellIcon } from 'lucide-react'
+import { BellIcon, LogOut } from 'lucide-react'
 
 function PlanningHeader() {
+  const { logout } = useAuth()
+  const { data: user } = useCurrentUser()
+  const isAuthed = !!getAccessToken()
+
   return (
     <PageHeader>
       <Logo showText={true} className="h-10 w-auto text-primary-700" />
@@ -40,6 +46,19 @@ function PlanningHeader() {
       <button className="btn btn-ghost btn-circle btn-sm">
         <BellIcon className="w-5 h-5 text-gray-600" />
       </button>
+
+      {isAuthed ? (
+        <button
+          type="button"
+          onClick={logout}
+          className="btn btn-ghost btn-sm rounded-full"
+          aria-label="Se déconnecter"
+          title={user?.email ?? 'Se déconnecter'}
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="hidden sm:inline">Se déconnecter</span>
+        </button>
+      ) : null}
     </PageHeader>
   )
 }

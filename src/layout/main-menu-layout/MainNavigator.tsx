@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
 import { HiOutlineOfficeBuilding } from 'react-icons/hi'
+import { useAuth, useCurrentUser } from '@/hooks/api/useAuth'
 
 const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
@@ -18,8 +19,32 @@ const NAV_ITEMS = [
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 
+function toRoleLabel(role: string | null | undefined) {
+  switch (role) {
+    case 'ADMIN':
+      return 'Administrateur'
+    case 'TEACHER':
+      return 'Enseignant'
+    case 'STUDENT':
+      return 'Étudiant'
+    default:
+      return ''
+  }
+}
+
 export default function MainNavigator() {
   const [isOpen, setIsOpen] = useState(true)
+  const { data: user } = useCurrentUser()
+  const { logout } = useAuth()
+
+  const fullName = useMemo(() => {
+    const first = user?.firstName?.trim() ?? ''
+    const last = user?.lastName?.trim() ?? ''
+    const combined = `${first} ${last}`.trim()
+    return combined || user?.email?.trim() || 'Utilisateur'
+  }, [user?.email, user?.firstName, user?.lastName])
+
+  const roleLabel = useMemo(() => toRoleLabel(user?.role), [user?.role])
 
   return (
     <>
@@ -60,8 +85,24 @@ export default function MainNavigator() {
         </div>
 
         {/* Bottom: User avatar */}
-        <div className="border-none mt-2 pt-2">
-          <UserAvatar fullName="John Doe" isOpen={isOpen} />
+        <div className="border-none mt-2 pt-2 px-3">
+          <UserAvatar fullName={fullName} roleLabel={roleLabel} isOpen={isOpen} />
+          <button
+            type="button"
+            onClick={logout}
+            className={`
+              mt-2 w-full flex items-center gap-3 rounded-lg px-3 py-2.5
+              text-gray-500 hover:bg-gray-200/60 hover:text-gray-700 transition-colors
+              ${!isOpen ? 'justify-center' : ''}
+            `}
+            aria-label="Se déconnecter"
+            title="Se déconnecter"
+          >
+            <span className="text-xl shrink-0 w-5 h-5 flex items-center justify-center">
+              <LogOut size={18} />
+            </span>
+            {isOpen ? <span className="text-sm">Se déconnecter</span> : null}
+          </button>
         </div>
       </motion.nav>
 

@@ -24,7 +24,7 @@ function LoginForm() {
     onSubmit: async ({ value }) => {
       const success = await login(value);
       if (success) {
-        navigate({ to: '/' });
+        navigate({ to: '/planning' });
       }
     },
   });
