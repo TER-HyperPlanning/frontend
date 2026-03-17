@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: '/buildings', icon: <HiOutlineOfficeBuilding size={20} />, label: 'Bâtiments et salles' },
   { to: '/formations', icon: <BookOpen size={20} />, label: 'Formations' },
   { to: '/modules', icon: <BookOpen size={20} />, label: 'Modules' }, // icône corrigée
+  { to: '/scolarite', icon: <GraduationCap size={20} />, label: 'Scolarité' },
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
 
@@ -40,7 +41,7 @@ export default function MainNavigator() {
             {isOpen ? <X size={20} /> : <Menu size={20} />}
           </motion.div>
         </button>
-        
+
       </div>
 
       {/* Navigation links */}

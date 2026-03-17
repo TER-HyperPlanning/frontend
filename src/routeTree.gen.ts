@@ -15,6 +15,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
+<<<<<<< HEAD
+import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
+import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
+import { Route as appAdminAccountsIndexRouteImport } from './routes/(app)/admin/accounts/index'
+=======
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appPlanningIndexRouteImport } from './routes/(app)/planning/index'
 <<<<<<< HEAD
@@ -28,6 +33,7 @@ import { Route as appBuildingsIndexRouteImport } from './routes/(app)/buildings/
 import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
 =======
 import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
+>>>>>>> develop
 >>>>>>> develop
 >>>>>>> develop
 >>>>>>> develop
@@ -61,9 +67,15 @@ const AuthForgetPwdIndexRoute = AuthForgetPwdIndexRouteImport.update({
   path: '/forget-pwd/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+<<<<<<< HEAD
+const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
+  id: '/scolarite/',
+  path: '/scolarite/',
+=======
 const appTeachersIndexRoute = appTeachersIndexRouteImport.update({
   id: '/teachers/',
   path: '/teachers/',
+>>>>>>> develop
   getParentRoute: () => appRouteRoute,
 } as any)
 const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
@@ -71,6 +83,11 @@ const appPlanningIndexRoute = appPlanningIndexRouteImport.update({
   path: '/planning/',
   getParentRoute: () => appRouteRoute,
 } as any)
+<<<<<<< HEAD
+const appAdminAccountsIndexRoute = appAdminAccountsIndexRouteImport.update({
+  id: '/admin/accounts/',
+  path: '/admin/accounts/',
+=======
 <<<<<<< HEAD
 const appModulesIndexRoute = appModulesIndexRouteImport.update({
   id: '/modules/',
@@ -97,6 +114,7 @@ const appGroupesIndexRoute = appGroupesIndexRouteImport.update({
 >>>>>>> develop
 >>>>>>> develop
 >>>>>>> develop
+>>>>>>> develop
   getParentRoute: () => appRouteRoute,
 } as any)
 
@@ -118,10 +136,15 @@ export interface FileRoutesByFullPath {
 >>>>>>> develop
 >>>>>>> develop
   '/planning/': typeof appPlanningIndexRoute
+<<<<<<< HEAD
+  '/scolarite/': typeof appScolariteIndexRoute
+=======
   '/teachers/': typeof appTeachersIndexRoute
+>>>>>>> develop
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
+  '/admin/accounts/': typeof appAdminAccountsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -141,10 +164,15 @@ export interface FileRoutesByTo {
 >>>>>>> develop
 >>>>>>> develop
   '/planning': typeof appPlanningIndexRoute
+<<<<<<< HEAD
+  '/scolarite': typeof appScolariteIndexRoute
+=======
   '/teachers': typeof appTeachersIndexRoute
+>>>>>>> develop
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
   '/auth/login': typeof AuthLoginIndexRoute
+  '/admin/accounts': typeof appAdminAccountsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -166,10 +194,15 @@ export interface FileRoutesById {
 >>>>>>> develop
 >>>>>>> develop
   '/(app)/planning/': typeof appPlanningIndexRoute
+<<<<<<< HEAD
+  '/(app)/scolarite/': typeof appScolariteIndexRoute
+=======
   '/(app)/teachers/': typeof appTeachersIndexRoute
+>>>>>>> develop
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
+  '/(app)/admin/accounts/': typeof appAdminAccountsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,10 +224,15 @@ export interface FileRouteTypes {
 >>>>>>> develop
 >>>>>>> develop
     | '/planning/'
+<<<<<<< HEAD
+    | '/scolarite/'
+=======
     | '/teachers/'
+>>>>>>> develop
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
+    | '/admin/accounts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -214,10 +252,15 @@ export interface FileRouteTypes {
 >>>>>>> develop
 >>>>>>> develop
     | '/planning'
+<<<<<<< HEAD
+    | '/scolarite'
+=======
     | '/teachers'
+>>>>>>> develop
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
     | '/auth/login'
+    | '/admin/accounts'
   id:
     | '__root__'
     | '/'
@@ -238,10 +281,15 @@ export interface FileRouteTypes {
 >>>>>>> develop
 >>>>>>> develop
     | '/(app)/planning/'
+<<<<<<< HEAD
+    | '/(app)/scolarite/'
+=======
     | '/(app)/teachers/'
+>>>>>>> develop
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
+    | '/(app)/admin/accounts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -294,11 +342,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgetPwdIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+<<<<<<< HEAD
+    '/(app)/scolarite/': {
+      id: '/(app)/scolarite/'
+      path: '/scolarite'
+      fullPath: '/scolarite/'
+      preLoaderRoute: typeof appScolariteIndexRouteImport
+=======
     '/(app)/teachers/': {
       id: '/(app)/teachers/'
       path: '/teachers'
       fullPath: '/teachers/'
       preLoaderRoute: typeof appTeachersIndexRouteImport
+>>>>>>> develop
       parentRoute: typeof appRouteRoute
     }
     '/(app)/planning/': {
@@ -308,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPlanningIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+<<<<<<< HEAD
+    '/(app)/admin/accounts/': {
+      id: '/(app)/admin/accounts/'
+      path: '/admin/accounts'
+      fullPath: '/admin/accounts/'
+      preLoaderRoute: typeof appAdminAccountsIndexRouteImport
+=======
 <<<<<<< HEAD
     '/(app)/modules/': {
       id: '/(app)/modules/'
@@ -344,6 +407,7 @@ declare module '@tanstack/react-router' {
 >>>>>>> develop
 >>>>>>> develop
 >>>>>>> develop
+>>>>>>> develop
       parentRoute: typeof appRouteRoute
     }
   }
@@ -365,7 +429,12 @@ interface appRouteRouteChildren {
 >>>>>>> develop
 >>>>>>> develop
   appPlanningIndexRoute: typeof appPlanningIndexRoute
+<<<<<<< HEAD
+  appScolariteIndexRoute: typeof appScolariteIndexRoute
+  appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
+=======
   appTeachersIndexRoute: typeof appTeachersIndexRoute
+>>>>>>> develop
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
@@ -384,7 +453,12 @@ const appRouteRouteChildren: appRouteRouteChildren = {
 >>>>>>> develop
 >>>>>>> develop
   appPlanningIndexRoute: appPlanningIndexRoute,
+<<<<<<< HEAD
+  appScolariteIndexRoute: appScolariteIndexRoute,
+  appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
+=======
   appTeachersIndexRoute: appTeachersIndexRoute,
+>>>>>>> develop
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
