@@ -16,23 +16,11 @@ interface AvailabilityButtonsProps {
  * 
  */
 export const AvailabilityButtons = ({selectedGroupNumber, availableAllDay, timeOfAvailability, dispatchSelectedDays, selectedMonth, selectedYear} : AvailabilityButtonsProps) => {
+  const commonStyle= "btn-sm p-8"
   return (
           <div className='flex-1 w-sm grid grid-cols-2 gap-2'>
-            <button onClick={() => { dispatchSelectedDays({ type: "resetEditableOnly",groupNumber:selectedGroupNumber }) }}
-              className='btn btn-info btn-sm p-8'
-            >
-              N'appliquer aucune modification sur tout les jours
-            </button>
-            <button onClick={() => { dispatchSelectedDays({
-               type: "addYearToEditable",
-               value: selectedYear.current,
-               groupNumber:selectedGroupNumber,
-               availableAllDay:availableAllDay,
-               timeOfAvailability:timeOfAvailability
-                }) }} className='btn btn-success btn-sm p-8 '>
-              Ajouter tout les jours de l'année
-            </button>
-            <button onClick={() => {
+
+                        <button onClick={() => {
               dispatchSelectedDays({
                 type: "addMonthToEditable",
                  value: {
@@ -43,13 +31,19 @@ export const AvailabilityButtons = ({selectedGroupNumber, availableAllDay, timeO
                 timeOfAvailability:timeOfAvailability,
                 groupNumber:selectedGroupNumber
               })
-            }} className='btn btn-info btn-sm p-8 '>
+            }} className={`btn btn-success ${commonStyle}`}>
               Ajouter tout les jours du mois
             </button>
-            <button onClick={() => { dispatchSelectedDays({ type: "resetYear", value: selectedYear.current, groupNumber:selectedGroupNumber }) }} className='btn btn-error btn-sm p-8'>
-              Retirer tout les jours de l'année
+            <button onClick={() => { dispatchSelectedDays({
+               type: "addYearToEditable",
+               value: selectedYear.current,
+               groupNumber:selectedGroupNumber,
+               availableAllDay:availableAllDay,
+               timeOfAvailability:timeOfAvailability
+                }) }} className={`btn btn-success ${commonStyle}`}>
+              Ajouter tout les jours de l'année
             </button>
-            <button onClick={() => {
+                        <button onClick={() => {
               dispatchSelectedDays({
                 type: "resetMonth", value: {
                   year: selectedYear.current,
@@ -57,11 +51,25 @@ export const AvailabilityButtons = ({selectedGroupNumber, availableAllDay, timeO
                 },
                 groupNumber:selectedGroupNumber
               })
-            }} className='btn btn-blue btn-sm p-8'>
+            }} className={`btn btn-error ${commonStyle}`}>
               Retirer tout les jours du mois
             </button>
-            <button onClick={()=>{dispatchSelectedDays({type:"setSelectedToEditable", groupNumber:selectedGroupNumber})}} className="btn btn-blue btn-sm p-8">
+
+            <button onClick={() => { dispatchSelectedDays({ type: "resetYear", value: selectedYear.current, groupNumber:selectedGroupNumber }) }} className='btn btn-error btn-sm p-8'>
+              Retirer tout les jours de l'année
+            </button>
+
+            <button onClick={()=>{
+              dispatchSelectedDays({type:"setSelectedToEditable", groupNumber:selectedGroupNumber}
+              )}}
+             className={`btn btn-blue ${commonStyle}`}>
               Rendre les éléments sélectionner modifiable
+            </button>
+
+                        <button onClick={() => { dispatchSelectedDays({ type: "resetEditableOnly",groupNumber:selectedGroupNumber }) }}
+              className={`btn btn-blue ${commonStyle}`}
+            >
+              N'appliquer aucune modification sur tout les jours
             </button>
           </div>
   )
