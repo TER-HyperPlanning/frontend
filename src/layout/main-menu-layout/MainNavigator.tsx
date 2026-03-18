@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { to: '/buildings', icon: <HiOutlineOfficeBuilding size={20} />, label: 'Bâtiments et salles' },
   { to: '/formations', icon: <BookOpen size={20} />, label: 'Formations' },
   { to: '/modules', icon: <BookOpen size={20} />, label: 'Modules' }, // icône corrigée
+  { to: '/requests', icon: <Clock size={20} />, label: 'Demandes' }, 
   { to: '/scolarite', icon: <GraduationCap size={20} />, label: 'Scolarité' },
   { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
 ]
