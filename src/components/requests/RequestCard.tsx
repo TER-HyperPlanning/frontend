@@ -75,14 +75,23 @@ export default function RequestCard({
 
           
           <div className="text-sm text-gray-500 mt-2 space-y-1">
-            <p>{sessionTime}</p>
+            <p>Séance : {sessionTime}</p>
             <p>Demande envoyée le {requestDate}</p>
           </div>
         </div>
 
         
         <div className="flex items-start md:items-center">
-          <span className="bg-[#003A68] text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
+          <span
+            className={`text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm
+              ${
+                type === 'Changement de salle'
+                  ? 'bg-blue-100 text-blue-700'
+                  : type === 'Changement de statut'
+                  ? 'bg-purple-100 text-purple-700'
+                  : 'bg-green-100 text-green-700'
+              }`}
+          >
             {type}
           </span>
         </div>

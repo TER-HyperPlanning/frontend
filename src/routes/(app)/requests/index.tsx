@@ -100,12 +100,13 @@ function RequestsPage() {
   ).length
 
   return (
-    <PageLayout className="min-h-screen bg-white py-12">
+    <PageLayout className="min-h-screen bg-white py-12 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6">
 
         <PageHeader />
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12 overflow-hidden">
           <StatsCard
             label="En attente"
             value={pendingCount}
@@ -124,14 +125,15 @@ function RequestsPage() {
 
           <StatsCard
             label="Refusées"
-            value={refusedCount}
             valueColor="text-red-500"
             iconColor="text-red-400"
+            value={refusedCount}
             icon={<XCircle className="w-10 h-10" />}
           />
         </div>
 
-        <div className="bg-[#F4F6F8] rounded-2xl p-6 mb-10 flex flex-col md:flex-row gap-4">
+        {/* Filtres */}
+        <div className="bg-[#F4F6F8] rounded-2xl p-6 mb-10 flex flex-col md:flex-row gap-4 overflow-hidden">
           <input
             type="text"
             placeholder="Rechercher un professeur, matiére, formation..."
@@ -167,7 +169,8 @@ function RequestsPage() {
           </select>
         </div>
 
-        <div className="flex flex-col gap-6">
+        {/* Liste des demandes */}
+        <div className="flex flex-col gap-6 overflow-y-auto">
           {filteredRequests.length > 0 ? (
             filteredRequests.map((req, index) => (
               <RequestCard key={index} {...req} />
