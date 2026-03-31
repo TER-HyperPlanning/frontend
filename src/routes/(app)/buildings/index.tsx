@@ -13,6 +13,7 @@ import {
 } from 'react-icons/hi';
 
 import Button from '@/components/Button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
 import TextField from '@/components/TextField'; // Utilisation du composant existant
 import PageLayout from '@/layout/PageLayout';
 import AddBuildingModal from '@/components/modals/AddBuildingModal';
@@ -135,51 +136,48 @@ function BuildingsPage() {
         {/* CONTENU : Scrollable avec espacement */}
         <div className="flex-1 overflow-y-auto space-y-8 pr-2 custom-scrollbar">
           {/* TABLEAU */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div className="overflow-x-auto mb-6">
             <div className="w-full">
-              <table className="w-full">
+              <Table>
 
                 {/* HEADER */}
-                <thead className="bg-[#0B3C5D] text-white text-sm">
-                  <tr>
-                    <th className="text-left px-6 py-4 font-semibold uppercase tracking-wider">
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>
                       Liste des Bâtiments
-                    </th>
+                    </TableHeader>
 
-                    <th className="text-right px-6 py-4 font-semibold uppercase tracking-wider">
+                    <TableHeader>
                       Actions
-                    </th>
-                  </tr>
-                </thead>
+                    </TableHeader>
+                  </TableRow>
+                </TableHead>
 
                 {/* BODY */}
-                <tbody className="divide-y divide-gray-100 bg-white">
+                <TableBody>
 
                   {currentData.length > 0 ? (
                     currentData.map((building) => (
-                      <tr
-                        key={building.id}
-                        className="hover:bg-gray-50 transition group"
-                      >
+                      <TableRow key={building.id}>
 
                         {/* NOM BATIMENT */}
-                        <td className="px-6 py-5 font-medium text-gray-700">
+                        <TableCell className="font-medium text-base-content">
                           {building.name}
-                        </td>
+                        </TableCell>
 
                         {/* ACTIONS */}
-                        <td className="px-6 py-5">
-                          <div className="flex justify-end items-center gap-4">
+                        <TableCell>
+                          <div className="flex items-center gap-2">
 
                             {/* DETAILS */}
                             <button
                               onClick={() =>
                                 navigate({ to: `/buildings/${building.id}` })
                               }
-                              className="text-gray-400 hover:text-blue-600 transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-primary transition tooltip"
                               data-tip="Détails du bâtiment"
                             >
-                              <HiOutlineSearch size={20} />
+                              <HiOutlineSearch size={18} />
                             </button>
 
                             {/* EDIT */}
@@ -188,10 +186,10 @@ function BuildingsPage() {
                                 setSelectedBuilding(building);
                                 setIsEditModalOpen(true);
                               }}
-                              className="text-gray-400 hover:text-orange-500 transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning transition tooltip"
                               data-tip="Modifier bâtiment"
                             >
-                              <HiOutlinePencil size={20} />
+                              <HiOutlinePencil size={18} />
                             </button>
 
                             {/* DELETE */}
@@ -200,26 +198,26 @@ function BuildingsPage() {
                                 setSelectedBuilding(building);
                                 setIsDeleteModalOpen(true);
                               }}
-                              className="text-gray-400 hover:text-red-500 transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-error transition tooltip"
                               data-tip="Supprimer bâtiment"
                             >
-                              <HiOutlineTrash size={20} />
+                              <HiOutlineTrash size={18} />
                             </button>
 
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan={2} className="text-center py-10 text-gray-400">
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-10 text-gray-400">
                         Aucun bâtiment trouvé
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )}
 
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
             {/* PAGINATION */}

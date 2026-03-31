@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { HiOutlinePencil, HiOutlineTrash, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
 import EditRoomModal from './EditRoomModal';
 import DeleteRoomModal from './DeleteRoomModal';
 
@@ -46,66 +47,63 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
     const currentData = filteredRooms.slice(startIndex, startIndex + itemsPerPage);
 
     return (
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+        <div className="overflow-x-auto mb-6">
             <div className="w-full">
-                <table className="w-full table-fixed">
+                <Table>
                     {/* HEADER */}
-                    <thead className="bg-[#0B3C5D] text-white text-sm">
-                        <tr>
-                            <th className="text-left py-4 px-8 font-semibold uppercase tracking-wider w-[30%]">
+                    <TableHead>
+                        <TableRow>
+                            <TableHeader>
                                 Numéro salle
-                            </th>
+                            </TableHeader>
 
-                            <th className="text-left py-4 px-8 font-semibold uppercase tracking-wider w-[20%]">
+                            <TableHeader>
                                 Capacité
-                            </th>
+                            </TableHeader>
 
-                            <th className="text-left py-4 px-8 font-semibold uppercase tracking-wider w-[25%]">
+                            <TableHeader>
                                 Type
-                            </th>
+                            </TableHeader>
 
-                            <th className="text-right py-4 px-8 font-semibold uppercase tracking-wider w-[25%]">
+                            <TableHeader>
                                 Actions
-                            </th>
-                        </tr>
-                    </thead>
+                            </TableHeader>
+                        </TableRow>
+                    </TableHead>
 
                     {/* BODY */}
-                    <tbody className="divide-y divide-gray-100 bg-white">
+                    <TableBody>
                         {currentData.length === 0 ? (
-                            <tr>
-                                <td colSpan={4} className="py-12 text-center text-gray-400 font-medium">
+                            <TableRow>
+                                <TableCell colSpan={4} className="py-12 text-center text-gray-400 font-medium">
                                     Aucune salle trouvée
-                                </td>
-                            </tr>
+                                </TableCell>
+                            </TableRow>
 
                         ) : currentData.map(room => (
 
-                            <tr
-                                key={room.id}
-                                className="hover:bg-gray-50 transition"
-                            >
+                            <TableRow key={room.id}>
 
                                 {/* NUMERO SALLE */}
-                                <td className="py-5 px-8 font-medium text-gray-700">
+                                <TableCell className="font-medium text-base-content">
                                     {room.number}
-                                </td>
+                                </TableCell>
 
                                 {/* CAPACITE */}
-                                <td className="py-5 px-8 text-gray-600">
+                                <TableCell className="text-sm text-base-content/80">
                                     {room.capacity} places
-                                </td>
+                                </TableCell>
 
                                 {/* TYPE */}
-                                <td className="py-5 px-8">
-                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                <TableCell className="py-5 px-8">
+                                    <span className="badge badge-secondary badge-outline badge-sm font-medium">
                                         {room.type}
                                     </span>
-                                </td>
+                                </TableCell>
 
                                 {/* ACTIONS */}
-                                <td className="py-5 px-8">
-                                    <div className="flex justify-end items-center gap-4">
+                                <TableCell>
+                                    <div className="flex items-center gap-2">
 
                                         {/* EDIT */}
                                         <button
@@ -113,10 +111,10 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
                                                 setSelectedRoom(room);
                                                 setIsEditModalOpen(true);
                                             }}
-                                            className="text-gray-400 hover:text-orange-500 transition tooltip"
+                                            className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning transition tooltip"
                                             data-tip="Modifier salle"
                                         >
-                                            <HiOutlinePencil size={20} />
+                                            <HiOutlinePencil size={18} />
                                         </button>
 
                                         {/* DELETE */}
@@ -125,20 +123,20 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
                                                 setRoomToDelete(room);
                                                 setIsDeleteModalOpen(true);
                                             }}
-                                            className="text-gray-400 hover:text-red-500 transition tooltip"
+                                            className="btn btn-ghost btn-sm text-base-content/50 hover:text-error transition tooltip"
                                             data-tip="Supprimer salle"
                                         >
-                                            <HiOutlineTrash size={20} />
+                                            <HiOutlineTrash size={18} />
                                         </button>
 
                                     </div>
-                                </td>
+                                </TableCell>
 
-                            </tr>
+                            </TableRow>
 
                         ))}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
 
                 {/* PAGINATION */}
                 {totalPages > 1 && (

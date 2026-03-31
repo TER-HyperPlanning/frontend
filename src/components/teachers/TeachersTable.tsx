@@ -1,5 +1,5 @@
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
 
 import type { Teacher } from './types';
 
@@ -12,63 +12,67 @@ interface Props {
 export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: Props) {
 
   return (
-    <div className="overflow-x-auto rounded-xl shadow-sm border border-gray-100">
-      <table className="w-full border-collapse bg-[#F4F6F8]">
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableHeader>Nom</TableHeader>
+            <TableHeader>Prénom</TableHeader>
+            <TableHeader>Email</TableHeader>
+            <TableHeader>Statut</TableHeader>
+          </TableRow>
+        </TableHead>
 
-        <thead>
-          <tr className="text-[#003A68] font-semibold text-sm uppercase border-b border-gray-200">
-            <th className="py-4 px-6 text-left">Nom</th>
-            <th className="py-4 px-6 text-left">Prénom</th>
-            <th className="py-4 px-6 text-left">Email</th>
-            <th className="py-4 px-6 text-left">Statut</th>
-          </tr>
-        </thead>
-
-        <tbody className="divide-y divide-gray-200 text-[#003A68] font-semibold">
+        <TableBody>
           {teachers.length > 0 ? (
             teachers.map((teacher) => (
-              <tr key={teacher.id} className="hover:bg-gray-50 transition-colors">
-
-                <td className="py-4 px-6">{teacher.nom}</td>
-                <td className="py-4 px-6">{teacher.prenom}</td>
-                <td className="py-4 px-6">{teacher.email}</td>
-
-                <td className="py-4 px-6">
+              <TableRow key={teacher.id}>
+                <TableCell className="font-medium text-base-content">{teacher.nom}</TableCell>
+                <TableCell className="text-sm text-base-content/80">{teacher.prenom}</TableCell>
+                <TableCell className="text-sm text-base-content/80">{teacher.email}</TableCell>
+                <TableCell>
                   <span
-                    className={`inline-block w-[100px] text-center py-1 rounded-[12px] font-semibold ${
+                    className={`badge badge-sm font-medium ${
                       teacher.statut === 'Associé'
-                        ? 'bg-[#D3D3D3] text-gray-800'
+                        ? 'badge-primary badge-outline'
                         : teacher.statut === 'Vacataire'
-                        ? 'bg-[#A06BEF] text-white'
-                        : 'bg-[#0072CE] text-white'
+                          ? 'badge-secondary badge-outline'
+                          : 'badge-accent badge-outline'
                     }`}
                   >
                     {teacher.statut}
                   </span>
-                </td>
+                </TableCell>
 
-                <td className="py-4 px-6 text-right flex justify-end gap-2" >
-                  <button className="p-2 hover:bg-orange-50 rounded-xl text-gray-400 hover:text-orange-500" onClick={() => onEditClick(teacher)}>
-                    <HiOutlinePencil size={20} />
-                  </button>
+                <TableCell>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
+                      onClick={() => onEditClick(teacher)}
+                    >
+                      <HiOutlinePencil size={18} />
+                    </button>
 
-                  <button className="p-2 hover:bg-red-50 rounded-xl text-gray-400 hover:text-red-500" onClick={() => onDeleteClick(teacher)}>
-                    <HiOutlineTrash size={20} />
-                  </button>
-                </td>
+                    <button
+                      className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
+                      onClick={() => onDeleteClick(teacher)}
+                    >
+                      <HiOutlineTrash size={18} />
+                    </button>
+                  </div>
+                </TableCell>
 
-              </tr>
+              </TableRow>
             ))
           ) : (
-            <tr>
-              <td colSpan={5} className="py-16 text-center text-gray-400">
+            <TableRow>
+              <TableCell colSpan={5} className="py-16 text-center text-gray-400">
                 Aucun enseignant trouvé.
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-
-      </table>
+        </TableBody>
+      </Table>
     </div>
   )
 }
