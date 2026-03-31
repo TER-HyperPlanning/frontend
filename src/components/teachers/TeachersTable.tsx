@@ -12,7 +12,6 @@ interface Props {
 export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: Props) {
 
   return (
-    <div className="overflow-x-auto">
       <Table>
         <TableHead>
           <TableRow>
@@ -20,6 +19,7 @@ export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: 
             <TableHeader>Prénom</TableHeader>
             <TableHeader>Email</TableHeader>
             <TableHeader>Statut</TableHeader>
+            <TableHeader>Actions</TableHeader>
           </TableRow>
         </TableHead>
 
@@ -29,15 +29,15 @@ export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: 
               <TableRow key={teacher.id}>
                 <TableCell className="font-medium text-base-content">{teacher.nom}</TableCell>
                 <TableCell className="text-sm text-base-content/80">{teacher.prenom}</TableCell>
-                <TableCell className="text-sm text-base-content/80">{teacher.email}</TableCell>
+                <TableCell className="text-sm text-primary/80">{teacher.email}</TableCell>
                 <TableCell>
                   <span
                     className={`badge badge-sm font-medium ${
-                      teacher.statut === 'Associé'
+                      teacher.statut === 'Permanent'
                         ? 'badge-primary badge-outline'
                         : teacher.statut === 'Vacataire'
-                          ? 'badge-secondary badge-outline'
-                          : 'badge-accent badge-outline'
+                          ? 'badge-warning badge-outline'
+                          : 'badge-secondary badge-outline'
                     }`}
                   >
                     {teacher.statut}
@@ -45,19 +45,19 @@ export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: 
                 </TableCell>
 
                 <TableCell>
-                  <div className="flex justify-end gap-2">
+                  <div className="flex items-center gap-1">
                     <button
                       className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
                       onClick={() => onEditClick(teacher)}
                     >
-                      <HiOutlinePencil size={18} />
+                      <HiOutlinePencil size={16} />
                     </button>
 
                     <button
                       className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
                       onClick={() => onDeleteClick(teacher)}
                     >
-                      <HiOutlineTrash size={18} />
+                      <HiOutlineTrash size={16} />
                     </button>
                   </div>
                 </TableCell>
@@ -66,13 +66,12 @@ export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: 
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="py-16 text-center text-gray-400">
+              <TableCell colSpan={5} className="py-16 text-center text-base-content/50">
                 Aucun enseignant trouvé.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-    </div>
   )
 }

@@ -136,8 +136,8 @@ function BuildingsPage() {
         {/* CONTENU : Scrollable avec espacement */}
         <div className="flex-1 overflow-y-auto space-y-8 pr-2 custom-scrollbar">
           {/* TABLEAU */}
-          <div className="overflow-x-auto mb-6">
-            <div className="w-full">
+          <div className="card bg-base-100 border border-base-200">
+            <div className="overflow-x-auto">
               <Table>
 
                 {/* HEADER */}
@@ -159,58 +159,50 @@ function BuildingsPage() {
                   {currentData.length > 0 ? (
                     currentData.map((building) => (
                       <TableRow key={building.id}>
-
-                        {/* NOM BATIMENT */}
                         <TableCell className="font-medium text-base-content">
                           {building.name}
                         </TableCell>
 
-                        {/* ACTIONS */}
                         <TableCell>
-                          <div className="flex items-center gap-2">
-
-                            {/* DETAILS */}
+                          <div className="flex items-center gap-1">
                             <button
                               onClick={() =>
                                 navigate({ to: `/buildings/${building.id}` })
                               }
-                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-primary transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-primary"
                               data-tip="Détails du bâtiment"
                             >
-                              <HiOutlineSearch size={18} />
+                              <HiOutlineSearch size={16} />
                             </button>
 
-                            {/* EDIT */}
                             <button
                               onClick={() => {
                                 setSelectedBuilding(building);
                                 setIsEditModalOpen(true);
                               }}
-                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
                               data-tip="Modifier bâtiment"
                             >
-                              <HiOutlinePencil size={18} />
+                              <HiOutlinePencil size={16} />
                             </button>
 
-                            {/* DELETE */}
                             <button
                               onClick={() => {
                                 setSelectedBuilding(building);
                                 setIsDeleteModalOpen(true);
                               }}
-                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-error transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
                               data-tip="Supprimer bâtiment"
                             >
-                              <HiOutlineTrash size={18} />
+                              <HiOutlineTrash size={16} />
                             </button>
-
                           </div>
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={2} className="text-center py-10 text-gray-400">
+                      <TableCell colSpan={2} className="text-center py-16 text-base-content/50">
                         Aucun bâtiment trouvé
                       </TableCell>
                     </TableRow>

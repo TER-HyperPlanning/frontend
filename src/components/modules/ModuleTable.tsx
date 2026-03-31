@@ -22,7 +22,6 @@ export default function ModuleTable({
   onEdit,
 }: Props) {
   return (
-    <div className="overflow-x-auto">
       <Table>
         <TableHead>
           <TableRow>
@@ -35,43 +34,54 @@ export default function ModuleTable({
         </TableHead>
 
         <TableBody>
-          {modules.map((module) => (
-            <TableRow key={module.id}>
-              <TableCell className="font-medium text-base-content">
-                {module.name}
-              </TableCell>
+          {modules.length > 0 ? (
+            modules.map((module) => (
+              <TableRow key={module.id}>
+                <TableCell className="font-medium text-base-content">
+                  {module.name}
+                </TableCell>
 
-              <TableCell className="text-sm text-base-content/80">
-                {module.code}
-              </TableCell>
+                <TableCell>
+                  <span className="badge badge-secondary badge-outline badge-sm font-medium">
+                    {module.code}
+                  </span>
+                </TableCell>
 
-              <TableCell className="text-sm text-base-content/80">
-                {module.volume}
-              </TableCell>
+                <TableCell className="text-sm text-base-content/80">
+                  {module.volume ?? <span className="text-base-content/40 italic">—</span>}
+                </TableCell>
 
-              <TableCell className="text-sm text-base-content/80">
-                {module.teacher}
-              </TableCell>
+                <TableCell className="text-sm text-base-content/80">
+                  {module.teacher ?? <span className="text-base-content/40 italic">Non assigné</span>}
+                </TableCell>
 
-              <TableCell>
-                <button
-                  className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
-                  onClick={() => onEdit(module)}
-                >
-                  <Pencil size={18} />
-                </button>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <button
+                      className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
+                      onClick={() => onEdit(module)}
+                    >
+                      <Pencil size={16} />
+                    </button>
 
-                <button
-                  className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
-                  onClick={() => onDelete(module.id)}
-                >
-                  <Trash2 size={18} />
-                </button>
+                    <button
+                      className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
+                      onClick={() => onDelete(module.id)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="py-16 text-center text-base-content/50">
+                Aucun module trouvé.
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
-    </div>
   );
 }

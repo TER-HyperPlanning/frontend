@@ -145,11 +145,15 @@ export default function ScolaritePage() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
                     >
-                        <ScolariteTable
-                            accounts={filteredAccounts}
-                            onEdit={(acc) => setEditAccount(acc)}
-                            onAssignFiliere={(acc) => setAssignAccount(acc)}
-                        />
+                        <div className="card bg-base-100 border border-base-200">
+                            <div className="overflow-x-auto">
+                                <ScolariteTable
+                                    accounts={filteredAccounts}
+                                    onEdit={(acc) => setEditAccount(acc)}
+                                    onAssignFiliere={(acc) => setAssignAccount(acc)}
+                                />
+                            </div>
+                        </div>
                     </motion.div>
 
                     {/* Stats summary */}

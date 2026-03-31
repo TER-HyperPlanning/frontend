@@ -14,28 +14,15 @@ export default function FormationsTable({
   onDelete,
 }: FormationsTableProps) {
   return (
-    <div className="overflow-x-auto">
       <Table>
         <TableHead>
           <TableRow>
-            <TableHeader>
-              Nom de la formation
-            </TableHeader>
-            <TableHeader>
-              Enseignant responsable
-            </TableHeader>
-            <TableHeader>
-              Programme
-            </TableHeader>
-            <TableHeader>
-              Lieu
-            </TableHeader>
-            <TableHeader>
-              Filière associée
-            </TableHeader>
-            <TableHeader>
-              Actions
-            </TableHeader>
+            <TableHeader>Nom de la formation</TableHeader>
+            <TableHeader>Enseignant responsable</TableHeader>
+            <TableHeader>Programme</TableHeader>
+            <TableHeader>Lieu</TableHeader>
+            <TableHeader>Filière associée</TableHeader>
+            <TableHeader>Actions</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -45,22 +32,30 @@ export default function FormationsTable({
               <TableCell className="text-sm text-base-content/80">
                 {formation.enseignantResponsable}
               </TableCell>
-              <TableCell className="text-sm text-base-content/80">{formation.programme}</TableCell>
-              <TableCell className="text-sm text-base-content/80">{formation.lieu}</TableCell>
-              <TableCell className="text-sm text-base-content/80">{formation.filiere.nom}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                <span className="badge badge-ghost badge-sm font-medium">
+                  {formation.programme}
+                </span>
+              </TableCell>
+              <TableCell className="text-sm text-base-content/80">{formation.lieu}</TableCell>
+              <TableCell>
+                <span className="badge badge-primary badge-outline badge-sm font-medium">
+                  {formation.filiere.nom}
+                </span>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => onEdit(formation)}
                     className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
                   >
-                    <PencilSquareIcon className="size-5" />
+                    <PencilSquareIcon className="size-4" />
                   </button>
                   <button
                     onClick={() => onDelete(formation)}
                     className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
                   >
-                    <TrashIcon className="size-5" />
+                    <TrashIcon className="size-4" />
                   </button>
                 </div>
               </TableCell>
@@ -68,13 +63,12 @@ export default function FormationsTable({
           ))}
           {formations.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-gray-400 py-12">
+              <TableCell colSpan={6} className="text-center text-base-content/50 py-16">
                 Aucune formation enregistrée
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-    </div>
   )
 }

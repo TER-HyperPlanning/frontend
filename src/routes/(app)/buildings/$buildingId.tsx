@@ -92,10 +92,14 @@ export default function BuildingDetailsPage() {
 
         {/* TABLE DES SALLES */}
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-          <RoomsTable
-            searchTerm={searchTerm}
-            onSuccess={showSuccess}
-          />
+          <div className="card bg-base-100 border border-base-200">
+            <div className="overflow-x-auto">
+              <RoomsTable
+                searchTerm={searchTerm}
+                onSuccess={showSuccess}
+              />
+            </div>
+          </div>
         </div>
 
         {/* MODAL AJOUT */}

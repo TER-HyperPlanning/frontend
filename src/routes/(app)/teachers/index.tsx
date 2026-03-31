@@ -104,7 +104,11 @@ function TeachersPage() {
 
         <AddTeacherButton onClick={() => setIsModalOpen(true)} />
 
-        <TeachersTable teachers={filteredTeachers}  onEditClick={(teacher) => {setEditingTeacher(teacher); setIsEditModalOpen(true)}} onDeleteClick={handleDeleteClick} />
+        <div className="card bg-base-100 border border-base-200">
+          <div className="overflow-x-auto">
+            <TeachersTable teachers={filteredTeachers}  onEditClick={(teacher) => {setEditingTeacher(teacher); setIsEditModalOpen(true)}} onDeleteClick={handleDeleteClick} />
+          </div>
+        </div>
 
         <AddTeacherModal
             isOpen={isModalOpen}

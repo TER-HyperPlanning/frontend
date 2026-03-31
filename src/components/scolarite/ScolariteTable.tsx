@@ -10,7 +10,6 @@ interface ScolariteTableProps {
 
 export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: ScolariteTableProps) {
     return (
-        <div className="overflow-x-auto">
             <Table>
                 <TableHead>
                     <TableRow>
@@ -24,7 +23,7 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                 <TableBody>
                     {accounts.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm">
+                            <TableCell colSpan={5} className="text-center text-base-content/50 py-12">
                                 Aucun compte scolarité trouvé
                             </TableCell>
                         </TableRow>
@@ -33,7 +32,7 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                             <TableRow key={account.id}>
                                 <TableCell className="font-medium text-base-content">{account.nom}</TableCell>
                                 <TableCell className="text-sm text-base-content/80">{account.prenom}</TableCell>
-                                <TableCell className="text-sm text-base-content/80">{account.email}</TableCell>
+                                <TableCell className="text-sm text-primary/80">{account.email}</TableCell>
                                 <TableCell>
                                     <div className="flex flex-wrap gap-1.5">
                                         {account.filieres.length > 0 ? account.filieres.map((f) => (
@@ -44,12 +43,12 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                                                 {f}
                                             </span>
                                         )) : (
-                                            <span className="text-xs text-base-content/50 italic">Aucune filière</span>
+                                            <span className="text-xs text-base-content/40 italic">Aucune filière</span>
                                         )}
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                         <button
                                             type="button"
                                             onClick={() => onAssignFiliere(account)}
@@ -61,7 +60,7 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                                         <button
                                             type="button"
                                             onClick={() => onEdit(account)}
-                                            className="btn btn-ghost btn-sm text-base-content/50 hover:text-primary"
+                                            className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
                                             title="Modifier"
                                         >
                                             <Pencil size={16} />
@@ -73,6 +72,5 @@ export default function ScolariteTable({ accounts, onEdit, onAssignFiliere }: Sc
                     )}
                 </TableBody>
             </Table>
-        </div>
     )
 }
