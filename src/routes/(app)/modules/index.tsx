@@ -5,16 +5,17 @@ import ModuleForm from "@/components/modules/ModuleForm";
 import PageLayout from "@/layout/PageLayout";
 import toast from "react-hot-toast";
 import { Bell, Search } from "lucide-react";
+import { useCourses } from "@/hooks/modules/useCourses";
 
 export const Route = createFileRoute("/(app)/modules/")({
   component: ModulesPage,
 });
 
 type Module = {
-  id: number;
+  id: string;
   name: string;
   code: string;
-  formationId: string;
+  formationId?: string;
   volume?: string;
   teacher?: string;
 };
@@ -48,63 +49,56 @@ function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
 }
 
 function ModulesPage() {
+  const { courses, createCourse, updateCourse, deleteCourse } = useCourses();
+
   const [selectedFormation, setSelectedFormation] = useState("1");
-
-  const [modules, setModules] = useState<Module[]>([
-    { id: 1, name: "Analyse de données", code: "ADD101", formationId: "1" },
-    { id: 2, name: "Programmation des applications", code: "PDA202", formationId: "1" },
-    { id: 3, name: "Administration des systèmes et réseaux", code: "ASR101", formationId: "2" },
-    { id: 4, name: "Systemes repartis", code: "SR101", formationId: "2" },
-  ]);
-
   const [editingModule, setEditingModule] = useState<Module | null>(null);
-
   const [search, setSearch] = useState("");
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddOrUpdate = (data: {
+  const handleAddOrUpdate = async (data: {
     name: string;
     code: string;
     formationId: string;
   }) => {
-    if (editingModule) {
-      setModules((prev) =>
-        prev.map((m) =>
-          m.id === editingModule.id ? { ...m, ...data } : m
-        )
-      );
-      setEditingModule(null);
+    try {
+      if (editingModule) {
+        await updateCourse({
+          id: editingModule.id,
+          data: {
+            name: data.name,
+            code: data.code,
+          },
+        });
 
-      toast.success("Module modifié avec succès");
-    } else {
-      setModules((prev) => [
-        ...prev,
-        { id: Date.now(), ...data },
-      ]);
+        setEditingModule(null);
+        toast.success("Module modifié avec succès");
+      } else {
+        await createCourse({
+          name: data.name,
+          code: data.code,
+        });
 
-      toast.success("Module ajouté avec succès");
+        toast.success("Module ajouté avec succès");
+      }
+    } catch {
+      toast.error("Erreur lors de l'opération");
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm(
+      "Voulez-vous vraiment supprimer ce module ?"
+    );
 
-    const confirmDelete = window.confirm("Voulez-vous vraiment supprimer ce module ?");
+    if (!confirmDelete) return;
 
-    if (!confirmDelete) {
-      return;
+    try {
+      await deleteCourse(id);
+      toast.success("Module supprimé avec succès");
+    } catch {
+      toast.error("Erreur lors de la suppression");
     }
-
-    const moduleHasCourses = false;
-
-    if (moduleHasCourses) {
-      toast.error("Impossible de supprimer ce module car des cours sont planifiés");
-      return;
-    }
-
-    setModules((prev) => prev.filter((m) => m.id !== id));
-
-    toast.success("Module supprimé avec succès");
   };
 
   const handleEdit = (module: Module) => {
@@ -112,38 +106,41 @@ function ModulesPage() {
     setIsModalOpen(true);
   };
 
-  const filteredModules = modules.filter(
-    (m) =>
-      m.formationId === selectedFormation &&
-      m.name.toLowerCase().includes(search.toLowerCase())
+  // Adaptation des données backend Courses -> UI Modules
+  const modules: Module[] = courses.map((course) => ({
+    id: course.id,
+    name: course.name,
+    code: course.code,
+    formationId: selectedFormation,
+    volume: "—",
+    teacher: "Non assigné",
+  }));
+
+  // Pour l'instant, Courses ne permet pas encore de filtrer réellement par formation
+  const filteredModules = modules.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div data-theme="light">
-
       <PageLayout className="p-4 space-y-4">
-
         <PageHeader onOpenModal={() => setIsModalOpen(true)} />
 
-        {/* Recherche + formation */}
         <div className="flex items-center justify-between mb-4">
-
           <div className="relative w-150">
+            <Search
+              size={22}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-800 z-10"
+            />
 
-  <Search
-    size={22}
-    className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-800 z-10"
-  />
-
-  <input
-    type="text"
-    placeholder="Rechercher un module..."
-    className="input input-bordered w-full pl-12 text-blue-950 font-bold text-lg placeholder:text-blue-800 rounded-xl  bg-gray-100 border-none"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-  />
-
-</div>
+            <input
+              type="text"
+              placeholder="Rechercher un module..."
+              className="input input-bordered w-full pl-12 text-blue-950 font-bold text-lg placeholder:text-blue-800 rounded-xl bg-gray-100 border-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
           <div>
             <label className="mr-2 font-medium">
@@ -162,10 +159,8 @@ function ModulesPage() {
               ))}
             </select>
           </div>
-
         </div>
 
-        {/* Module Table */}
         <div className="card bg-base-100 border border-base-200">
           <div className="overflow-x-auto">
             <ModuleTable
@@ -176,18 +171,16 @@ function ModulesPage() {
           </div>
         </div>
 
-        {/* Modal Nouveau Module */}
         {isModalOpen && (
           <div className="modal modal-open">
             <div className="modal-box">
-
               <h3 className="font-bold text-lg mb-4">
-                Nouveau Module
+                {editingModule ? "Modifier le module" : "Nouveau Module"}
               </h3>
 
               <ModuleForm
-                onSubmit={(data) => {
-                  handleAddOrUpdate(data);
+                onSubmit={async (data) => {
+                  await handleAddOrUpdate(data);
                   setIsModalOpen(false);
                 }}
                 editingModule={editingModule}
@@ -197,18 +190,18 @@ function ModulesPage() {
               <div className="modal-action">
                 <button
                   className="btn"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingModule(null);
+                  }}
                 >
                   Annuler
                 </button>
               </div>
-
             </div>
           </div>
         )}
-
       </PageLayout>
-
     </div>
   );
 }
