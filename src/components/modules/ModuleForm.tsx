@@ -6,17 +6,17 @@ const moduleSchema = z.object({
   name: z.string().min(3, "Le nom doit contenir au moins 3 caractères"),
   code: z.string().min(2, "Le code est obligatoire"),
   formationId: z.string().min(1, "Formation obligatoire"),
-  volume: z.string().optional(), // AJOUT
-  teacher: z.string().optional(), // AJOUT
+  volume: z.string().optional(),
+  teacher: z.string().optional(),
 });
 
 type Module = {
-  id: number;
+  id: string;
   name: string;
   code: string;
-  formationId: string;
-  volume?: string; // AJOUT
-  teacher?: string; // AJOUT
+  formationId?: string;
+  volume?: string;
+  teacher?: string;
 };
 
 type Props = {
@@ -24,9 +24,9 @@ type Props = {
     name: string;
     code: string;
     formationId: string;
-    volume?: string; // AJOUT
-    teacher?: string; // AJOUT
-  }) => void;
+    volume?: string;
+    teacher?: string;
+  }) => void | Promise<void>;
   editingModule: Module | null;
   selectedFormation: string;
 };
@@ -41,11 +41,11 @@ export default function ModuleForm({
       name: "",
       code: "",
       formationId: selectedFormation,
-      volume: "", // AJOUT
-      teacher: "", // AJOUT
+      volume: "",
+      teacher: "",
     },
     onSubmit: async ({ value }) => {
-      onSubmit(value);
+      await onSubmit(value);
       form.reset();
     },
   });
@@ -58,11 +58,11 @@ export default function ModuleForm({
     if (editingModule) {
       form.setFieldValue("name", editingModule.name);
       form.setFieldValue("code", editingModule.code);
-      form.setFieldValue("formationId", editingModule.formationId);
-      form.setFieldValue("volume", editingModule.volume || ""); // AJOUT
-      form.setFieldValue("teacher", editingModule.teacher || ""); // AJOUT
+      form.setFieldValue("formationId", editingModule.formationId || selectedFormation);
+      form.setFieldValue("volume", editingModule.volume || "");
+      form.setFieldValue("teacher", editingModule.teacher || "");
     }
-  }, [editingModule]);
+  }, [editingModule, selectedFormation]);
 
   return (
     <form
@@ -118,7 +118,6 @@ export default function ModuleForm({
         )}
       </form.Field>
 
-      {/* AJOUT Volume horaire */}
       <form.Field name="volume">
         {(field) => (
           <div>
@@ -129,13 +128,12 @@ export default function ModuleForm({
               value={field.state.value || ""}
               onChange={(e) => field.handleChange(e.target.value)}
               className="input input-bordered w-full"
-              placeholder="ex: 20h CM / 10h TD"
+              placeholder="En attente de Assign"
             />
           </div>
         )}
       </form.Field>
 
-      {/* AJOUT Intervenant */}
       <form.Field name="teacher">
         {(field) => (
           <div>
@@ -146,7 +144,7 @@ export default function ModuleForm({
               value={field.state.value || ""}
               onChange={(e) => field.handleChange(e.target.value)}
               className="input input-bordered w-full"
-              placeholder="Nom de l'intervenant"
+              placeholder="Non géré par l'API actuelle"
             />
           </div>
         )}
