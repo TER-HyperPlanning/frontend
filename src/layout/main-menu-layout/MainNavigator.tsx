@@ -1,11 +1,18 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
+<<<<<<< HEAD
+import { useMatchRoute } from '@tanstack/react-router'
+import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X } from 'lucide-react'
+=======
 import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock } from 'lucide-react'
+>>>>>>> develop
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
 import { HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { useAuth, useCurrentUser } from '@/hooks/api/useAuth'
+
+const TEACHER_NAME = 'Yassine'
 
 const NAV_ITEMS = [
   { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
@@ -34,6 +41,14 @@ function toRoleLabel(role: string | null | undefined) {
 }
 
 export default function MainNavigator() {
+  const matchRoute = useMatchRoute()
+  const isPlanningPage = !!matchRoute({ to: '/planning', fuzzy: false })
+
+  // Masquer complètement le menu principal sur la page Planning
+  if (isPlanningPage) {
+    return null
+  }
+
   const [isOpen, setIsOpen] = useState(true)
   const { data: user } = useCurrentUser()
   const { logout } = useAuth()
@@ -48,6 +63,31 @@ export default function MainNavigator() {
   const roleLabel = useMemo(() => toRoleLabel(user?.role), [user?.role])
 
   return (
+<<<<<<< HEAD
+    <motion.nav
+      animate={{ width: isOpen ? 240 : 72 }}
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className="h-full flex flex-col py-4 overflow-hidden shrink-0"
+    >
+      <div
+        className={`flex items-center mb-6 px-4 ${
+          isOpen ? 'justify-between' : 'justify-center flex-col gap-4 flex-col-reverse'
+        }`}
+      >
+        <Logo showText className="h-8 w-auto text-primary-700" />
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200/60 hover:text-gray-700 transition-colors"
+        >
+          <motion.div
+            animate={{ rotate: isOpen ? 0 : 180 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+          </motion.div>
+        </button>
+      </div>
+=======
     <>
       <motion.nav
         animate={{ width: isOpen ? 240 : 72 }}
@@ -71,6 +111,7 @@ export default function MainNavigator() {
           </button>
           
         </div>
+>>>>>>> develop
 
         {/* Navigation links */}
         <div className="flex-1 flex flex-col gap-1 px-3">
@@ -118,7 +159,17 @@ export default function MainNavigator() {
             isOpen={false}
           />
         ))}
+<<<<<<< HEAD
+      </div>
+
+      {/* Bottom: User avatar */}
+      <div className="border-none mt-2 pt-2">
+        <UserAvatar fullName={TEACHER_NAME} isOpen={isOpen} />
+      </div>
+    </motion.nav>
+=======
       </nav>
     </>
+>>>>>>> develop
   )
 }

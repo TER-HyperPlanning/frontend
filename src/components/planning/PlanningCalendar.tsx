@@ -1,9 +1,12 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import frLocale from '@fullcalendar/core/locales/fr'
-import type { EventContentArg, DayHeaderContentArg } from '@fullcalendar/core'
+import type { EventClickArg, EventContentArg, DayHeaderContentArg } from '@fullcalendar/core'
+import SeanceDetailsModal from '../seance-details/SeanceDetailsModal'
+import { detailsSeanceFromPlanningLike } from '../seance-details/types'
+import type { DetailsSeance } from '../seance-details/types'
 import './planning-calendar.css'
 
 interface PlanningCalendarProps {
@@ -15,7 +18,15 @@ const SAMPLE_EVENTS = [
   {
     id: '1',
     title: 'TD 02',
-    extendedProps: { description: 'Implementation de ..' },
+    extendedProps: {
+      description: 'Implementation de ..',
+      module: 'Algorithmique',
+      groupe: 'Groupe A',
+      enseignant: 'M. Dupont',
+      salle: 'S101',
+      batiment: 'Bâtiment A',
+      typeSeance: 'Travaux dirigés',
+    },
     start: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -37,6 +48,15 @@ const SAMPLE_EVENTS = [
   {
     id: '2',
     title: 'Cours',
+    extendedProps: {
+      description: 'Cours magistral sur la gestion de projet.',
+      module: 'Management',
+      groupe: 'Groupe B',
+      enseignant: 'Mme Martin',
+      salle: 'A201',
+      batiment: 'Bâtiment B',
+      typeSeance: 'Cours',
+    },
     start: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -79,6 +99,15 @@ const SAMPLE_EVENTS = [
   {
     id: '4',
     title: 'TD',
+    extendedProps: {
+      description: 'Travail sur les exercices pratiques du chapitre 3.',
+      module: 'Bases de données',
+      groupe: 'Groupe C',
+      enseignant: 'M. Leroy',
+      salle: 'B102',
+      batiment: 'Bâtiment C',
+      typeSeance: 'Travaux dirigés',
+    },
     start: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -147,12 +176,35 @@ function renderDayHeader(arg: DayHeaderContentArg) {
 
 function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
   const calendarRef = useRef<FullCalendar>(null)
+  const [selectedSeance, setSelectedSeance] = useState<DetailsSeance | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.getApi().gotoDate(selectedDate)
     }
   }, [selectedDate])
+
+  function closeModal() {
+    setIsModalOpen(false)
+    setSelectedSeance(null)
+  }
+
+  function handleEventClick(clickInfo: EventClickArg) {
+    const event = clickInfo.event
+    if (!event.start || !event.end) return
+
+    setSelectedSeance(
+      detailsSeanceFromPlanningLike({
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        extendedProps: event.extendedProps as { [key: string]: unknown },
+      })
+    )
+    setIsModalOpen(true)
+  }
 
   return (
     <div className="planning-calendar flex-1 overflow-auto px-1">
@@ -179,10 +231,12 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
           height="auto"
           events={SAMPLE_EVENTS}
           eventContent={renderEventContent}
+          eventClick={handleEventClick}
           editable={false}
           selectable={false}
         />
       </div>
+      <SeanceDetailsModal isOpen={isModalOpen} onClose={closeModal} seance={selectedSeance} />
     </div>
   )
 }
