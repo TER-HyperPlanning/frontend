@@ -7,6 +7,8 @@ import { PatternInfoForm } from '../../../components/forms/availability/PatternI
 import type { GroupProps, TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
 import { availabilityReducer } from './availabilityReducer'
 import { AvailabilityCalendar } from '../../../components/availability/AvailabilityCalendar/AvailabilityCalendar'
+import PageLayout from '../../../layout/PageLayout'
+import Logo from '../../../components/Logo'
 
 export const Route = createFileRoute('/(app)/availability/')({
   component: RouteComponent,
@@ -18,7 +20,7 @@ function RouteComponent() {
   const selectedYear = useRef(new Date().getFullYear())
   const [availableAllDay, setAvailableAllDay] = useState(true)
   const [selectedGroupNumber, setSelectedGroupNumber] = useState(1);
-  const [groups, setGroups] = useState<GroupProps[]>([{number:1}]);
+  const [groups, setGroups] = useState<GroupProps[]>([{ number: 1 }]);
   const [currentPage, setCurrentPage] = useState(0);
   const [numberOfDayPattern, setNumberOfDayPattern] = useState(0);
   const [endOfDatePattern, setEndOfDatePattern] = useState("");
@@ -33,66 +35,67 @@ function RouteComponent() {
 
   return (
     <div>
-      <div className="m-8">
-        <div className="grid grid-cols-3">
-          <AvailabilityCalendar
-          groups={groups}
-            timeOfAvailability={timeOfAvailability}
-            availableAllDay={availableAllDay}
-            selectedGroupNumber={selectedGroupNumber}
-            className='row-span-2'
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            selectedDays={selectedDays}
-            dispatchSelectedDays={dispatchSelectedDays} />
-
-          <div className="flex justify-center">
-            <AvailabilityTypeCheckbox className='flex flex-col justify-around  h-full '
-              selectedDays={selectedDays}
+        <PageLayout>
+      <div className='flex mt-8 ml-8 justify-between'>
+        <Logo showText={true} className="h-8 w-auto text-primary-700" />
+        {/* <div>test</div> */}
+      </div>
+    
+        <div className="m-8">
+          <div className="grid grid-cols-3">
+            <AvailabilityCalendar
               groups={groups}
               timeOfAvailability={timeOfAvailability}
               availableAllDay={availableAllDay}
               selectedGroupNumber={selectedGroupNumber}
-              dispatchSelectedDays={dispatchSelectedDays}
-              setGroups={setGroups}
-              setAvailableAllDay={setAvailableAllDay} />
-          </div>
-
-          <PatternInfoForm
-            availableAllDay={availableAllDay}
-            timeOfAvailability={timeOfAvailability}
-            selectedGroupNumber={selectedGroupNumber}
-            selectedDays={selectedDays}
-            dispatchSelectedDays={dispatchSelectedDays}
-            setEndOfDatePattern={setEndOfDatePattern}
-            endOfDatePattern={endOfDatePattern}
-            numberOfDayPattern={numberOfDayPattern}
-            setNumberOfDayPattern={setNumberOfDayPattern} />
-
-
-          <div className='grid grid-cols-2 col-span-2 items-baseline'>
-
-            {!availableAllDay &&
-              <AvailabilityHoursForm
-              availableAllDay={availableAllDay}
+              className='row-span-2'
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              selectedDays={selectedDays}
+              dispatchSelectedDays={dispatchSelectedDays} />
+            <div className="flex justify-center">
+              <AvailabilityTypeCheckbox className='flex flex-col justify-around  h-full '
+                selectedDays={selectedDays}
+                groups={groups}
                 timeOfAvailability={timeOfAvailability}
-                setTimeOfAvailability={setTimeOfAvailability}
+                availableAllDay={availableAllDay}
                 selectedGroupNumber={selectedGroupNumber}
-                dispatchSelectedDays={dispatchSelectedDays} />
-            }
-            <GroupNav
-              dispatchSelectedDays={dispatchSelectedDays}
+                dispatchSelectedDays={dispatchSelectedDays}
+                setGroups={setGroups}
+                setAvailableAllDay={setAvailableAllDay} />
+            </div>
+            <PatternInfoForm
+              availableAllDay={availableAllDay}
+              timeOfAvailability={timeOfAvailability}
               selectedGroupNumber={selectedGroupNumber}
-              className='flex justify-around'
-              groups={groups}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              setGroups={setGroups}
-              setSelectedGroupNumber={setSelectedGroupNumber} />
+              selectedDays={selectedDays}
+              dispatchSelectedDays={dispatchSelectedDays}
+              setEndOfDatePattern={setEndOfDatePattern}
+              endOfDatePattern={endOfDatePattern}
+              numberOfDayPattern={numberOfDayPattern}
+              setNumberOfDayPattern={setNumberOfDayPattern} />
+            <div className='grid grid-cols-2 col-span-2 items-baseline'>
+              {!availableAllDay &&
+                <AvailabilityHoursForm
+                  availableAllDay={availableAllDay}
+                  timeOfAvailability={timeOfAvailability}
+                  setTimeOfAvailability={setTimeOfAvailability}
+                  selectedGroupNumber={selectedGroupNumber}
+                  dispatchSelectedDays={dispatchSelectedDays} />
+              }
+              <GroupNav
+                dispatchSelectedDays={dispatchSelectedDays}
+                selectedGroupNumber={selectedGroupNumber}
+                className='flex justify-around'
+                groups={groups}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                setGroups={setGroups}
+                setSelectedGroupNumber={setSelectedGroupNumber} />
+            </div>
           </div>
         </div>
-
-      </div>
+      </PageLayout>
     </div>
   )
 }
