@@ -1,48 +1,34 @@
-const API_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5075";
+import { useCallback } from 'react';
+import { useAppClient } from '@/hooks/api/useAppClient';
+import { type ApiResponse } from '@/services/apiClient';
 
 export type Building = {
     id: string;
     name: string;
 };
 
-// GET ALL
-export async function getBuildings(): Promise<Building[]> {
-    const res = await fetch(`${API_URL}/Buildings`);
-    const json = await res.json();
-    return json.result;
-}
+export function useBuildingService() {
+    const { api } = useAppClient();
 
-// CREATE
-export async function createBuilding(name: string) {
-    const res = await fetch(`${API_URL}/Buildings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-    });
+    const getBuildings = useCallback(
+        () => api.get<ApiResponse<Building[]>>('/Buildings').then((r) => r.data.result),
+        [api],
+    );
 
-    const json = await res.json();
-    return json.result;
-}
+    const createBuilding = useCallback(
+        (name: string) => api.post<ApiResponse<Building>>('/Buildings', { name }).then((r) => r.data.result),
+        [api],
+    );
 
-// UPDATE
-export async function updateBuilding(id: string, name: string) {
-    const res = await fetch(`${API_URL}/Buildings/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-    });
+    const updateBuilding = useCallback(
+        (id: string, name: string) => api.put<ApiResponse<Building>>(`/Buildings/${id}`, { name }).then((r) => r.data.result),
+        [api],
+    );
 
-    const json = await res.json();
-    return json.result;
-}
+    const deleteBuilding = useCallback(
+        (id: string) => api.delete<ApiResponse<string>>(`/Buildings/${id}`).then((r) => r.data.result),
+        [api],
+    );
 
-// DELETE
-export async function deleteBuilding(id: string) {
-    const res = await fetch(`${API_URL}/Buildings/${id}`, {
-        method: "DELETE",
-    });
-
-    const json = await res.json();
-    return json.result;
+    return { getBuildings, createBuilding, updateBuilding, deleteBuilding };
 }

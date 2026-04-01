@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createBuilding } from "@/hooks/api/buildings";
+import { useBuildingService } from "@/hooks/api/buildings";
 
 export function useCreateBuilding() {
     const queryClient = useQueryClient();
+    const { createBuilding } = useBuildingService();
 
     return useMutation({
         mutationFn: createBuilding,

@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateBuilding } from "@/hooks/api/buildings";
+import { useBuildingService } from "@/hooks/api/buildings";
 
 export function useUpdateBuilding() {
     const queryClient = useQueryClient();
+    const { updateBuilding } = useBuildingService();
 
     return useMutation({
         mutationFn: ({ id, name }: { id: string; name: string }) =>
