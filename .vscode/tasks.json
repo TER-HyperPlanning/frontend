@@ -1,0 +1,47 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Frontend (stable)",
+			"type": "shell",
+			"command": "zsh",
+			"args": [
+				"-lc",
+				"source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && npm run dev -- --host localhost"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Stop Frontend",
+			"type": "shell",
+			"command": "zsh",
+			"args": [
+				"-lc",
+				"pkill -f vite || true"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Restart Frontend",
+			"type": "shell",
+			"command": "zsh",
+			"args": [
+				"-lc",
+				"pkill -f vite || true; source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && npm run dev -- --host localhost"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Restart Frontend + Open",
+			"type": "shell",
+			"command": "zsh",
+			"args": [
+				"-lc",
+				"pkill -f vite || true; source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && nohup npm run dev -- --host localhost >/tmp/frontend-vite.log 2>&1 & sleep 2; open http://localhost:3000"
+			],
+			"problemMatcher": []
+		}
+	]
+}
