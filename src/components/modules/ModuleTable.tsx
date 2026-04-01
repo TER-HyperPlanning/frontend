@@ -1,5 +1,5 @@
-import React from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
 
 type Module = {
   id: number;
@@ -22,67 +22,66 @@ export default function ModuleTable({
   onEdit,
 }: Props) {
   return (
-    <div className="overflow-x-auto bg-gray-100 p-6 rounded-xl">
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableHeader>Nom</TableHeader>
+            <TableHeader>Code</TableHeader>
+            <TableHeader>Volume horaire</TableHeader>
+            <TableHeader>Intervenant</TableHeader>
+            <TableHeader>Actions</TableHeader>
+          </TableRow>
+        </TableHead>
 
-      <table className="w-full bg-gray-100 border-collapse">
+        <TableBody>
+          {modules.length > 0 ? (
+            modules.map((module) => (
+              <TableRow key={module.id}>
+                <TableCell className="font-medium text-base-content">
+                  {module.name}
+                </TableCell>
 
-        <thead className="text-blue-900 font-bold text-lg uppercase">
-          <tr>
-            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Nom</th>
-            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Code</th>
-            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Volume horaire</th>
-            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Intervenant</th>
-            <th className="px-6 py-3 text-left border-b-2 border-gray-400">Actions</th>
-          </tr>
-        </thead>
+                <TableCell>
+                  <span className="badge badge-secondary badge-outline badge-sm font-medium">
+                    {module.code}
+                  </span>
+                </TableCell>
 
-        <tbody className="text-blue-900 font-bold text-lg uppercase border-b-2 border-gray-400">
-          {modules.map((module) => (
-            <tr
-              key={module.id}
-              className="border-b-2 border-gray-300 hover:bg-blue-50 transition"
-            >
+                <TableCell className="text-sm text-base-content/80">
+                  {module.volume ?? <span className="text-base-content/40 italic">—</span>}
+                </TableCell>
 
-              <td className="font-bold text-blue-900 text-lg px-6 py-3 border-b border-gray-400">
-                {module.name}
-              </td>
+                <TableCell className="text-sm text-base-content/80">
+                  {module.teacher ?? <span className="text-base-content/40 italic">Non assigné</span>}
+                </TableCell>
 
-              <td className="font-bold text-blue-800 text-lg px-6 py-3 border-b border-gray-400">
-                {module.code}
-              </td>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <button
+                      className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
+                      onClick={() => onEdit(module)}
+                    >
+                      <Pencil size={16} />
+                    </button>
 
-              <td className="font-bold text-blue-800 text-lg px-6 py-3 border-b border-gray-400">
-                {module.volume}
-              </td>
-
-              <td className="font-bold text-blue-800 text-lg px-6 py-3 border-b border-gray-400">
-                {module.teacher}
-              </td>
-
-              <td className="space-x-2 px-6 py-3">
-
-                <button
-                  className="btn btn-ghost"
-                  onClick={() => onEdit(module)}
-                >
-                  <Pencil size={25} />
-                </button>
-
-                <button
-                  className="btn btn-ghost text-black"
-                  onClick={() => onDelete(module.id)}
-                >
-                  <Trash2 size={25} />
-                </button>
-
-              </td>
-
-            </tr>
-          ))}
-        </tbody>
-
-      </table>
-
-    </div>
+                    <button
+                      className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
+                      onClick={() => onDelete(module.id)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="py-16 text-center text-base-content/50">
+                Aucun module trouvé.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
   );
 }

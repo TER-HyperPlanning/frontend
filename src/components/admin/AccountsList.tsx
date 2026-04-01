@@ -76,7 +76,7 @@ export default function AccountsList() {
       <div className="fixed top-4 right-4 z-50 max-w-sm space-y-2 pointer-events-none">
         {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto">
-            <Toast id={toast.id} message={toast.message} type={toast.type} onClose={removeToast} />
+            <Toast toast={{message:toast.message, type:toast.type as 'success' | 'error'}} onClose={()=>removeToast(toast.id)} />
           </div>
         ))}
       </div>

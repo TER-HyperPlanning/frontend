@@ -23,6 +23,7 @@ import { Route as appModulesIndexRouteImport } from './routes/(app)/modules/inde
 import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
 import { Route as appFormationsIndexRouteImport } from './routes/(app)/formations/index'
 import { Route as appBuildingsIndexRouteImport } from './routes/(app)/buildings/index'
+import { Route as appAvailabilityIndexRouteImport } from './routes/(app)/availability/index'
 import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
 import { Route as appAdminAccountsIndexRouteImport } from './routes/(app)/admin/accounts/index'
 
@@ -95,6 +96,11 @@ const appBuildingsIndexRoute = appBuildingsIndexRouteImport.update({
   path: '/buildings/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appAvailabilityIndexRoute = appAvailabilityIndexRouteImport.update({
+  id: '/availability/',
+  path: '/availability/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 const appBuildingsBuildingIdRoute = appBuildingsBuildingIdRouteImport.update({
   id: '/buildings/$buildingId',
   path: '/buildings/$buildingId',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
   '/planning/': typeof PlanningIndexRoute
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/availability/': typeof appAvailabilityIndexRoute
   '/buildings/': typeof appBuildingsIndexRoute
   '/formations/': typeof appFormationsIndexRoute
   '/groupes/': typeof appGroupesIndexRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRouteWithChildren
   '/planning': typeof PlanningIndexRoute
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/availability': typeof appAvailabilityIndexRoute
   '/buildings': typeof appBuildingsIndexRoute
   '/formations': typeof appFormationsIndexRoute
   '/groupes': typeof appGroupesIndexRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteRouteWithChildren
   '/planning/': typeof PlanningIndexRoute
   '/(app)/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
+  '/(app)/availability/': typeof appAvailabilityIndexRoute
   '/(app)/buildings/': typeof appBuildingsIndexRoute
   '/(app)/formations/': typeof appFormationsIndexRoute
   '/(app)/groupes/': typeof appGroupesIndexRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/planning/'
     | '/buildings/$buildingId'
+    | '/availability/'
     | '/buildings/'
     | '/formations/'
     | '/groupes/'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/planning'
     | '/buildings/$buildingId'
+    | '/availability'
     | '/buildings'
     | '/formations'
     | '/groupes'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/planning/'
     | '/(app)/buildings/$buildingId'
+    | '/(app)/availability/'
     | '/(app)/buildings/'
     | '/(app)/formations/'
     | '/(app)/groupes/'
@@ -321,6 +333,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appBuildingsIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/availability/': {
+      id: '/(app)/availability/'
+      path: '/availability'
+      fullPath: '/availability/'
+      preLoaderRoute: typeof appAvailabilityIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
     '/(app)/buildings/$buildingId': {
       id: '/(app)/buildings/$buildingId'
       path: '/buildings/$buildingId'
@@ -340,6 +359,7 @@ declare module '@tanstack/react-router' {
 
 interface appRouteRouteChildren {
   appBuildingsBuildingIdRoute: typeof appBuildingsBuildingIdRoute
+  appAvailabilityIndexRoute: typeof appAvailabilityIndexRoute
   appBuildingsIndexRoute: typeof appBuildingsIndexRoute
   appFormationsIndexRoute: typeof appFormationsIndexRoute
   appGroupesIndexRoute: typeof appGroupesIndexRoute
@@ -352,6 +372,7 @@ interface appRouteRouteChildren {
 
 const appRouteRouteChildren: appRouteRouteChildren = {
   appBuildingsBuildingIdRoute: appBuildingsBuildingIdRoute,
+  appAvailabilityIndexRoute: appAvailabilityIndexRoute,
   appBuildingsIndexRoute: appBuildingsIndexRoute,
   appFormationsIndexRoute: appFormationsIndexRoute,
   appGroupesIndexRoute: appGroupesIndexRoute,

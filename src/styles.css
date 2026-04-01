@@ -1,5 +1,10 @@
 @import "tailwindcss";
-@plugin "daisyui";
+/* @plugin "daisyui"; */
+
+
+ @plugin "daisyui" {
+   themes: light --default;
+ }
 
 :root {
   color-scheme: light;
@@ -19,8 +24,12 @@ code {
     monospace;
 }
 
-@theme {
+@utility btn-blue {
+  @apply bg-dark-blue text-white hover:brightness-94;
+}
 
+@theme {
+  --color-dark-blue: #003A68;
   --color-primary-50: oklch(0.853 0.072 264.08);
   --color-primary-100: oklch(0.821 0.089 262.1);
   --color-primary-200: oklch(0.76 0.123 259.17);
@@ -44,6 +53,4 @@ code {
   --color-secondary-800: oklch(0.41 0.176 301.15);
   --color-secondary-900: oklch(0.318 0.137 301.24);
   --color-secondary-950: oklch(0.282 0.122 301.19);
-
-
 }

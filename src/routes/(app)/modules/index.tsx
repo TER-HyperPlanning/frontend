@@ -166,8 +166,8 @@ function ModulesPage() {
         </div>
 
         {/* Module Table */}
-        <div className="card bg-base-100 shadow">
-          <div className="card-body p-4">
+        <div className="card bg-base-100 border border-base-200">
+          <div className="overflow-x-auto">
             <ModuleTable
               modules={filteredModules}
               onDelete={handleDelete}

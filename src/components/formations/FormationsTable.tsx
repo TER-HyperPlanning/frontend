@@ -1,6 +1,6 @@
 import { type Formation } from '@/types/formation'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { motion } from 'framer-motion'
 
 interface FormationsTableProps {
   formations: Formation[]
@@ -14,73 +14,61 @@ export default function FormationsTable({
   onDelete,
 }: FormationsTableProps) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200">
-      <table className="table w-full">
-        <thead>
-          <tr className="bg-gray-50 text-primary-900">
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Nom de la formation
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Enseignant responsable
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Programme
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Lieu
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Filière associée
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide text-right">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {formations.map((formation, index) => (
-            <motion.tr
-              key={formation.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="hover:bg-gray-50 transition-colors border-b border-gray-100"
-            >
-              <td className="text-gray-800 font-medium">{formation.nom}</td>
-              <td className="text-gray-600">
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableHeader>Nom de la formation</TableHeader>
+            <TableHeader>Enseignant responsable</TableHeader>
+            <TableHeader>Programme</TableHeader>
+            <TableHeader>Lieu</TableHeader>
+            <TableHeader>Filière associée</TableHeader>
+            <TableHeader>Actions</TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {formations.map(formation => (
+            <TableRow key={formation.id}>
+              <TableCell className="font-medium text-base-content">{formation.nom}</TableCell>
+              <TableCell className="text-sm text-base-content/80">
                 {formation.enseignantResponsable}
-              </td>
-              <td className="text-gray-600">{formation.programme}</td>
-              <td className="text-gray-600">{formation.lieu}</td>
-              <td className="text-gray-600">{formation.filiere.nom}</td>
-              <td>
-                <div className="flex items-center justify-end gap-2">
+              </TableCell>
+              <TableCell>
+                <span className="badge badge-ghost badge-sm font-medium">
+                  {formation.programme}
+                </span>
+              </TableCell>
+              <TableCell className="text-sm text-base-content/80">{formation.lieu}</TableCell>
+              <TableCell>
+                <span className="badge badge-primary badge-outline badge-sm font-medium">
+                  {formation.filiere.nom}
+                </span>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => onEdit(formation)}
-                    className="p-1.5 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
+                    className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
                   >
-                    <PencilSquareIcon className="size-5" />
+                    <PencilSquareIcon className="size-4" />
                   </button>
                   <button
                     onClick={() => onDelete(formation)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                    className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
                   >
-                    <TrashIcon className="size-5" />
+                    <TrashIcon className="size-4" />
                   </button>
                 </div>
-              </td>
-            </motion.tr>
+              </TableCell>
+            </TableRow>
           ))}
           {formations.length === 0 && (
-            <tr>
-              <td colSpan={6} className="text-center text-gray-400 py-12">
+            <TableRow>
+              <TableCell colSpan={6} className="text-center text-base-content/50 py-16">
                 Aucune formation enregistrée
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
   )
 }

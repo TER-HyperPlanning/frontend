@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { TableHeader } from '@/components/Table'
 import type { SortConfig, SortKey } from '../types'
 
 interface SortableHeaderProps {
@@ -11,7 +12,7 @@ interface SortableHeaderProps {
 
 function SortableHeader({ children, sortKey, sortConfig, onSort }: SortableHeaderProps) {
   return (
-    <th className="cursor-pointer select-none" onClick={() => onSort(sortKey)}>
+    <TableHeader className="cursor-pointer select-none" onClick={() => onSort(sortKey)}>
       <div className="flex items-center gap-1">
         {children}
         <div className="flex flex-col">
@@ -33,7 +34,7 @@ function SortableHeader({ children, sortKey, sortConfig, onSort }: SortableHeade
           />
         </div>
       </div>
-    </th>
+    </TableHeader>
   )
 }
 
