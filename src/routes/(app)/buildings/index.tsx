@@ -1,5 +1,9 @@
 import { useState, useMemo } from 'react';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useBuildings } from "@/hooks/buildings/useBuildings";
+import type { Building } from "@/hooks/api/buildings";
+import { useEffect } from "react";
+import Logo from '@/components/Logo';
 import {
   HiOutlineSearch,
   HiOutlinePencil,
@@ -13,6 +17,7 @@ import {
 } from 'react-icons/hi';
 
 import Button from '@/components/Button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
 import TextField from '@/components/TextField'; // Utilisation du composant existant
 import PageLayout from '@/layout/PageLayout';
 import AddBuildingModal from '@/components/modals/AddBuildingModal';
@@ -34,22 +39,19 @@ function BuildingsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedBuilding, setSelectedBuilding] = useState<any>(null);
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // --- DONNÉES ---
-  const allBuildings = useMemo(() => [
-    { id: 1, name: 'Bâtiments IBGBI' },
-    { id: 2, name: 'Bâtiments Île de France' },
-    { id: 3, name: 'Bâtiments A' },
-    { id: 4, name: 'Bâtiments B' },
-    { id: 5, name: 'Bâtiments C' },
-    { id: 6, name: 'Bâtiments D' },
-    { id: 7, name: 'Bâtiments E' },
-    { id: 8, name: 'Bâtiments F' },
-    { id: 9, name: 'Bâtiments G' },
-  ], []);
+  //l'appel du hooks  recuperation des données
+  const { data: allBuildings = [], isLoading } = useBuildings();
 
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <div className="p-10 text-gray-500">Chargement...</div>
+      </PageLayout>
+    );
+  }
   // --- LOGIQUE ---
   const filteredBuildings = allBuildings.filter((b) =>
     b.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -86,24 +88,29 @@ function BuildingsPage() {
 
         {/* HEADER : Recherche et Actions */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 w-full shrink-0">
-          <div className="relative w-full lg:max-w-xl">
-            <span className="absolute inset-y-0 left-4 flex items-center text-gray-400 z-10">
-              <HiOutlineSearch size={20} />
-            </span>
-            <TextField
-              placeholder="Rechercher un bâtiment..."
-              value={searchTerm}
-              onChange={handleSearch}
-              className="pl-12 w-full h-12 shadow-sm border-none bg-white text-gray-800 placeholder:text-gray-400"
-              name="search"
-            />
 
+          {/* Nouveau container pour Logo + Barre de recherche */}
+          <div className="flex items-center gap-4 w-full lg:max-w-2xl">
+            {/* Intégration du Logo */}
+            <Logo showText={true} className="shrink-0 h-10 w-auto text-[#003366]" />
+
+            {/* Barre de recherche */}
+            <div className="relative flex-1">
+              <span className="absolute inset-y-0 left-4 flex items-center text-gray-400 z-10">
+                <HiOutlineSearch size={20} />
+              </span>
+              <TextField
+                placeholder="Rechercher un bâtiment..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="pl-12 w-full h-12 shadow-sm border-none bg-white text-gray-800 placeholder:text-gray-400"
+                name="search"
+              />
+            </div>
           </div>
 
-
+          {/* Actions (Import, Nouveau, Notifications) */}
           <div className="flex items-center gap-4 w-full lg:w-auto">
-
-            {/* BOUTON IMPORT CSV */}
             <button
               onClick={() => console.log('Import CSV')}
               className="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center p-3 rounded-xl shadow-sm"
@@ -112,7 +119,6 @@ function BuildingsPage() {
               <HiOutlineCloudUpload size={20} />
             </button>
 
-            {/* BOUTON AJOUT - reste inchangé car c'est un composant */}
             <Button
               onClick={() => setIsAddModalOpen(true)}
               className="bg-[#003366] hover:bg-[#002244] text-white flex items-center gap-2 px-8 h-12 flex-1 lg:flex-none rounded-xl transition-all shadow-md"
@@ -121,105 +127,91 @@ function BuildingsPage() {
               <span className="whitespace-nowrap font-semibold">Nouveau bâtiment</span>
             </Button>
 
-            {/* BOUTON NOTIFICATIONS */}
             <button
               className="btn btn-ghost btn-circle bg-white shadow-sm shrink-0 h-12 w-12 border border-gray-100"
               title="Notifications"
             >
               <HiOutlineBell size={24} className="text-gray-600" />
             </button>
-
           </div>
         </div>
-
         {/* CONTENU : Scrollable avec espacement */}
         <div className="flex-1 overflow-y-auto space-y-8 pr-2 custom-scrollbar">
           {/* TABLEAU */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-            <div className="w-full">
-              <table className="w-full">
+          <div className="card bg-base-100 border border-base-200">
+            <div className="overflow-x-auto">
+              <Table>
 
                 {/* HEADER */}
-                <thead className="bg-[#0B3C5D] text-white text-sm">
-                  <tr>
-                    <th className="text-left px-6 py-4 font-semibold uppercase tracking-wider">
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>
                       Liste des Bâtiments
-                    </th>
+                    </TableHeader>
 
-                    <th className="text-right px-6 py-4 font-semibold uppercase tracking-wider">
+                    <TableHeader className="text-right">
                       Actions
-                    </th>
-                  </tr>
-                </thead>
+                    </TableHeader>
+                  </TableRow>
+                </TableHead>
 
                 {/* BODY */}
-                <tbody className="divide-y divide-gray-100 bg-white">
+                <TableBody>
 
                   {currentData.length > 0 ? (
                     currentData.map((building) => (
-                      <tr
-                        key={building.id}
-                        className="hover:bg-gray-50 transition group"
-                      >
-
-                        {/* NOM BATIMENT */}
-                        <td className="px-6 py-5 font-medium text-gray-700">
+                      <TableRow key={building.id}>
+                        <TableCell className="font-medium text-base-content">
                           {building.name}
-                        </td>
+                        </TableCell>
 
-                        {/* ACTIONS */}
-                        <td className="px-6 py-5">
-                          <div className="flex justify-end items-center gap-4">
-
-                            {/* DETAILS */}
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() =>
                                 navigate({ to: `/buildings/${building.id}` })
                               }
-                              className="text-gray-400 hover:text-blue-600 transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-primary"
                               data-tip="Détails du bâtiment"
                             >
-                              <HiOutlineSearch size={20} />
+                              <HiOutlineSearch size={16} />
                             </button>
 
-                            {/* EDIT */}
                             <button
                               onClick={() => {
                                 setSelectedBuilding(building);
                                 setIsEditModalOpen(true);
                               }}
-                              className="text-gray-400 hover:text-orange-500 transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
                               data-tip="Modifier bâtiment"
                             >
-                              <HiOutlinePencil size={20} />
+                              <HiOutlinePencil size={16} />
                             </button>
 
-                            {/* DELETE */}
                             <button
                               onClick={() => {
                                 setSelectedBuilding(building);
                                 setIsDeleteModalOpen(true);
                               }}
-                              className="text-gray-400 hover:text-red-500 transition tooltip"
+                              className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
                               data-tip="Supprimer bâtiment"
                             >
-                              <HiOutlineTrash size={20} />
+                              <HiOutlineTrash size={16} />
                             </button>
-
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan={2} className="text-center py-10 text-gray-400">
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-16 text-base-content/50">
                         Aucun bâtiment trouvé
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )}
 
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
             {/* PAGINATION */}
@@ -256,6 +248,7 @@ function BuildingsPage() {
           building={selectedBuilding}
           onSuccess={showSuccess}
         />
+
         <DeleteBuildingModal
           isOpen={isDeleteModalOpen}
           onClose={() => { setIsDeleteModalOpen(false); setSelectedBuilding(null); }}
