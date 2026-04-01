@@ -110,3 +110,25 @@
 .planning-calendar .fc .fc-scrollgrid-section-header>td {
   border-bottom: 1px solid #e5e7eb;
 }
+
+/* Drag & Drop Visual Feedback */
+.planning-calendar .fc .valid-drop {
+  border: 2px dashed #a78bfa;
+  background-color: rgba(167, 139, 250, 0.05);
+}
+
+.planning-calendar .fc .invalid-drop {
+  opacity: 0.3;
+}
+
+/* Dragging event styling */
+.planning-calendar .fc-event.fc-event-dragging {
+  opacity: 0.8;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Pending status styling */
+.planning-calendar .fc .fc-event.pending {
+  opacity: 0.6;
+  filter: grayscale(10%);
+}
