@@ -1,11 +1,17 @@
 import { type ReactNode, useEffect } from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { ArrowRight, Calendar, CheckCircle, Clock, Users } from 'lucide-react'
 import Logo from '@/components/Logo'
 import Button from '@/components/Button'
+import { getAccessToken } from '@/auth/storage'
 
 export const Route = createFileRoute('/')({
+  beforeLoad: () => {
+    if (getAccessToken()) {
+      throw redirect({ to: '/planning' })
+    }
+  },
   component: LandingPage,
 })
 
