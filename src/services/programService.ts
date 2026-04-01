@@ -1,22 +1,35 @@
+import { useCallback } from 'react'
 import { type ProgramModel, type CreateProgramRequest, type UpdateProgramRequest } from '@/types/formation'
-import { apiGet, apiPost, apiPut, apiDelete } from '@/services/apiClient'
+import { useAppClient } from '@/hooks/api/useAppClient'
+import { type ApiResponse } from '@/services/apiClient'
 
-export function getPrograms(): Promise<ProgramModel[]> {
-  return apiGet<ProgramModel[]>('/Programs')
-}
+export function useProgramService() {
+  const { api } = useAppClient()
 
-export function getProgramById(id: string): Promise<ProgramModel> {
-  return apiGet<ProgramModel>(`/Programs/${id}`)
-}
+  const getPrograms = useCallback(
+    () => api.get<ApiResponse<ProgramModel[]>>('/Programs').then((r) => r.data.result),
+    [api],
+  )
 
-export function createProgram(data: CreateProgramRequest): Promise<ProgramModel> {
-  return apiPost<ProgramModel>('/Programs', data)
-}
+  const getProgramById = useCallback(
+    (id: string) => api.get<ApiResponse<ProgramModel>>(`/Programs/${id}`).then((r) => r.data.result),
+    [api],
+  )
 
-export function updateProgram(id: string, data: UpdateProgramRequest): Promise<ProgramModel> {
-  return apiPut<ProgramModel>(`/Programs/${id}`, data)
-}
+  const createProgram = useCallback(
+    (data: CreateProgramRequest) => api.post<ApiResponse<ProgramModel>>('/Programs', data).then((r) => r.data.result),
+    [api],
+  )
 
-export function deleteProgram(id: string): Promise<string> {
-  return apiDelete<string>(`/Programs/${id}`)
+  const updateProgram = useCallback(
+    (id: string, data: UpdateProgramRequest) => api.put<ApiResponse<ProgramModel>>(`/Programs/${id}`, data).then((r) => r.data.result),
+    [api],
+  )
+
+  const deleteProgram = useCallback(
+    (id: string) => api.delete<ApiResponse<string>>(`/Programs/${id}`).then((r) => r.data.result),
+    [api],
+  )
+
+  return { getPrograms, getProgramById, createProgram, updateProgram, deleteProgram }
 }

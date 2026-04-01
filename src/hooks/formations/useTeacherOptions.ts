@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { type SelectOption } from '@/types/formation'
-import { getTeachers } from '@/services/teacherService'
+import { useTeacherService } from '@/services/teacherService'
 
 export function useTeacherOptions() {
+  const { getTeachers } = useTeacherService()
   const [options, setOptions] = useState<SelectOption[]>([])
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function useTeacherOptions() {
       .catch(() => {
         setOptions([])
       })
-  }, [])
+  }, [getTeachers])
 
   return options
 }
