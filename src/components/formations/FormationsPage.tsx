@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react'
+import Logo from '@/components/Logo'
 import FormationsSearchBar from '@/components/formations/FormationsSearchBar'
 import FormationsTable from '@/components/formations/FormationsTable'
 import AddFormationModal from '@/components/formations/AddFormationModal'
@@ -38,13 +39,8 @@ export default function FormationsPage() {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-base-content">
-          Gestion des Formations
-        </h1>
+        <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
         <div className="flex items-center gap-3">
-          <div className="badge badge-neutral badge-lg">
-            {formations.length} formation{formations.length > 1 ? 's' : ''}
-          </div>
           <Button
             onClick={openAddModal}
             leftIcon={<Plus size={18} />}
