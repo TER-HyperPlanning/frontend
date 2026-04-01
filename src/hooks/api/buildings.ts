@@ -8,14 +8,14 @@ export type Building = {
 
 // GET ALL
 export async function getBuildings(): Promise<Building[]> {
-    const res = await fetch(`${API_URL}/api/Buildings`);
+    const res = await fetch(`${API_URL}/Buildings`);
     const json = await res.json();
     return json.result;
 }
 
 // CREATE
 export async function createBuilding(name: string) {
-    const res = await fetch(`${API_URL}/api/Buildings`, {
+    const res = await fetch(`${API_URL}/Buildings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -27,7 +27,7 @@ export async function createBuilding(name: string) {
 
 // UPDATE
 export async function updateBuilding(id: string, name: string) {
-    const res = await fetch(`${API_URL}/api/Buildings/${id}`, {
+    const res = await fetch(`${API_URL}/Buildings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -39,7 +39,7 @@ export async function updateBuilding(id: string, name: string) {
 
 // DELETE
 export async function deleteBuilding(id: string) {
-    const res = await fetch(`${API_URL}/api/Buildings/${id}`, {
+    const res = await fetch(`${API_URL}/Buildings/${id}`, {
         method: "DELETE",
     });
 

@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL as string
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   status: string | null
   message: string | null
   result: T

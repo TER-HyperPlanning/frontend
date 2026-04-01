@@ -3,7 +3,7 @@ import { type Formation, type ProgramModel } from '@/types/formation'
 import { type AddFormationValues } from '@/hooks/formations/useAddFormationForm'
 import { type EditFormationValues } from '@/hooks/formations/useEditFormationForm'
 import { useProgramService } from '@/services/programService'
-import { getTracks } from '@/services/trackService'
+import { useTrackService } from '@/services/trackService'
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -36,6 +36,7 @@ function programToFormation(
 
 export function useFormations() {
   const { getPrograms, createProgram, updateProgram, deleteProgram } = useProgramService()
+  const { getTracks } = useTrackService()
   const [formations, setFormations] = useState<Formation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -67,7 +68,7 @@ export function useFormations() {
     } finally {
       setIsLoading(false)
     }
-  }, [getPrograms])
+  }, [getPrograms, getTracks])
 
   useEffect(() => {
     fetchFormations()

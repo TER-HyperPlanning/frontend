@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { type SelectOption } from '@/types/formation'
-import { getTracks } from '@/services/trackService'
+import { useTrackService } from '@/services/trackService'
 
 export function useTrackOptions() {
+  const { getTracks } = useTrackService()
   const [options, setOptions] = useState<SelectOption[]>([])
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function useTrackOptions() {
       .catch(() => {
         setOptions([])
       })
-  }, [])
+  }, [getTracks])
 
   return options
 }
