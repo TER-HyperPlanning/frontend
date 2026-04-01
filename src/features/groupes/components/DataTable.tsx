@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import SortableHeader from './SortableHeader'
 
 export interface DataColumn<T> {
@@ -9,20 +9,20 @@ export interface DataColumn<T> {
   className?: string
 }
 
-export interface DataTableProps<T> {
+export interface DataTableProps<T, SortKeyType extends string = string> {
   columns: DataColumn<T>[]
   data: T[]
   sortConfig?: {
-    key: string | null
+    key: SortKeyType | null
     direction: 'asc' | 'desc'
   }
-  onSort?: (key: string) => void
+  onSort?: (key: SortKeyType) => void
   loading?: boolean
   emptyState?: ReactNode
   className?: string
 }
 
-function DataTable<T extends { id: string }>({
+function DataTable<T extends { id: string }, SortKeyType extends string = string>({
   columns,
   data,
   sortConfig = { key: null, direction: 'asc' },
@@ -30,7 +30,7 @@ function DataTable<T extends { id: string }>({
   loading = false,
   emptyState,
   className = '',
-}: DataTableProps<T>) {
+}: DataTableProps<T, SortKeyType>) {
   return (
     <table className={`table table-zebra w-full ${className}`}>
       <thead>
@@ -39,9 +39,9 @@ function DataTable<T extends { id: string }>({
             <th key={column.key} className={column.className}>
               {column.sortable ? (
                 <SortableHeader
-                  sortKey={column.key}
+                  sortKey={column.key as any}
                   sortConfig={sortConfig as any}
-                  onSort={onSort!}
+                  onSort={onSort as any}
                 >
                   {column.label}
                 </SortableHeader>

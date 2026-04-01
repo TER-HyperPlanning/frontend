@@ -11,7 +11,9 @@ function RouteComponent() {
       <div className="card bg-base-100 border border-base-200">
         <div className="card-body">
           <h1 className="text-2xl font-bold text-base-content">Planning</h1>
-          <p className="text-base-content/60">La vue planning est prête pour l'intégration fonctionnelle.</p>
+          <p className="text-base-content/60">
+            La vue planning est prête pour l'intégration backend et l'affichage des emplois du temps.
+          </p>
         </div>
       </div>
     </PageLayout>

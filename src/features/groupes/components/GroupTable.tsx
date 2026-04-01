@@ -101,7 +101,7 @@ function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTa
   )
 
   return (
-    <DataTable<Group>
+    <DataTable<Group, SortKey>
       columns={columns}
       data={groupes}
       sortConfig={sortConfig}
