@@ -2,19 +2,18 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   useAddFormationForm,
-  addFormationSchema,
   type AddFormationValues,
 } from '@/hooks/formations/useAddFormationForm'
+import { useTeacherOptions } from '@/hooks/formations/useTeacherOptions'
+import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
 import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
-import SelectField from '@/components/SelectField'
 import Button from '@/components/Button'
-import { FILIERE_OPTIONS, ENSEIGNANT_OPTIONS } from '@/types/formation'
 
 interface AddFormationModalProps {
   isOpen: boolean
   onClose: () => void
-  onAdd: (values: AddFormationValues) => void
+  onAdd: (values: AddFormationValues) => Promise<void>
 }
 
 export default function AddFormationModal({
@@ -22,10 +21,13 @@ export default function AddFormationModal({
   onClose,
   onAdd,
 }: AddFormationModalProps) {
-  const form = useAddFormationForm((values) => {
-    onAdd(values)
+  const form = useAddFormationForm(async (values) => {
+    await onAdd(values)
     form.reset()
   })
+
+  const enseignantOptions = useTeacherOptions()
+  const filiereOptions = useTrackOptions()
 
   return (
     <AnimatePresence>
@@ -66,19 +68,11 @@ export default function AddFormationModal({
                 }}
                 className="space-y-4"
               >
-                {/* Nom — texte, max 150 */}
-                <form.Field
-                  name="nom"
-                  validators={{ onChange: addFormationSchema.shape.nom }}
-                >
+                <form.Field name="nom">
                   {(field) => (
                     <div className="space-y-1">
-                      <label
-                        htmlFor={field.name}
-                        className="text-sm font-semibold text-primary-900"
-                      >
-                        Nom de la formation{' '}
-                        <span className="text-red-500">*</span>
+                      <label className="text-sm font-semibold text-primary-900">
+                        Nom de la formation
                       </label>
                       <TextField
                         name={field.name}
@@ -88,9 +82,6 @@ export default function AddFormationModal({
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
-                        error={field.state.meta.errors
-                          .map((err) => (err ? err.message : ''))
-                          .join(', ')}
                       />
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/150
@@ -99,50 +90,34 @@ export default function AddFormationModal({
                   )}
                 </form.Field>
 
-                {/* Enseignant responsable — liste déroulante */}
-                <form.Field
-                  name="enseignantId"
-                  validators={{
-                    onChange: addFormationSchema.shape.enseignantId,
-                  }}
-                >
+                <form.Field name="enseignantId">
                   {(field) => (
                     <div className="space-y-1">
-                      <label
-                        htmlFor={field.name}
-                        className="text-sm font-semibold text-primary-900"
-                      >
-                        Enseignant responsable{' '}
-                        <span className="text-red-500">*</span>
+                      <label className="text-sm font-semibold text-primary-900">
+                        Enseignant responsable
                       </label>
-                      <SelectField
-                        name={field.name}
-                        placeholder="Sélectionner un enseignant"
-                        options={ENSEIGNANT_OPTIONS}
+                      <select
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={() => field.handleBlur()}
-                        className="bg-white text-gray-900 border-gray-300"
-                        error={field.state.meta.errors
-                          .map((err) => (err ? err.message : ''))
-                          .join(', ')}
-                      />
+                        className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
+                      >
+                        <option value="">— Aucun —</option>
+                        {enseignantOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   )}
                 </form.Field>
 
-                {/* Programme — texte long, max 500 */}
-                <form.Field
-                  name="programme"
-                  validators={{ onChange: addFormationSchema.shape.programme }}
-                >
+                <form.Field name="programme">
                   {(field) => (
                     <div className="space-y-1">
-                      <label
-                        htmlFor={field.name}
-                        className="text-sm font-semibold text-primary-900"
-                      >
-                        Programme <span className="text-red-500">*</span>
+                      <label className="text-sm font-semibold text-primary-900">
+                        Programme
                       </label>
                       <TextAreaField
                         name={field.name}
@@ -153,9 +128,6 @@ export default function AddFormationModal({
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
-                        error={field.state.meta.errors
-                          .map((err) => (err ? err.message : ''))
-                          .join(', ')}
                       />
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/500
@@ -164,18 +136,11 @@ export default function AddFormationModal({
                   )}
                 </form.Field>
 
-                {/* Lieu — texte, max 150 */}
-                <form.Field
-                  name="lieu"
-                  validators={{ onChange: addFormationSchema.shape.lieu }}
-                >
+                <form.Field name="lieu">
                   {(field) => (
                     <div className="space-y-1">
-                      <label
-                        htmlFor={field.name}
-                        className="text-sm font-semibold text-primary-900"
-                      >
-                        Lieu <span className="text-red-500">*</span>
+                      <label className="text-sm font-semibold text-primary-900">
+                        Lieu
                       </label>
                       <TextField
                         name={field.name}
@@ -185,9 +150,6 @@ export default function AddFormationModal({
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
-                        error={field.state.meta.errors
-                          .map((err) => (err ? err.message : ''))
-                          .join(', ')}
                       />
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/150
@@ -196,36 +158,29 @@ export default function AddFormationModal({
                   )}
                 </form.Field>
 
-                {/* Filière — liste déroulante */}
-                <form.Field
-                  name="filiereId"
-                  validators={{ onChange: addFormationSchema.shape.filiereId }}
-                >
+                <form.Field name="filiereId">
                   {(field) => (
                     <div className="space-y-1">
-                      <label
-                        htmlFor={field.name}
-                        className="text-sm font-semibold text-primary-900"
-                      >
-                        Filière <span className="text-red-500">*</span>
+                      <label className="text-sm font-semibold text-primary-900">
+                        Filière
                       </label>
-                      <SelectField
-                        name={field.name}
-                        placeholder="Sélectionner une filière"
-                        options={FILIERE_OPTIONS}
+                      <select
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={() => field.handleBlur()}
-                        className="bg-white text-gray-900 border-gray-300"
-                        error={field.state.meta.errors
-                          .map((err) => (err ? err.message : ''))
-                          .join(', ')}
-                      />
+                        className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
+                      >
+                        <option value="">— Aucune —</option>
+                        {filiereOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   )}
                 </form.Field>
 
-                {/* Boutons : Annuler + Créer */}
                 <div className="flex justify-end gap-3 pt-2">
                   <Button
                     type="button"

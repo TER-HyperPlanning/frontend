@@ -35,17 +35,14 @@ export default function DeleteFormationModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end">
-              <button
-                onClick={onClose}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-              >
+              <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
                 <XMarkIcon className="size-5" />
               </button>
             </div>
 
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
-                Confirmer la suppression de la formation
+                Voulez-vous vraiment supprimer cette formation ?
               </h3>
               <p className="text-gray-500 mt-1">
                 {formation.nom} — {formation.filiere.nom}
@@ -60,11 +57,8 @@ export default function DeleteFormationModal({
               >
                 Annuler
               </Button>
-              <Button
-                onClick={onConfirm}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-              >
-                Supprimer
+              <Button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+                Confirmer
               </Button>
             </div>
           </motion.div>
