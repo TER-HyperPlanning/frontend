@@ -6,14 +6,16 @@ export type Building = {
     name: string;
 };
 
-// GET ALL
+
+
+// Recuperer les batiments
 export async function getBuildings(): Promise<Building[]> {
-    const res = await fetch(`${API_URL}/api/Buildings`);
+    const res = await fetch(`${API_URL}/api/Buildings`); //retourne JSON
     const json = await res.json();
     return json.result;
 }
 
-// CREATE
+// Ajout
 export async function createBuilding(name: string) {
     const res = await fetch(`${API_URL}/api/Buildings`, {
         method: "POST",
@@ -25,7 +27,7 @@ export async function createBuilding(name: string) {
     return json.result;
 }
 
-// UPDATE
+// Modiication
 export async function updateBuilding(id: string, name: string) {
     const res = await fetch(`${API_URL}/api/Buildings/${id}`, {
         method: "PUT",
@@ -37,7 +39,7 @@ export async function updateBuilding(id: string, name: string) {
     return json.result;
 }
 
-// DELETE
+// Supression
 export async function deleteBuilding(id: string) {
     const res = await fetch(`${API_URL}/api/Buildings/${id}`, {
         method: "DELETE",
