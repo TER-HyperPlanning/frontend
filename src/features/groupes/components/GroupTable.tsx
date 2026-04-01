@@ -1,7 +1,8 @@
 import { UserPlus } from 'lucide-react'
+import { useMemo } from 'react'
 import Button from '@/components/Button'
-import SortableHeader from './SortableHeader'
 import type { Group, SortConfig, SortKey, Student } from '../types'
+import DataTable, { type DataColumn } from './DataTable'
 
 interface GroupTableProps {
   groupes: Group[]
@@ -12,81 +13,100 @@ interface GroupTableProps {
 }
 
 function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTableProps) {
-  return (
-    <table className="table table-zebra w-full">
-      <thead>
-        <tr className="text-base-content/60 text-xs uppercase">
-          <th>Nom</th>
-          <th>Type</th>
-          <th>Formation</th>
-          <th>Classe</th>
-          <SortableHeader sortKey="capacite" sortConfig={sortConfig} onSort={onSort}>
-            Capacité
-          </SortableHeader>
-          <SortableHeader sortKey="effectif" sortConfig={sortConfig} onSort={onSort}>
-            Effectif
-          </SortableHeader>
-          <th>Remplissage</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {groupes.map(groupe => {
-          const ratio = groupe.effectif / groupe.capacite
+  const columns = useMemo<DataColumn<Group>[]>(
+    () => [
+      {
+        key: 'nom',
+        label: 'Nom',
+        render: groupe => <span className="font-medium text-base-content">{groupe.nom}</span>,
+      },
+      {
+        key: 'type',
+        label: 'Type',
+        render: groupe => (
+          <span
+            className={`badge badge-sm font-medium ${
+              groupe.type === 'FI'
+                ? 'badge-primary badge-outline'
+                : 'badge-secondary badge-outline'
+            }`}
+          >
+            {groupe.type}
+          </span>
+        ),
+      },
+      {
+        key: 'formation',
+        label: 'Formation',
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.formation}</span>,
+      },
+      {
+        key: 'classe',
+        label: 'Classe',
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.classe}</span>,
+      },
+      {
+        key: 'capacite',
+        label: 'Capacité',
+        sortable: true,
+        render: groupe => <span className="text-sm">{groupe.capacite}</span>,
+      },
+      {
+        key: 'effectif',
+        label: 'Effectif',
+        sortable: true,
+        render: groupe => <span className="text-sm">{groupe.effectif}</span>,
+      },
+      {
+        key: 'remplissage',
+        label: 'Remplissage',
+        render: groupe => {
           const assignedCount = students.filter(student => student.groupeId === groupe.id).length
+          const percentage = (assignedCount / groupe.capacite) * 100
 
           return (
-            <tr key={groupe.id} className="hover">
-              <td className="font-medium text-base-content">{groupe.nom}</td>
-              <td>
-                <span
-                  className={`badge badge-sm font-medium ${
-                    groupe.type === 'FI'
-                      ? 'badge-primary badge-outline'
-                      : 'badge-secondary badge-outline'
-                  }`}
-                >
-                  {groupe.type}
-                </span>
-              </td>
-              <td className="text-sm text-base-content/80">{groupe.formation}</td>
-              <td className="text-sm text-base-content/80">{groupe.classe}</td>
-              <td className="text-sm">{groupe.capacite}</td>
-              <td className="text-sm">{groupe.effectif}</td>
-              <td>
-                <div className="flex items-center gap-2">
-                  <progress
-                    className={`progress w-16 h-2 ${
-                      ratio > 0.9
-                        ? 'progress-error'
-                        : ratio > 0.7
-                          ? 'progress-warning'
-                          : 'progress-success'
-                    }`}
-                    value={ratio * 100}
-                    max={100}
-                  />
-                  <span className="text-xs text-base-content/50">{Math.round(ratio * 100)}%</span>
-                </div>
-              </td>
-              <td>
-                <Button
-                  variant="outlined"
-                  leftIcon={<UserPlus size={15} />}
-                  className="btn-sm text-xs"
-                  onClick={() => onAssign(groupe)}
-                >
-                  Assigner
-                  {assignedCount > 0 && (
-                    <span className="badge badge-primary badge-sm ml-1">{assignedCount}</span>
-                  )}
-                </Button>
-              </td>
-            </tr>
+            <div className="flex items-center gap-2">
+              <progress
+                className={`progress w-16 h-2 ${
+                  assignedCount > groupe.capacite * 0.9
+                    ? 'progress-error'
+                    : assignedCount > groupe.capacite * 0.7
+                      ? 'progress-warning'
+                      : 'progress-success'
+                }`}
+                value={percentage}
+                max={100}
+              />
+              <span className="text-xs text-base-content/50">{Math.round(percentage)}%</span>
+            </div>
           )
-        })}
-      </tbody>
-    </table>
+        },
+      },
+      {
+        key: 'actions',
+        label: 'Actions',
+        render: groupe => (
+          <Button
+            variant="outlined"
+            leftIcon={<UserPlus size={15} />}
+            className="btn-sm text-xs"
+            onClick={() => onAssign(groupe)}
+          >
+            Assigner
+          </Button>
+        ),
+      },
+    ],
+    [students],
+  )
+
+  return (
+    <DataTable<Group>
+      columns={columns}
+      data={groupes}
+      sortConfig={sortConfig}
+      onSort={onSort}
+    />
   )
 }
 
