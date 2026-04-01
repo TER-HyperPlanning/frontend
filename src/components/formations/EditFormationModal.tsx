@@ -2,24 +2,20 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   useEditFormationForm,
-  editFormationSchema,
   type EditFormationValues,
 } from '@/hooks/formations/useEditFormationForm'
+import { useTeacherOptions } from '@/hooks/formations/useTeacherOptions'
+import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
 import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
-import SelectField from '@/components/SelectField'
 import Button from '@/components/Button'
-import {
-  type Formation,
-  FILIERE_OPTIONS,
-  ENSEIGNANT_OPTIONS,
-} from '@/types/formation'
+import { type Formation } from '@/types/formation'
 
 interface EditFormationModalProps {
   isOpen: boolean
   formation: Formation | null
   onClose: () => void
-  onEdit: (values: EditFormationValues) => void
+  onEdit: (values: EditFormationValues) => Promise<void>
 }
 
 export default function EditFormationModal({
@@ -28,6 +24,9 @@ export default function EditFormationModal({
   onClose,
   onEdit,
 }: EditFormationModalProps) {
+  const enseignantOptions = useTeacherOptions()
+  const filiereOptions = useTrackOptions()
+
   return (
     <AnimatePresence>
       {isOpen && formation && (
@@ -49,6 +48,8 @@ export default function EditFormationModal({
             <EditFormationContent
               key={formation.id}
               formation={formation}
+              enseignantOptions={enseignantOptions}
+              filiereOptions={filiereOptions}
               onClose={onClose}
               onEdit={onEdit}
             />
@@ -61,17 +62,21 @@ export default function EditFormationModal({
 
 interface EditFormationContentProps {
   formation: Formation
+  enseignantOptions: { value: string; label: string }[]
+  filiereOptions: { value: string; label: string }[]
   onClose: () => void
-  onEdit: (values: EditFormationValues) => void
+  onEdit: (values: EditFormationValues) => Promise<void>
 }
 
 function EditFormationContent({
   formation,
+  enseignantOptions,
+  filiereOptions,
   onClose,
   onEdit,
 }: EditFormationContentProps) {
-  const form = useEditFormationForm(formation, (values) => {
-    onEdit(values)
+  const form = useEditFormationForm(formation, async (values) => {
+    await onEdit(values)
   })
 
   return (
@@ -97,18 +102,11 @@ function EditFormationContent({
           }}
           className="space-y-4"
         >
-          <form.Field
-            name="nom"
-            validators={{ onChange: editFormationSchema.shape.nom }}
-          >
+          <form.Field name="nom">
             {(field) => (
               <div className="space-y-1">
-                <label
-                  htmlFor={field.name}
-                  className="text-sm font-semibold text-primary-900"
-                >
-                  Nom de la formation{' '}
-                  <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold text-primary-900">
+                  Nom de la formation
                 </label>
                 <TextField
                   name={field.name}
@@ -118,9 +116,6 @@ function EditFormationContent({
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
-                  error={field.state.meta.errors
-                    .map((err) => (err ? err.message : ''))
-                    .join(', ')}
                 />
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/150
@@ -129,48 +124,34 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          <form.Field
-            name="enseignantId"
-            validators={{
-              onChange: editFormationSchema.shape.enseignantId,
-            }}
-          >
+          <form.Field name="enseignantId">
             {(field) => (
               <div className="space-y-1">
-                <label
-                  htmlFor={field.name}
-                  className="text-sm font-semibold text-primary-900"
-                >
-                  Enseignant responsable{' '}
-                  <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold text-primary-900">
+                  Enseignant responsable
                 </label>
-                <SelectField
-                  name={field.name}
-                  placeholder="Sélectionner un enseignant"
-                  options={ENSEIGNANT_OPTIONS}
+                <select
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={() => field.handleBlur()}
-                  className="bg-white text-gray-900 border-gray-300"
-                  error={field.state.meta.errors
-                    .map((err) => (err ? err.message : ''))
-                    .join(', ')}
-                />
+                  className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
+                >
+                  <option value="">— Aucun —</option>
+                  {enseignantOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="programme"
-            validators={{ onChange: editFormationSchema.shape.programme }}
-          >
+          <form.Field name="programme">
             {(field) => (
               <div className="space-y-1">
-                <label
-                  htmlFor={field.name}
-                  className="text-sm font-semibold text-primary-900"
-                >
-                  Programme <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold text-primary-900">
+                  Programme
                 </label>
                 <TextAreaField
                   name={field.name}
@@ -181,9 +162,6 @@ function EditFormationContent({
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
-                  error={field.state.meta.errors
-                    .map((err) => (err ? err.message : ''))
-                    .join(', ')}
                 />
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/500
@@ -192,17 +170,11 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          <form.Field
-            name="lieu"
-            validators={{ onChange: editFormationSchema.shape.lieu }}
-          >
+          <form.Field name="lieu">
             {(field) => (
               <div className="space-y-1">
-                <label
-                  htmlFor={field.name}
-                  className="text-sm font-semibold text-primary-900"
-                >
-                  Lieu <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold text-primary-900">
+                  Lieu
                 </label>
                 <TextField
                   name={field.name}
@@ -212,9 +184,6 @@ function EditFormationContent({
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
-                  error={field.state.meta.errors
-                    .map((err) => (err ? err.message : ''))
-                    .join(', ')}
                 />
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/150
@@ -223,30 +192,25 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          <form.Field
-            name="filiereId"
-            validators={{ onChange: editFormationSchema.shape.filiereId }}
-          >
+          <form.Field name="filiereId">
             {(field) => (
               <div className="space-y-1">
-                <label
-                  htmlFor={field.name}
-                  className="text-sm font-semibold text-primary-900"
-                >
-                  Filière <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold text-primary-900">
+                  Filière
                 </label>
-                <SelectField
-                  name={field.name}
-                  placeholder="Sélectionner une filière"
-                  options={FILIERE_OPTIONS}
+                <select
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={() => field.handleBlur()}
-                  className="bg-white text-gray-900 border-gray-300"
-                  error={field.state.meta.errors
-                    .map((err) => (err ? err.message : ''))
-                    .join(', ')}
-                />
+                  className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
+                >
+                  <option value="">— Aucune —</option>
+                  {filiereOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
           </form.Field>
