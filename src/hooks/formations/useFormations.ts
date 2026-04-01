@@ -2,12 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { type Formation, type ProgramModel } from '@/types/formation'
 import { type AddFormationValues } from '@/hooks/formations/useAddFormationForm'
 import { type EditFormationValues } from '@/hooks/formations/useEditFormationForm'
-import {
-  getPrograms,
-  createProgram,
-  updateProgram,
-  deleteProgram,
-} from '@/services/programService'
+import { useProgramService } from '@/services/programService'
 import { getTracks } from '@/services/trackService'
 
 const UUID_REGEX =
@@ -40,6 +35,7 @@ function programToFormation(
 }
 
 export function useFormations() {
+  const { getPrograms, createProgram, updateProgram, deleteProgram } = useProgramService()
   const [formations, setFormations] = useState<Formation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -71,7 +67,7 @@ export function useFormations() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [getPrograms])
 
   useEffect(() => {
     fetchFormations()
