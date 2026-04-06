@@ -1,17 +1,24 @@
-import FormationsHeader from '@/components/formations/FormationsHeader'
+import { Plus } from 'lucide-react'
+import Logo from '@/components/Logo'
+import FormationsSearchBar from '@/components/formations/FormationsSearchBar'
 import FormationsTable from '@/components/formations/FormationsTable'
 import AddFormationModal from '@/components/formations/AddFormationModal'
 import EditFormationModal from '@/components/formations/EditFormationModal'
 import DeleteFormationModal from '@/components/formations/DeleteFormationModal'
 import Toast from '@/components/Toast'
+import Button from '@/components/Button'
 import { useFormations } from '@/hooks/formations/useFormations'
+import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
 import { useToast } from '@/hooks/useToast'
 
 export default function FormationsPage() {
   const {
     formations,
+    isLoading,
     searchQuery,
     setSearchQuery,
+    filiereFilter,
+    setFiliereFilter,
     isAddModalOpen,
     openAddModal,
     closeAddModal,
@@ -26,34 +33,53 @@ export default function FormationsPage() {
     deleteFormation,
   } = useFormations()
 
+  const trackOptions = useTrackOptions()
   const { toast, showToast, hideToast } = useToast()
 
   return (
-    <div className="flex flex-col h-full">
-      <FormationsHeader
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={openAddModal}
+            leftIcon={<Plus size={18} />}
+            className="bg-primary-900 hover:bg-primary-800 text-white"
+          >
+            Nouvelle Formation
+          </Button>
+        </div>
+      </div>
+
+      <FormationsSearchBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onAddClick={openAddModal}
+        filiereFilter={filiereFilter}
+        onFiliereChange={setFiliereFilter}
+        filieres={trackOptions}
       />
 
-      <div className="flex-1 p-6 space-y-6 overflow-auto">
-        <div className="card bg-base-100 border border-base-200">
-          <div className="overflow-x-auto">
-            <FormationsTable
-              formations={formations}
-              onEdit={openEditModal}
-              onDelete={openDeleteModal}
-            />
-          </div>
+      <div className="card bg-base-100 border border-base-200">
+        <div className="overflow-x-auto">
+          <FormationsTable
+            formations={formations}
+            isLoading={isLoading}
+            onEdit={openEditModal}
+            onDelete={openDeleteModal}
+          />
         </div>
       </div>
 
       <AddFormationModal
         isOpen={isAddModalOpen}
         onClose={closeAddModal}
-        onAdd={(values) => {
-          addFormation(values)
-          showToast('Formation ajoutée avec succès', 'success')
+        onAdd={async (values) => {
+          try {
+            await addFormation(values)
+            showToast('Formation créée avec succès', 'success')
+          } catch {
+            showToast('Erreur lors de la création de la formation', 'error')
+          }
         }}
       />
 
@@ -61,10 +87,13 @@ export default function FormationsPage() {
         isOpen={!!editTarget}
         formation={editTarget}
         onClose={closeEditModal}
-        onEdit={(values) => {
-          if (editTarget) {
-            editFormation(editTarget.id, values)
+        onEdit={async (values) => {
+          if (!editTarget) return
+          try {
+            await editFormation(editTarget.id, values)
             showToast('Formation modifiée avec succès', 'success')
+          } catch {
+            showToast('Erreur lors de la modification de la formation', 'error')
           }
         }}
       />
@@ -73,15 +102,18 @@ export default function FormationsPage() {
         isOpen={!!deleteTarget}
         formation={deleteTarget}
         onClose={closeDeleteModal}
-        onConfirm={() => {
-          if (deleteTarget) {
-            deleteFormation(deleteTarget.id)
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          try {
+            await deleteFormation(deleteTarget.id)
             showToast('Formation supprimée avec succès', 'success')
+          } catch {
+            showToast('Erreur lors de la suppression de la formation', 'error')
           }
         }}
       />
 
       <Toast toast={toast} onClose={hideToast} />
-    </div>
+    </>
   )
 }

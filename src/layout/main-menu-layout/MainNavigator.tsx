@@ -1,24 +1,25 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, LayoutDashboard, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock } from 'lucide-react'
+import { CalendarDays, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock, CalendarRange } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
 import { HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { useAuth, useCurrentUser } from '@/hooks/api/useAuth'
+import { navItemsForRole, normalizeRole, type AppRole } from '@/auth/rolePermissions'
 
-const NAV_ITEMS = [
-  { to: '/planning', icon: <CalendarDays size={20} />, label: 'Planning' },
-  { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tableau de bord' },
-  { to: '/teachers', icon: <Users size={20} />, label: 'Enseignants' },
-  { to: '/groupes', icon: <UsersRound size={20} />, label: 'Groupes' },
-  { to: '/buildings', icon: <HiOutlineOfficeBuilding size={20} />, label: 'Bâtiments et salles' },
-  { to: '/formations', icon: <BookOpen size={20} />, label: 'Formations' },
-  { to: '/modules', icon: <BookOpen size={20} />, label: 'Modules' }, // icône corrigée
-  { to: '/requests', icon: <Clock size={20} />, label: 'Demandes' }, 
-  { to: '/scolarite', icon: <GraduationCap size={20} />, label: 'Scolarité' },
-  { to: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
-]
+const NAV_ICONS: Record<string, ReactNode> = {
+  '/planning': <CalendarDays size={20} />,
+  '/teachers': <Users size={20} />,
+  '/groupes': <UsersRound size={20} />,
+  '/buildings': <HiOutlineOfficeBuilding size={20} />,
+  '/formations': <BookOpen size={20} />,
+  '/modules': <BookOpen size={20} />,
+  '/requests': <Clock size={20} />,
+  '/scolarite': <GraduationCap size={20} />,
+  '/availability': <CalendarRange size={20} />,
+  '/admin/accounts': <Settings size={20} />,
+}
 
 function toRoleLabel(role: string | null | undefined) {
   switch (role) {
@@ -37,6 +38,14 @@ export default function MainNavigator() {
   const [isOpen, setIsOpen] = useState(true)
   const { data: user } = useCurrentUser()
   const { logout } = useAuth()
+
+  const navItems = useMemo(() => {
+    const role = normalizeRole(user?.role) as AppRole | null
+    return navItemsForRole(role).map((item) => ({
+      ...item,
+      icon: NAV_ICONS[item.to] ?? <CalendarDays size={20} />,
+    }))
+  }, [user?.role])
 
   const fullName = useMemo(() => {
     const first = user?.firstName?.trim() ?? ''
@@ -74,7 +83,7 @@ export default function MainNavigator() {
 
         {/* Navigation links */}
         <div className="flex-1 flex flex-col gap-1 px-3">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -109,7 +118,7 @@ export default function MainNavigator() {
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden flex flex-row items-center justify-around bg-white border-t border-gray-200 p-2 shrink-0 z-50">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
