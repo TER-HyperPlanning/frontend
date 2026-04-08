@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import Logo from '@/components/Logo'
 import FormationsSearchBar from '@/components/formations/FormationsSearchBar'
@@ -5,11 +7,13 @@ import FormationsTable from '@/components/formations/FormationsTable'
 import AddFormationModal from '@/components/formations/AddFormationModal'
 import EditFormationModal from '@/components/formations/EditFormationModal'
 import DeleteFormationModal from '@/components/formations/DeleteFormationModal'
+import ProgrammeInfoModal from '@/components/formations/ProgrammeInfoModal'
 import Toast from '@/components/Toast'
 import Button from '@/components/Button'
 import { useFormations } from '@/hooks/formations/useFormations'
 import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
 import { useToast } from '@/hooks/useToast'
+import { type Formation } from '@/types/formation'
 
 export default function FormationsPage() {
   const {
@@ -35,6 +39,8 @@ export default function FormationsPage() {
 
   const trackOptions = useTrackOptions()
   const { toast, showToast, hideToast } = useToast()
+  const navigate = useNavigate()
+  const [programmeTarget, setProgrammeTarget] = useState<Formation | null>(null)
 
   return (
     <>
@@ -66,6 +72,10 @@ export default function FormationsPage() {
             isLoading={isLoading}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
+            onViewProgramme={(f) => setProgrammeTarget(f)}
+            onViewGroups={(f) =>
+              navigate({ to: '/formations/$formationId/groupes', params: { formationId: f.id } })
+            }
           />
         </div>
       </div>
@@ -111,6 +121,12 @@ export default function FormationsPage() {
             showToast('Erreur lors de la suppression de la formation', 'error')
           }
         }}
+      />
+
+      <ProgrammeInfoModal
+        isOpen={!!programmeTarget}
+        formation={programmeTarget}
+        onClose={() => setProgrammeTarget(null)}
       />
 
       <Toast toast={toast} onClose={hideToast} />

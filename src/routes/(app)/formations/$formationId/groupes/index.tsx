@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Search } from 'lucide-react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useState, useMemo } from 'react'
+import { ArrowLeft, Search } from 'lucide-react'
 import PageLayout from '@/layout/PageLayout'
-import Logo from '@/components/Logo'
 import {
   Table,
   TableBody,
@@ -10,59 +10,63 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/Table'
-import { useGroupes } from '@/hooks/groupes/useGroupes'
+import { useFormationGroups } from '@/hooks/formations/useFormationGroups'
 
-export const Route = createFileRoute('/(app)/groupes/')({
+export const Route = createFileRoute(
+  '/(app)/formations/$formationId/groupes/',
+)({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const {
-    groups,
-    isLoading,
-    formations,
-    searchTerm,
-    setSearchTerm,
-    formationFilter,
-    setFormationFilter,
-  } = useGroupes()
+  const { formationId } = Route.useParams()
+  const { groups, formationName, isLoading } = useFormationGroups(formationId)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim()
+    if (!q) return groups
+    return groups.filter(
+      (g) =>
+        g.name.toLowerCase().includes(q) ||
+        g.trackName.toLowerCase().includes(q) ||
+        g.academicYear.toLowerCase().includes(q),
+    )
+  }, [groups, searchQuery])
 
   return (
     <PageLayout className="p-6 overflow-y-auto">
-      <div className="flex items-center justify-between mb-6">
-        <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
-        <span className="text-sm text-base-content/60">
-          {groups.length} groupe{groups.length > 1 ? 's' : ''}
-        </span>
+      <div className="flex items-center gap-4 mb-6">
+        <Link
+          to="/formations"
+          className="btn btn-ghost btn-sm btn-circle"
+          title="Retour aux formations"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+        <div>
+          <h1 className="text-2xl font-bold text-base-content">
+            Groupes — {formationName || 'Chargement…'}
+          </h1>
+          <p className="text-sm text-base-content/60 mt-0.5">
+            {filtered.length} groupe{filtered.length > 1 ? 's' : ''} dans cette
+            formation
+          </p>
+        </div>
       </div>
 
       <div className="card bg-base-100 border border-base-200 mb-6">
         <div className="card-body py-4 px-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="input input-bordered flex items-center gap-2">
-              <Search size={16} className="text-base-content/40" />
-              <input
-                type="text"
-                placeholder="Rechercher un groupe…"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="grow text-sm"
-              />
-            </label>
-
-            <select
-              value={formationFilter}
-              onChange={(e) => setFormationFilter(e.target.value)}
-              className="select select-bordered w-full text-sm"
-            >
-              <option value="all">Toutes les formations</option>
-              {formations.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </div>
+          <label className="input input-bordered flex items-center gap-2 max-w-md">
+            <Search size={16} className="text-base-content/40" />
+            <input
+              type="text"
+              placeholder="Rechercher un groupe…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="grow text-sm"
+            />
+          </label>
         </div>
       </div>
 
@@ -75,10 +79,10 @@ function RouteComponent() {
                 Chargement des groupes...
               </span>
             </div>
-          ) : groups.length === 0 ? (
+          ) : filtered.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-base-content/50 text-sm">
-                Aucun groupe trouvé
+                Aucun groupe trouvé pour cette formation
               </p>
             </div>
           ) : (
@@ -86,19 +90,15 @@ function RouteComponent() {
               <TableHead>
                 <TableRow className="text-base-content/60 text-xs uppercase">
                   <TableHeader>Nom du groupe</TableHeader>
-                  <TableHeader>Formation</TableHeader>
                   <TableHeader>Filière</TableHeader>
                   <TableHeader>Année académique</TableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {groups.map((g) => (
+                {filtered.map((g) => (
                   <TableRow key={g.id}>
                     <TableCell className="font-medium text-base-content">
                       {g.name}
-                    </TableCell>
-                    <TableCell className="text-sm text-base-content/80">
-                      {g.formationName}
                     </TableCell>
                     <TableCell className="text-sm text-base-content/80">
                       {g.trackName}
