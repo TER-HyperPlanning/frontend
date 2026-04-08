@@ -1,118 +1,166 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Search } from 'lucide-react'
+import { Check } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/layout/PageLayout'
-import Logo from '@/components/Logo'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/Table'
-import { useGroupes } from '@/hooks/groupes/useGroupes'
+import AssignModal from '@/features/groupes/components/AssignModal'
+import EmptyGroupState from '@/features/groupes/components/EmptyGroupState'
+import GroupFilters from '@/features/groupes/components/GroupFilters'
+import GroupTable from '@/features/groupes/components/GroupTable'
+import { mockGroupes, mockStudents } from '@/features/groupes/mockData'
+import type { Group, SortKey, Student } from '@/features/groupes/types'
 
 export const Route = createFileRoute('/(app)/groupes/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const {
-    groups,
-    isLoading,
-    formations,
-    searchTerm,
-    setSearchTerm,
-    formationFilter,
-    setFormationFilter,
-  } = useGroupes()
+  const [groupes, setGroupes] = useState<Group[]>([])
+  const [students, setStudents] = useState<Student[]>(mockStudents)
+  const [loading, setLoading] = useState(true)
+  const [formationFilter, setFormationFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortKey | null
+    direction: 'asc' | 'desc'
+  }>({ key: null, direction: 'asc' })
+  const [assignGroupe, setAssignGroupe] = useState<Group | null>(null)
+  const [successMsg, setSuccessMsg] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchGroupes = async () => {
+      setLoading(true)
+      try {
+        await new Promise(resolve => setTimeout(resolve, 800))
+        setGroupes(mockGroupes)
+      } catch (error) {
+        console.error('Erreur lors du chargement des groupes:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchGroupes()
+  }, [])
+
+  const formations = useMemo(() => [...new Set(groupes.map(groupe => groupe.formation))].sort(), [groupes])
+
+  const filteredAndSortedGroupes = useMemo(() => {
+    const filtered = groupes.filter(groupe => {
+      const matchesFormation = formationFilter === 'all' || groupe.formation === formationFilter
+      const matchesType = typeFilter === 'all' || groupe.type === typeFilter
+      const matchesSearch =
+        groupe.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        groupe.formation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        groupe.classe.toLowerCase().includes(searchTerm.toLowerCase())
+
+      return matchesFormation && matchesType && matchesSearch
+    })
+
+    if (!sortConfig.key) {
+      return filtered
+    }
+
+    return [...filtered].sort((first, second) => {
+      const firstValue = first[sortConfig.key!]
+      const secondValue = second[sortConfig.key!]
+
+      return sortConfig.direction === 'asc'
+        ? firstValue - secondValue
+        : secondValue - firstValue
+    })
+  }, [groupes, formationFilter, typeFilter, searchTerm, sortConfig])
+
+  const handleSort = (key: SortKey) => {
+    setSortConfig(prev =>
+      prev.key === key
+        ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
+        : { key, direction: 'asc' },
+    )
+  }
+
+  const handleAssignConfirm = (groupeId: string, studentIds: string[]) => {
+    setStudents(prev =>
+      prev.map(student => {
+        if (studentIds.includes(student.id)) {
+          return { ...student, groupeId }
+        }
+
+        if (student.groupeId === groupeId && !studentIds.includes(student.id)) {
+          return { ...student, groupeId: null }
+        }
+
+        return student
+      }),
+    )
+
+    const groupe = groupes.find(item => item.id === groupeId)
+    setSuccessMsg(
+      `${studentIds.length} étudiant${studentIds.length > 1 ? 's' : ''} assigné${studentIds.length > 1 ? 's' : ''} à ${groupe?.nom}`,
+    )
+    setTimeout(() => setSuccessMsg(null), 3000)
+  }
 
   return (
     <PageLayout className="p-6 overflow-y-auto">
-      <div className="flex items-center justify-between mb-6">
-        <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
-        <span className="text-sm text-base-content/60">
-          {groups.length} groupe{groups.length > 1 ? 's' : ''}
-        </span>
-      </div>
-
-      <div className="card bg-base-100 border border-base-200 mb-6">
-        <div className="card-body py-4 px-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="input input-bordered flex items-center gap-2">
-              <Search size={16} className="text-base-content/40" />
-              <input
-                type="text"
-                placeholder="Rechercher un groupe…"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="grow text-sm"
-              />
-            </label>
-
-            <select
-              value={formationFilter}
-              onChange={(e) => setFormationFilter(e.target.value)}
-              className="select select-bordered w-full text-sm"
-            >
-              <option value="all">Toutes les formations</option>
-              {formations.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
+      {successMsg && (
+        <div className="toast toast-top toast-end z-50">
+          <div className="alert alert-success shadow-lg">
+            <Check size={16} />
+            <span className="text-sm">{successMsg}</span>
           </div>
         </div>
+      )}
+
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-base-content">Gestion des Groupes</h1>
+          <p className="text-sm text-base-content/60 mt-1">Gérez et organisez les groupes d'étudiants</p>
+        </div>
+        <div className="badge badge-neutral badge-lg">
+          {filteredAndSortedGroupes.length} groupe{filteredAndSortedGroupes.length > 1 ? 's' : ''}
+        </div>
       </div>
+
+      <GroupFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        formationFilter={formationFilter}
+        onFormationChange={setFormationFilter}
+        typeFilter={typeFilter}
+        onTypeChange={setTypeFilter}
+        formations={formations}
+      />
 
       <div className="card bg-base-100 border border-base-200">
         <div className="overflow-x-auto">
-          {isLoading ? (
+          {loading ? (
             <div className="flex justify-center items-center py-16 gap-3">
-              <span className="loading loading-spinner loading-md text-primary" />
-              <span className="text-base-content/60 text-sm">
-                Chargement des groupes...
-              </span>
+              <span className="loading loading-spinner loading-md text-primary"></span>
+              <span className="text-base-content/60 text-sm">Chargement des groupes...</span>
             </div>
-          ) : groups.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-base-content/50 text-sm">
-                Aucun groupe trouvé
-              </p>
-            </div>
+          ) : filteredAndSortedGroupes.length === 0 ? (
+            <EmptyGroupState />
           ) : (
-            <Table>
-              <TableHead>
-                <TableRow className="text-base-content/60 text-xs uppercase">
-                  <TableHeader>Nom du groupe</TableHeader>
-                  <TableHeader>Formation</TableHeader>
-                  <TableHeader>Filière</TableHeader>
-                  <TableHeader>Année académique</TableHeader>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {groups.map((g) => (
-                  <TableRow key={g.id}>
-                    <TableCell className="font-medium text-base-content">
-                      {g.name}
-                    </TableCell>
-                    <TableCell className="text-sm text-base-content/80">
-                      {g.formationName}
-                    </TableCell>
-                    <TableCell className="text-sm text-base-content/80">
-                      {g.trackName}
-                    </TableCell>
-                    <TableCell className="text-sm text-base-content/80">
-                      {g.academicYear}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <GroupTable
+              groupes={filteredAndSortedGroupes}
+              students={students}
+              sortConfig={sortConfig}
+              onSort={handleSort}
+              onAssign={setAssignGroupe}
+            />
           )}
         </div>
       </div>
+
+      {assignGroupe && (
+        <AssignModal
+          groupe={assignGroupe}
+          students={students}
+          onClose={() => setAssignGroupe(null)}
+          onConfirm={handleAssignConfirm}
+        />
+      )}
     </PageLayout>
   )
 }
