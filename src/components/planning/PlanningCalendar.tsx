@@ -301,7 +301,7 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
           eventContent={renderEventContent}
           editable={true}
           droppable={true}
-          eventDurationEditable={true}
+          eventDurationEditable={false}
           eventClick={handleEventClick}
           eventDragStart={handleEventDragStart}
           eventDragStop={handleEventDragStop}
