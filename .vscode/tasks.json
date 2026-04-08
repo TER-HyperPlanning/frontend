@@ -9,7 +9,8 @@
 				"-lc",
 				"source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && npm --prefix frontend run dev -- --host localhost"
 			],
-			"isBackground": true
+			"isBackground": true,
+			"problemMatcher": []
 		},
 		{
 			"label": "Stop Frontend",
@@ -29,26 +30,7 @@
 				"-lc",
 				"pkill -f vite || true; source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && npm --prefix frontend run dev -- --host localhost"
 			],
-			"isBackground": true
-		},
-		{
-			"label": "Restart Frontend + Open",
-			"type": "shell",
-			"command": "zsh",
-			"args": [
-				"-lc",
-				"pkill -f 'vite --port 3000' || true; source ~/.nvm/nvm.sh && nvm use 25 >/dev/null && nohup npm --prefix frontend run dev -- --host localhost >/tmp/frontend-vite.log 2>&1 & sleep 2; open http://localhost:3000"
-			],
-			"problemMatcher": []
-		},
-		{
-			"label": "Restart Frontend + Open",
-			"type": "shell",
-			"command": "zsh",
-			"args": [
-				"-lc",
-				"pkill -f \"vite --port 3000\" || true; source ~/.nvm/nvm.sh && nvm use 25 >/dev/null && nohup npm --prefix frontend run dev -- --host localhost >/tmp/frontend-vite.log 2>&1 & sleep 2; open http://localhost:3000"
-			],
+			"isBackground": true,
 			"problemMatcher": []
 		},
 		{
@@ -60,36 +42,6 @@
 				"pkill -f vite || true; source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && nohup npm --prefix frontend run dev -- --host localhost >/tmp/frontend-vite.log 2>&1 & sleep 2; open http://localhost:3000"
 			],
 			"problemMatcher": []
-		},
-		{
-			"label": "Restart Frontend + Open",
-			"type": "shell",
-			"command": "zsh",
-			"args": [
-				"-lc",
-				"pkill -f vite || true; source ~/.nvm/nvm.sh && nvm use 25 >/dev/null && nohup npm --prefix frontend run dev -- --host localhost >/tmp/frontend-vite.log 2>&1 & sleep 2; open http://localhost:3000"
-			],
-			"problemMatcher": []
-		},
-		{
-			"label": "Start Frontend (stable)",
-			"type": "shell",
-			"command": "zsh",
-			"args": [
-				"-lc",
-				"source ~/.nvm/nvm.sh && nvm use 25 >/dev/null && npm --prefix frontend run dev -- --host localhost"
-			],
-			"isBackground": true
-		},
-		{
-			"label": "Start Frontend (stable)",
-			"type": "shell",
-			"command": "zsh",
-			"args": [
-				"-lc",
-				"source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && npm --prefix frontend run dev -- --host localhost"
-			],
-			"isBackground": true
 		}
 	]
 }

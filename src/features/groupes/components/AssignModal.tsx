@@ -32,6 +32,12 @@ function AssignModal({ groupe, students, onClose, onConfirm }: AssignModalProps)
   )
 
   const toggleSelection = (studentId: string) => {
+    const student = students.find(s => s.id === studentId)
+    // Ne pas permettre de sélectionner un étudiant déjà assigné à un autre groupe
+    if (student?.groupeId && student.groupeId !== groupe.id) {
+      return
+    }
+
     setSelected(prev =>
       prev.includes(studentId)
         ? prev.filter(id => id !== studentId)
@@ -79,16 +85,25 @@ function AssignModal({ groupe, students, onClose, onConfirm }: AssignModalProps)
           ) : (
             filteredStudents.map(student => {
               const isSelected = selected.includes(student.id)
+              const isAssignedElsewhere =
+                student.groupeId !== null && student.groupeId !== groupe.id
+              const isDisabled = isAssignedElsewhere
+
               return (
                 <label
                   key={student.id}
-                  className="flex items-center gap-4 px-6 py-3 hover:bg-base-200/50 cursor-pointer transition-colors"
+                  className={`flex items-center gap-4 px-6 py-3 transition-colors ${
+                    isDisabled
+                      ? 'bg-base-200/30 cursor-not-allowed opacity-60'
+                      : 'hover:bg-base-200/50 cursor-pointer'
+                  }`}
                 >
                   <input
                     type="checkbox"
                     className="checkbox checkbox-primary checkbox-sm"
                     checked={isSelected}
                     onChange={() => toggleSelection(student.id)}
+                    disabled={isDisabled}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-base-content">
@@ -96,8 +111,8 @@ function AssignModal({ groupe, students, onClose, onConfirm }: AssignModalProps)
                     </p>
                     <p className="text-xs text-base-content/50 truncate">{student.email}</p>
                   </div>
-                  {student.groupeId && student.groupeId !== groupe.id && (
-                    <span className="badge badge-warning badge-sm shrink-0">Déjà assigné</span>
+                  {isAssignedElsewhere && (
+                    <span className="badge badge-error badge-sm shrink-0">Assigné ailleurs</span>
                   )}
                   {student.groupeId === groupe.id && (
                     <span className="badge badge-success badge-sm shrink-0">Dans ce groupe</span>
