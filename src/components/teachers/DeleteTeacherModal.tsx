@@ -1,14 +1,14 @@
+// DeleteTeacherModal.tsx
 import { HiOutlineExclamation, HiOutlineTrash } from 'react-icons/hi'
 import Button from '@/components/Button'
-import type { Teacher } from './types';
-
+import type { Teacher } from './types'
 
 interface DeleteTeacherModalProps {
   isOpen: boolean
   teacher: Teacher | null
   onClose: () => void
   onSuccess: (message: string) => void
-  onDelete: (teacherId: number) => void
+  onDelete: (teacherId: string) => void
 }
 
 export default function DeleteTeacherModal({
@@ -20,13 +20,21 @@ export default function DeleteTeacherModal({
 }: DeleteTeacherModalProps) {
   if (!isOpen || !teacher) return null
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     try {
+      const res = await fetch(`https://hyper-planning.fr/api/Teachers/${teacher.id}`, {
+        method: 'DELETE',
+        headers: { 'accept': 'application/json' },
+      })
+
+      if (!res.ok) throw new Error('Erreur lors de la suppression')
+
       onDelete(teacher.id)
       onSuccess(`L'enseignant ${teacher.nom} ${teacher.prenom} a été supprimé avec succès.`)
       onClose()
     } catch (error) {
       console.error('Erreur lors de la suppression', error)
+      alert('Impossible de supprimer cet enseignant.')
     }
   }
 
@@ -34,7 +42,6 @@ export default function DeleteTeacherModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all scale-100">
         <div className="flex flex-col items-center text-center">
-          {/* Icône d'avertissement */}
           <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-6">
             <HiOutlineExclamation size={40} />
           </div>
@@ -49,7 +56,6 @@ export default function DeleteTeacherModal({
           </p>
 
           <div className="flex gap-4 w-full">
-            {/* Annuler à gauche */}
             <button
               onClick={onClose}
               className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-500 hover:bg-gray-50 transition-colors border border-gray-100"
@@ -57,7 +63,6 @@ export default function DeleteTeacherModal({
               Annuler
             </button>
 
-            {/* Supprimer à droite */}
             <Button
               onClick={handleDelete}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-red-200"
