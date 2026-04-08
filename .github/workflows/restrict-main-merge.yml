@@ -1,0 +1,17 @@
+name: Enforce Merge Policy
+
+on:
+  pull_request:
+    branches:
+      - main  # Trigger only when someone tries to merge into main
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        if: github.head_ref != 'develop'
+        run: |
+          echo "Error: You can only merge into main from the develop branch."
+          echo "Current source branch: ${{ github.head_ref }}"
+          exit 1

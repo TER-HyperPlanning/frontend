@@ -1,0 +1,49 @@
+name: Deploy React App
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - '.github/workflows/deploy-react.yml'
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    env:
+      REACT_APP_API_URL: ${{ secrets.VITE_API_URL }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Project
+        run: pnpm run build
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # The source folder ON GITHUB (dist for Vite)
+          source: "dist/*" 
+          # The destination ON VPS
+          target: "/var/www/myapp/client"
+          # Strip the folder structure
+          strip_components: 1
