@@ -9,6 +9,7 @@ interface Props {
   setFilterStatut: (v: string) => void
   showStatutMenu: boolean
   setShowStatutMenu: (v: boolean) => void
+  onFilterChange: (title: string) => void
 }
 
 export default function TeachersFilters({
@@ -17,14 +18,19 @@ export default function TeachersFilters({
   filterStatut,
   setFilterStatut,
   showStatutMenu,
-  setShowStatutMenu
+  setShowStatutMenu,
+  onFilterChange,
 }: Props) {
-
   const statutOptions = ['Associé', 'Vacataire', 'Permanent']
+
+  const handleSelectStatut = (statut: string) => {
+    setFilterStatut(statut)
+    setShowStatutMenu(false)
+    onFilterChange(statut)
+  }
 
   return (
     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full mb-6">
-
       <div className="w-full lg:w-1/3 relative">
         <TextField
           placeholder="Rechercher un enseignant"
@@ -52,10 +58,7 @@ export default function TeachersFilters({
               <div
                 key={statut}
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800 font-medium"
-                onClick={() => {
-                  setFilterStatut(statut)
-                  setShowStatutMenu(false)
-                }}
+                onClick={() => handleSelectStatut(statut)}
               >
                 {statut}
               </div>
@@ -63,17 +66,13 @@ export default function TeachersFilters({
 
             <div
               className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-600 font-medium"
-              onClick={() => {
-                setFilterStatut('')
-                setShowStatutMenu(false)
-              }}
+              onClick={() => handleSelectStatut('')}
             >
               Tous les statuts
             </div>
           </div>
         )}
       </div>
-
     </div>
   )
 }
