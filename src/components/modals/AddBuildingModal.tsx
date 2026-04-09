@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { HiPlus, HiOutlineTrash, HiX } from 'react-icons/hi';
 import Button from '../Button';
+import { useCreateBuilding } from "@/hooks/buildings/useCreateBuilding";
 
 interface Room {
   number: string;
   capacity: string;
   type: string;
 }
-
 
 interface AddBuildingModalProps {
   isOpen: boolean;
@@ -18,18 +18,21 @@ interface AddBuildingModalProps {
 const ROOM_TYPES = ['TD', 'Info', 'Amphi', 'Labo'];
 
 export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuildingModalProps) {
+  // --- HOOKS (DOIVENT ÊTRE ICI) ---
+  const { mutate: createBuilding } = useCreateBuilding();
+
+  // --- ÉTATS ---
   const [buildingName, setBuildingName] = useState('');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [errors, setErrors] = useState<{ buildingName?: string; rooms?: string[] }>({});
 
   if (!isOpen) return null;
 
-  // Ajouter une salle
+  // --- LOGIQUE DES SALLES ---
   const addRoom = () => {
     setRooms([...rooms, { number: '', capacity: '', type: 'TD' }]);
   };
 
-  // Supprimer une salle
   const removeRoom = (index: number) => {
     setRooms(rooms.filter((_, i) => i !== index));
     setErrors(prev => ({
@@ -38,20 +41,16 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
     }));
   };
 
-  // Mettre à jour une salle
   const updateRoom = (index: number, field: keyof Room, value: string) => {
     const newRooms = [...rooms];
     newRooms[index] = { ...newRooms[index], [field]: value };
     setRooms(newRooms);
   };
 
-  // Validation simple
+  // --- VALIDATION ---
   const validate = () => {
     const newErrors: typeof errors = {};
 
-    if (!buildingName.trim()) {
-      newErrors.buildingName = "Le nom du bâtiment est obligatoire";
-    }
     if (!buildingName.trim()) {
       newErrors.buildingName = "Le nom du bâtiment est obligatoire";
     } else if (!/^[A-Za-z0-9\- ]+$/.test(buildingName)) {
@@ -78,26 +77,33 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
     }
 
     setErrors(newErrors);
-
-    // Retourne true si pas d'erreurs
     return !newErrors.buildingName && (!newErrors.rooms || newErrors.rooms.every(e => e === ""));
   };
 
+  // --- SOUMISSION ---
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    console.log({ buildingName, rooms });
-
-    onSuccess?.(`Bâtiment "${buildingName}" ajouté avec succès !`);
-
-    onClose();
+    // Appel à l'API via le hook de mutation
+    createBuilding(buildingName, {
+      onSuccess: () => {
+        setBuildingName(''); // Reset le champ
+        setRooms([]);        // Reset les salles
+        onSuccess?.(`Bâtiment "${buildingName}" ajouté avec succès !`);
+        onClose();
+      },
+      onError: (error) => {
+        console.error("Erreur lors de la création:", error);
+      }
+    });
   };
 
   return (
     <div className="modal modal-open">
       <div className="modal-box max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 relative">
         <button
+          type="button"
           onClick={onClose}
           className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-gray-400"
         >
@@ -112,7 +118,7 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
             <input
               type="text"
               placeholder="Nom du bâtiment"
-              className="input bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 w-full"
+              className={`input bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 w-full ${errors.buildingName ? 'ring-2 ring-red-500' : ''}`}
               value={buildingName}
               onChange={(e) => setBuildingName(e.target.value)}
             />
@@ -202,5 +208,4 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
       <div className="modal-backdrop bg-black/20 backdrop-blur-sm" onClick={onClose}></div>
     </div>
   );
-
 }

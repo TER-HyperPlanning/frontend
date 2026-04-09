@@ -1,86 +1,118 @@
 import { type Formation } from '@/types/formation'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { motion } from 'framer-motion'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/Table'
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline'
+import { UsersRound } from 'lucide-react'
 
 interface FormationsTableProps {
   formations: Formation[]
+  isLoading: boolean
   onEdit: (formation: Formation) => void
   onDelete: (formation: Formation) => void
+  onViewProgramme: (formation: Formation) => void
+  onViewGroups: (formation: Formation) => void
 }
 
 export default function FormationsTable({
   formations,
+  isLoading,
   onEdit,
   onDelete,
+  onViewProgramme,
+  onViewGroups,
 }: FormationsTableProps) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-16 gap-3">
+        <span className="loading loading-spinner loading-md text-primary" />
+        <span className="text-base-content/60 text-sm">
+          Chargement des formations...
+        </span>
+      </div>
+    )
+  }
+
+  if (formations.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-base-content/50 text-sm">
+          Aucune formation enregistrée
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200">
-      <table className="table w-full">
-        <thead>
-          <tr className="bg-gray-50 text-primary-900">
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Nom de la formation
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Enseignant responsable
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Programme
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Lieu
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide">
-              Filière associée
-            </th>
-            <th className="font-semibold text-sm uppercase tracking-wide text-right">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {formations.map((formation, index) => (
-            <motion.tr
-              key={formation.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="hover:bg-gray-50 transition-colors border-b border-gray-100"
-            >
-              <td className="text-gray-800 font-medium">{formation.nom}</td>
-              <td className="text-gray-600">
-                {formation.enseignantResponsable}
-              </td>
-              <td className="text-gray-600">{formation.programme}</td>
-              <td className="text-gray-600">{formation.lieu}</td>
-              <td className="text-gray-600">{formation.filiere.nom}</td>
-              <td>
-                <div className="flex items-center justify-end gap-2">
-                  <button
-                    onClick={() => onEdit(formation)}
-                    className="p-1.5 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
-                  >
-                    <PencilSquareIcon className="size-5" />
-                  </button>
-                  <button
-                    onClick={() => onDelete(formation)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
-                  >
-                    <TrashIcon className="size-5" />
-                  </button>
-                </div>
-              </td>
-            </motion.tr>
-          ))}
-          {formations.length === 0 && (
-            <tr>
-              <td colSpan={6} className="text-center text-gray-400 py-12">
-                Aucune formation enregistrée
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    <Table>
+      <TableHead>
+        <TableRow className="text-base-content/60 text-xs uppercase">
+          <TableHeader>Nom de la formation</TableHeader>
+          <TableHeader>Enseignant responsable</TableHeader>
+          <TableHeader>Lieu</TableHeader>
+          <TableHeader>Filière associée</TableHeader>
+          <TableHeader>Actions</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {formations.map((formation) => (
+          <TableRow key={formation.id}>
+            <TableCell className="font-medium text-base-content">
+              {formation.nom}
+            </TableCell>
+            <TableCell className="text-sm text-base-content/80">
+              {formation.enseignantResponsable || '—'}
+            </TableCell>
+            <TableCell className="text-sm text-base-content/80">
+              {formation.lieu || '—'}
+            </TableCell>
+            <TableCell className="text-sm text-base-content/80">
+              {formation.filiere.nom || '—'}
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onViewGroups(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
+                  title="Voir les groupes"
+                >
+                  <UsersRound size={16} />
+                </button>
+                <button
+                  onClick={() => onViewProgramme(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-info"
+                  title="Voir le programme"
+                >
+                  <InformationCircleIcon className="size-4" />
+                </button>
+                <button
+                  onClick={() => onEdit(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
+                  title="Modifier"
+                >
+                  <PencilSquareIcon className="size-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-error"
+                  title="Supprimer"
+                >
+                  <TrashIcon className="size-4" />
+                </button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   )
 }

@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useAuthClient } from './useAuthClient';
+import axios from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { clearSession, getAccessToken, getStoredCurrentUser, setSession, setStoredCurrentUser } from '@/auth/storage'
+import { useAuthClient } from './useAuthClient'
+import { useAppClient } from './useAppClient'
 
 // ── Types basés sur le Swagger ──────────────────────────────────────────
 
@@ -30,51 +33,59 @@ export interface ApiResponse<T> {
     result: T;
 }
 
+export const authKeys = {
+    currentUser: ['auth', 'currentUser'] as const,
+}
+
 // ── Hook ────────────────────────────────────────────────────────────────
 
 export function useAuth() {
     const navigate = useNavigate();
     const authApi = useAuthClient();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = useQueryClient()
 
-    /**
-     * Connecte l'utilisateur et stocke le token JWT.
-     */
-    const login = async (credentials: LoginRequest): Promise<boolean> => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
+    const loginMutation = useMutation({
+        mutationFn: async (credentials: LoginRequest) => {
             const { data } = await authApi.post<ApiResponse<LoginResponse>>(
                 '/Auth/login',
                 credentials,
-            );
+            )
 
-            if (data.result?.accessToken) {
-                localStorage.setItem('accessToken', data.result.accessToken);
-                localStorage.setItem('expiresIn', String(data.result.expiresIn));
-                return true;
+            if (!data.result?.accessToken) {
+                const message = data.message ?? 'Échec de la connexion'
+                throw new Error(message)
             }
 
-            setError(data.message ?? 'Échec de la connexion');
-            return false;
-        } catch (err: any) {
-            const message =
-                err.response?.data?.message ?? 'Une erreur est survenue lors de la connexion';
-            setError(message);
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
+            setSession(data.result.accessToken, data.result.expiresIn)
+            return data.result
+        },
+        onSuccess: async (result) => {
+            await queryClient.fetchQuery({
+                queryKey: authKeys.currentUser,
+                queryFn: async () => {
+                    const baseURL = import.meta.env.VITE_API_URL || "https://hyper-planning.fr/api"
+                    const { data } = await axios.get<ApiResponse<CurrentUserResponse>>(
+                        `${baseURL}/Auth/current-user`,
+                        {
+                            headers: { Authorization: `Bearer ${result.accessToken}` },
+                        },
+                    )
+                    setStoredCurrentUser(data.result)
+                    return data.result
+                },
+            })
+        },
+        onError: () => {
+            clearSession()
+        },
+    })
 
     /**
      * Déconnecte l'utilisateur (supprime le token et redirige vers /auth/login).
      */
     const logout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('expiresIn');
+        clearSession()
+        queryClient.removeQueries({ queryKey: authKeys.currentUser })
         navigate({ to: '/auth/login' });
     };
 
@@ -82,14 +93,37 @@ export function useAuth() {
      * Vérifie si un token est actuellement stocké.
      */
     const isAuthenticated = (): boolean => {
-        return !!localStorage.getItem('accessToken');
+        return !!getAccessToken()
     };
 
     return {
-        login,
+        login: async (credentials: LoginRequest): Promise<boolean> => {
+            try {
+                await loginMutation.mutateAsync(credentials)
+                return true
+            } catch {
+                return false
+            }
+        },
         logout,
         isAuthenticated,
-        isLoading,
-        error,
+        isLoading: loginMutation.isPending,
+        error: loginMutation.error instanceof Error ? loginMutation.error.message : null,
     };
+}
+
+export function useCurrentUser() {
+    const { api } = useAppClient()
+
+    return useQuery({
+        queryKey: authKeys.currentUser,
+        enabled: !!getAccessToken(),
+        initialData: () => getStoredCurrentUser<CurrentUserResponse>() ?? undefined,
+        queryFn: async () => {
+            const { data } = await api.get<ApiResponse<CurrentUserResponse>>('/Auth/current-user')
+            setStoredCurrentUser(data.result)
+            return data.result
+        },
+        staleTime: 5 * 60 * 1000,
+    })
 }

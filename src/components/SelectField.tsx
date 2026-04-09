@@ -18,7 +18,7 @@ export default function SelectField({
   name,
   options,
   placeholder,
-  value,
+  value = '',
   onChange,
   onBlur,
   className,
@@ -27,6 +27,11 @@ export default function SelectField({
   const baseClasses =
     'select select-bordered w-full transition-all duration-200'
   const errorClasses = error ? 'select-error border-red-500' : ''
+
+  const allOptions = [
+    { value: '', label: placeholder ?? '— Aucun —' },
+    ...options,
+  ]
 
   return (
     <div className="form-control w-full">
@@ -43,12 +48,7 @@ export default function SelectField({
         onBlur={onBlur}
         className={cn(baseClasses, errorClasses, className)}
       >
-        {placeholder && (
-          <option value="" disabled>
-            {placeholder}
-          </option>
-        )}
-        {options.map((opt) => (
+        {allOptions.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>

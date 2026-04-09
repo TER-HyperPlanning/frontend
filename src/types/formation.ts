@@ -1,3 +1,5 @@
+// ── Frontend model (US7/US8) ──
+
 export interface Filiere {
   id: string
   nom: string
@@ -7,6 +9,8 @@ export interface Formation {
   id: string
   nom: string
   enseignantResponsable: string
+  enseignantId: string
+  trackId: string
   programme: string
   lieu: string
   filiere: Filiere
@@ -17,15 +21,41 @@ export interface SelectOption {
   label: string
 }
 
-export const FILIERE_OPTIONS: SelectOption[] = [
-  { value: 'MIAGE', label: 'MIAGE' },
-  { value: 'INFO', label: 'INFO' },
-]
+// ── API models (Swagger) ──
 
-export const ENSEIGNANT_OPTIONS: SelectOption[] = [
-  { value: '1', label: 'Guillaume POSTIC' },
-  { value: '2', label: 'Nathalie DAVID' },
-  { value: '3', label: 'Hanna KLAUDEL' },
-  { value: '4', label: 'Jean DUPONT' },
-  { value: '5', label: 'Marie MARTIN' },
-]
+export interface ProgramModel {
+  id: string
+  name: string
+  field: string
+}
+
+export interface CreateProgramRequest {
+  name: string
+  field: string
+}
+
+export interface UpdateProgramRequest {
+  name: string
+  field: string
+}
+
+export interface TeacherResponse {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  matricule: string
+  title: string
+  role: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TrackResponse {
+  id: string
+  name: string
+  teacherId: string
+  programId: string
+}
+
