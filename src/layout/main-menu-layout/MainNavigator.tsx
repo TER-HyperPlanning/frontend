@@ -61,7 +61,7 @@ export default function MainNavigator() {
       <motion.nav
         animate={{ width: isOpen ? 240 : 72 }}
         transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden md:flex h-full flex-col py-4 overflow-hidden shrink-0"
+        className="hidden md:flex h-screen flex-col py-4 overflow-hidden shrink-0 sticky top-0"// AJOUT Rosane
       >
         <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center  gap-4 flex-col-reverse'}`}>
           
