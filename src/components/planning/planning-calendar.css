@@ -110,3 +110,115 @@
 .planning-calendar .fc .fc-scrollgrid-section-header>td {
   border-bottom: 1px solid #e5e7eb;
 }
+
+.planning-tooltip {
+  position: absolute;
+  z-index: 30;
+  min-width: 260px;
+  max-width: 360px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  pointer-events: none;
+}
+
+.planning-tooltip-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+  margin-bottom: 10px;
+}
+
+.planning-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.2rem;
+}
+
+.planning-tooltip-row + .planning-tooltip-row {
+  margin-top: 6px;
+}
+
+.planning-tooltip-icon {
+  flex-shrink: 0;
+}
+
+.planning-tooltip-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.68rem;
+  line-height: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.planning-tooltip-value {
+  color: #0f172a;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.planning-tooltip-tag--cyan {
+  background-color: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.5);
+  color: #0e7490;
+}
+
+.planning-tooltip-tag--indigo {
+  background-color: rgba(99, 102, 241, 0.22);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #4338ca;
+}
+
+.planning-tooltip-tag--violet {
+  background-color: rgba(139, 92, 246, 0.24);
+  border-color: rgba(167, 139, 250, 0.55);
+  color: #6d28d9;
+}
+
+.planning-tooltip-tag--blue {
+  background-color: rgba(59, 130, 246, 0.24);
+  border-color: rgba(96, 165, 250, 0.55);
+  color: #1d4ed8;
+}
+
+.planning-tooltip-tag--emerald {
+  background-color: rgba(16, 185, 129, 0.2);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #047857;
+}
+
+.planning-tooltip-tag--amber {
+  background-color: rgba(245, 158, 11, 0.2);
+  border-color: rgba(251, 191, 36, 0.52);
+  color: #b45309;
+}
+
+.planning-tooltip-tag--rose {
+  background-color: rgba(244, 63, 94, 0.2);
+  border-color: rgba(251, 113, 133, 0.5);
+  color: #be123c;
+}
+
+.planning-tooltip-tag--teal {
+  background-color: rgba(20, 184, 166, 0.2);
+  border-color: rgba(45, 212, 191, 0.5);
+  color: #0f766e;
+}
+
+.planning-tooltip-tag--fuchsia {
+  background-color: rgba(217, 70, 239, 0.2);
+  border-color: rgba(232, 121, 249, 0.52);
+  color: #a21caf;
+}
