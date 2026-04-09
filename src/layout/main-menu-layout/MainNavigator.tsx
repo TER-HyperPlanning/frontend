@@ -96,15 +96,15 @@ export default function MainNavigator() {
         </div>
 
         {/* Bottom: User avatar */}
-        <div className="border-none mt-2 pt-2 px-3">
+        <div className="border-none mt-auto px-2 flex flex-col">
           <UserAvatar fullName={fullName} roleLabel={roleLabel} isOpen={isOpen} />
           <button
             type="button"
             onClick={logout}
             className={`
-              mt-2 w-full flex items-center gap-3 rounded-lg px-3 py-2.5
+               w-full flex items-center rounded-lg py-2.5
               text-gray-500 hover:bg-gray-200/60 hover:text-gray-700 transition-colors
-              ${!isOpen ? 'justify-center' : ''}
+              ${isOpen ? 'gap-3 px-3' : 'justify-center px-0'}
             `}
             aria-label="Se déconnecter"
             title="Se déconnecter"

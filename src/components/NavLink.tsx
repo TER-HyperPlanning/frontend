@@ -36,7 +36,7 @@ export default function NavLink({ to, icon, label, isOpen }: NavLinkProps) {
       )}
 
       {/* Icon */}
-      <span className="text-xl shrink-0 w-5 h-5 flex items-center justify-center">
+      <span className="text-xl shrink-0 w-4 h-4 flex items-center justify-center">
         {icon}
       </span>
 
