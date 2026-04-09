@@ -1,4 +1,4 @@
-import { useState} from 'react'
+import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import PageLayout from '@/layout/PageLayout'
 
@@ -11,113 +11,198 @@ import DeleteTeacherModal from '@/components/teachers/DeleteTeacherModal'
 import { HiCheckCircle } from "react-icons/hi"
 import type { Teacher } from '@/components/teachers/types'
 
-
 export const Route = createFileRoute('/(app)/teachers/')({
   component: TeachersPage,
 })
 
-
 function TeachersPage() {
-
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatut, setFilterStatut] = useState('')
   const [showStatutMenu, setShowStatutMenu] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [teachers, setTeachers] = useState<Teacher[]>([])
 
-  const handleDeleteClick = (teacher: Teacher) => {
-    setTeacherToDelete(teacher); 
-    setIsDeleteModalOpen(true);
-  };
-  
+  useEffect(() => {
+    fetchTeachers()
+  }, [])
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await fetch('https://hyper-planning.fr/api/Teachers', {
+        headers: { accept: 'application/json' },
+      })
+      const data = await res.json()
+      const formatted: Teacher[] = data.result.map((t: any) => ({
+        id: t.id,
+        nom: t.lastName,
+        prenom: t.firstName,
+        email: t.email,
+        telephone: t.phone,
+        matricule: t.matricule || '',
+        statut: t.title,
+        createdAt: t.createdAt,
+      }))
+      const sorted = formatted.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return dateB - dateA
+      })
+
+      setTeachers(sorted)
+    } catch (err) {
+      console.error('Erreur fetch Teachers:', err)
+    }
+  }
+  const statutMapping: Record<string, string> = {
+  Associé: "ASSOCIE",
+  Vacataire: "VACATAIRE",
+  Permanent: "PERMANENT",
+}
+
+ const fetchFilteredTeachers = async (title: string) => {
+  try {
+       if (!title) {
+      fetchTeachers()
+      return
+    }
+
+    const query = `?title=${statutMapping[title]}`
+
+    const res = await fetch(`https://hyper-planning.fr/api/Teachers/filter${query}`, {
+      headers: { accept: 'application/json' },
+    })
+
+    const data = await res.json()
+
+    console.log("DATA API:", data)
+
+    const formatted: Teacher[] = data.result.map((t: any) => ({
+      id: t.id,
+      nom: t.lastName,
+      prenom: t.firstName,
+      email: t.email,
+      telephone: t.phone,
+      matricule: t.matricule || '',
+      statut: t.title,
+    }))
+
+    setTeachers(formatted)
+
+  } catch (err) {
+    console.error('Erreur fetch Teachers:', err)
+  }
+}
 
   const showSuccess = (msg: string) => {
-    setSuccessMessage(msg);
-    setTimeout(() => setSuccessMessage(null), 3000);
-   };
+    setSuccessMessage(msg)
+    setTimeout(() => setSuccessMessage(null), 3000)
+  }
 
+   const handleDeleteClick = (teacher: Teacher) => {
+    setTeacherToDelete(teacher)
+    setIsDeleteModalOpen(true)
+  }
+  const fetchSearchTeachers = async (query: string) => {
+  try {
+    
+    if (!query) {
+      fetchTeachers()
+      return
+    }
 
-  const [teachers, setTeachers] = useState<Teacher[]>([
-  { id: 1, nom: 'Lefebvre', prenom: 'Sophie', email: 'Sophie.lefebvre@univ-evry.fr', telephone: '0601020304', statut: 'Permanent' },
-  { id: 2, nom: 'David', prenom: 'Nathalie', email: 'Nathalie.david@univ-evry.fr', telephone: '0605060708', statut: 'Vacataire' },
-  { id: 3, nom: 'Klaudel', prenom: 'Hanna', email: 'Hanna.Klaudel@univ-evry.fr', telephone: '0608091011', statut: 'Associé' },
-])
+    const res = await fetch(
+      `https://hyper-planning.fr/api/Teachers/search?query=${query}`,
+      { headers: { accept: 'application/json' } }
+    )
 
-  const filteredTeachers = teachers.filter((t) => {
-    const matchSearch =
-      t.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const data = await res.json()
 
-    const matchStatut = filterStatut ? t.statut === filterStatut : true
+    const formatted: Teacher[] = data.result.map((t: any) => ({
+      id: t.id,
+      nom: t.lastName,
+      prenom: t.firstName,
+      email: t.email,
+      telephone: t.phone,
+      matricule: t.matricule || '',
+      statut: t.title,
+    }))
 
-    return matchSearch && matchStatut
-  })
+    setTeachers(formatted)
+
+  } catch (err) {
+    console.error("Erreur search:", err)
+  }
+}
 
   return (
     <PageLayout>
-        {successMessage && (
-            <div className="toast toast-top toast-end z-[100] mt-4 mr-4">
-                <div className="alert alert-success shadow-lg text-white border-none bg-emerald-500 flex items-center gap-2">
-                <HiCheckCircle size={22} />
-                <span className="font-medium">{successMessage}</span>
-                </div>
-            </div>
-        )}
-        <EditTeacherModal
-            isOpen={isEditModalOpen}
-            teacher={editingTeacher}
-            onClose={() => setIsEditModalOpen(false)}
-            onSuccess={(msg) => showSuccess(msg)}
-            onEdit={(updatedTeacher) => {
-                setTeachers((prev) =>
-                    prev.map((t) => (t.id === updatedTeacher.id ? updatedTeacher : t))
-                );
-                setIsEditModalOpen(false);
-            }}
-        />
-        <DeleteTeacherModal
-          isOpen={isDeleteModalOpen}
-          teacher={teacherToDelete}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onSuccess={(msg) => showSuccess(msg)}
-          onDelete={(deletedTeacherId : number) => {
-             setTeachers(prev => prev.filter(t => t.id !== deletedTeacherId));
-            setIsDeleteModalOpen(false);
-          }}
-        />
-
+      {successMessage && (
+        <div className="toast toast-top toast-end z-[100] mt-4 mr-4">
+          <div className="alert alert-success shadow-lg text-white border-none bg-emerald-500 flex items-center gap-2">
+            <HiCheckCircle size={22} />
+            <span className="font-medium">{successMessage}</span>
+          </div>
+        </div>
+      )}
+    <EditTeacherModal
+      isOpen={isEditModalOpen}
+      teacher={editingTeacher}
+      onClose={() => setIsEditModalOpen(false)}
+      onSuccess={showSuccess}
+      onEdit={(updatedTeacher) => {
+        setTeachers((prev) =>
+          prev.map((t) => (t.id === updatedTeacher.id ? updatedTeacher : t))
+        );
+        setIsEditModalOpen(false);
+      }}
+    />
+      <DeleteTeacherModal
+        isOpen={isDeleteModalOpen}
+        teacher={teacherToDelete}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onSuccess={showSuccess}
+        onDelete={(deletedTeacherId) => {
+          setTeachers(prev => prev.filter(t => t.id !== deletedTeacherId))
+          setIsDeleteModalOpen(false)
+        }}
+      />
       <div className="flex flex-col gap-6 p-6">
-
-        <TeachersFilters
+         <TeachersFilters
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={(value) => {
+            setSearchTerm(value)
+            fetchSearchTeachers(value) 
+          }}
           filterStatut={filterStatut}
           setFilterStatut={setFilterStatut}
           showStatutMenu={showStatutMenu}
           setShowStatutMenu={setShowStatutMenu}
-        />
+          onFilterChange={fetchFilteredTeachers}         />
 
         <AddTeacherButton onClick={() => setIsModalOpen(true)} />
 
         <div className="card bg-base-100 border border-base-200">
           <div className="overflow-x-auto">
-            <TeachersTable teachers={filteredTeachers}  onEditClick={(teacher) => {setEditingTeacher(teacher); setIsEditModalOpen(true)}} onDeleteClick={handleDeleteClick} />
+            <TeachersTable
+              teachers={teachers}
+              onEditClick={(teacher) => { setEditingTeacher(teacher); setIsEditModalOpen(true) }}
+              onDeleteClick={handleDeleteClick}
+            />
           </div>
         </div>
 
         <AddTeacherModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSuccess={showSuccess}
-            onAdd={(teacher) => setTeachers(prev => [...prev, teacher])}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={showSuccess}
+          onAdd={(teacher) => setTeachers(prev => [...prev, teacher])}
         />
       </div>
-
     </PageLayout>
   )
 }

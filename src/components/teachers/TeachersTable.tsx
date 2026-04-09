@@ -9,6 +9,7 @@ interface Props {
   onDeleteClick: (teacher: Teacher) => void
 }
 
+
 export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: Props) {
 
   return (
@@ -31,13 +32,15 @@ export default function TeachersTable({ teachers, onEditClick, onDeleteClick }: 
                 <TableCell className="text-sm text-base-content/80">{teacher.prenom}</TableCell>
                 <TableCell className="text-sm text-primary/80">{teacher.email}</TableCell>
                 <TableCell>
-                  <span
+                 <span
                     className={`badge badge-sm font-medium ${
-                      teacher.statut === 'Permanent'
+                      teacher.statut.toUpperCase() === 'ASSOCIE'
                         ? 'badge-primary badge-outline'
-                        : teacher.statut === 'Vacataire'
+                        : teacher.statut.toUpperCase() === 'VACATAIRE'
                           ? 'badge-warning badge-outline'
-                          : 'badge-secondary badge-outline'
+                          : teacher.statut.toUpperCase() === 'PERMANENT'
+                            ? 'badge-secondary badge-outline'
+                            : 'badge-ghost'
                     }`}
                   >
                     {teacher.statut}
