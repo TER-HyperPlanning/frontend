@@ -75,16 +75,24 @@ function sessionToEvent(
   }
 }
 
+type PlanningQueryOptions = {
+  /** When false, the query does not run (e.g. teacher/student must use `/Planning/me` only). */
+  enabled?: boolean
+}
+
 /**
- * Fetch the general planning (public-ish — works without auth via apiGet).
- * Used for the public planning view or when filtering by group/track/program.
+ * Fetch the general planning (`GET /Planning`).
+ * Use for unauthenticated guests and for **admin** (with optional group/track/program filters).
+ * Teachers and students must use {@link useMyPlanning} instead.
  */
-export function usePlanning(filters: PlanningFilters) {
+export function usePlanning(filters: PlanningFilters, options?: PlanningQueryOptions) {
   const hasToken = !!getAccessToken()
   const appClient = hasToken ? useAppClient() : null
+  const enabled = options?.enabled !== false
 
   return useQuery({
     queryKey: ['planning', filters],
+    enabled,
     queryFn: async () => {
       const qs = buildQueryParams(filters)
 
@@ -102,15 +110,17 @@ export function usePlanning(filters: PlanningFilters) {
 }
 
 /**
- * Fetch the current user's personal planning (requires auth).
+ * Fetch the current user's personal planning (`GET /Planning/me`, requires auth).
+ * Intended for **teacher** and **student** roles.
  */
-export function useMyPlanning(filters: PlanningFilters) {
+export function useMyPlanning(filters: PlanningFilters, options?: PlanningQueryOptions) {
   const { api } = useAppClient()
   const hasToken = !!getAccessToken()
+  const roleAllowed = options?.enabled !== false
 
   return useQuery({
     queryKey: ['planning', 'me', filters],
-    enabled: hasToken,
+    enabled: hasToken && roleAllowed,
     queryFn: async () => {
       const qs = buildQueryParams(filters)
       const { data } = await api.get<ApiResponse<PlanningWeekDto[]>>(

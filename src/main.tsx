@@ -1,40 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { RouterProvider } from '@tanstack/react-router'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from "react-hot-toast" // AJOUT ROSANE
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+import { queryClient } from './queryClient'
+import { router } from './router'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-})
-
-// Create a new router instance
-const router = createRouter({
-  routeTree,
-  context: {},
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
-  defaultPreloadStaleTime: 0,
-})
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
 
 // Render the app
 const rootElement = document.getElementById('app')

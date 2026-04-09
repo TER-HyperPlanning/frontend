@@ -4,6 +4,7 @@ import PlanningHeader from '@/components/planning/PlanningHeader'
 import { useCurrentUser } from '@/hooks/api/useAuth'
 import { usePlanning, useMyPlanning } from '@/hooks/planning/usePlanning'
 import { getAccessToken } from '@/auth/storage'
+import { normalizeRole } from '@/auth/rolePermissions'
 import type { PlanningFilters } from '@/types/planning'
 import MainMenuContainer from '@/layout/main-menu-layout/MainMenuContainer'
 import MainNavigator from '@/layout/main-menu-layout/MainNavigator'
@@ -42,8 +43,9 @@ function PlanningContent() {
   const [trackId, setTrackId] = useState('')
   const [groupId, setGroupId] = useState('')
 
-  const { data: user } = useCurrentUser()
+  const { data: user, isPending: isUserPending } = useCurrentUser()
   const hasToken = !!getAccessToken()
+  const role = normalizeRole(user?.role)
 
   const weekBounds = useMemo(() => getWeekBounds(selectedDate), [selectedDate])
 
@@ -58,10 +60,18 @@ function PlanningContent() {
     [groupId, trackId, programId, weekBounds],
   )
 
-  const usePersonal = hasToken && !!user && !groupId && !trackId && !programId
-  const publicQuery = usePlanning(filters)
-  const personalQuery = useMyPlanning(filters)
-  const activeQuery = usePersonal ? personalQuery : publicQuery
+  /** `GET /Planning` — guests and admins only. */
+  const useGeneralEndpoint = !hasToken || role === 'ADMIN'
+  /** `GET /Planning/me` — authenticated teachers and students only. */
+  const useMeEndpoint = hasToken && (role === 'TEACHER' || role === 'STUDENT')
+
+  const publicQuery = usePlanning(filters, { enabled: useGeneralEndpoint })
+  const personalQuery = useMyPlanning(filters, { enabled: useMeEndpoint })
+  const activeQuery = useMeEndpoint ? personalQuery : publicQuery
+
+  const calendarLoading =
+    activeQuery.isLoading ||
+    (hasToken && isUserPending && !user)
 
   return (
     <PageLayout className="flex flex-col">
@@ -77,7 +87,7 @@ function PlanningContent() {
       <PlanningCalendar
         selectedDate={selectedDate}
         events={activeQuery.data ?? []}
-        isLoading={activeQuery.isLoading}
+        isLoading={calendarLoading}
       />
     </PageLayout>
   )

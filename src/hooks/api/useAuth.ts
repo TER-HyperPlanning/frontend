@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { authQueryKeys } from '@/auth/queryKeys'
 import { clearSession, getAccessToken, getStoredCurrentUser, setSession, setStoredCurrentUser } from '@/auth/storage'
 import { useAuthClient } from './useAuthClient'
 import { useAppClient } from './useAppClient'
@@ -33,9 +34,8 @@ export interface ApiResponse<T> {
     result: T;
 }
 
-export const authKeys = {
-    currentUser: ['auth', 'currentUser'] as const,
-}
+/** @deprecated use authQueryKeys from @/auth/queryKeys */
+export const authKeys = authQueryKeys
 
 // ── Hook ────────────────────────────────────────────────────────────────
 
@@ -61,7 +61,7 @@ export function useAuth() {
         },
         onSuccess: async (result) => {
             await queryClient.fetchQuery({
-                queryKey: authKeys.currentUser,
+                queryKey: authQueryKeys.currentUser,
                 queryFn: async () => {
                     const baseURL = import.meta.env.VITE_API_URL || "https://hyper-planning.fr/api"
                     const { data } = await axios.get<ApiResponse<CurrentUserResponse>>(
@@ -85,7 +85,7 @@ export function useAuth() {
      */
     const logout = () => {
         clearSession()
-        queryClient.removeQueries({ queryKey: authKeys.currentUser })
+        queryClient.removeQueries({ queryKey: authQueryKeys.currentUser })
         navigate({ to: '/auth/login' });
     };
 
@@ -116,7 +116,7 @@ export function useCurrentUser() {
     const { api } = useAppClient()
 
     return useQuery({
-        queryKey: authKeys.currentUser,
+        queryKey: authQueryKeys.currentUser,
         enabled: !!getAccessToken(),
         initialData: () => getStoredCurrentUser<CurrentUserResponse>() ?? undefined,
         queryFn: async () => {
