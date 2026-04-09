@@ -7,13 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/Table'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline'
+import { UsersRound } from 'lucide-react'
 
 interface FormationsTableProps {
   formations: Formation[]
   isLoading: boolean
   onEdit: (formation: Formation) => void
   onDelete: (formation: Formation) => void
+  onViewProgramme: (formation: Formation) => void
+  onViewGroups: (formation: Formation) => void
 }
 
 export default function FormationsTable({
@@ -21,6 +28,8 @@ export default function FormationsTable({
   isLoading,
   onEdit,
   onDelete,
+  onViewProgramme,
+  onViewGroups,
 }: FormationsTableProps) {
   if (isLoading) {
     return (
@@ -49,7 +58,6 @@ export default function FormationsTable({
         <TableRow className="text-base-content/60 text-xs uppercase">
           <TableHeader>Nom de la formation</TableHeader>
           <TableHeader>Enseignant responsable</TableHeader>
-          <TableHeader>Programme</TableHeader>
           <TableHeader>Lieu</TableHeader>
           <TableHeader>Filière associée</TableHeader>
           <TableHeader>Actions</TableHeader>
@@ -64,9 +72,6 @@ export default function FormationsTable({
             <TableCell className="text-sm text-base-content/80">
               {formation.enseignantResponsable || '—'}
             </TableCell>
-            <TableCell className="text-sm text-base-content/80 max-w-xs truncate">
-              {formation.programme || '—'}
-            </TableCell>
             <TableCell className="text-sm text-base-content/80">
               {formation.lieu || '—'}
             </TableCell>
@@ -74,16 +79,32 @@ export default function FormationsTable({
               {formation.filiere.nom || '—'}
             </TableCell>
             <TableCell>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onViewGroups(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
+                  title="Voir les groupes"
+                >
+                  <UsersRound size={16} />
+                </button>
+                <button
+                  onClick={() => onViewProgramme(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-info"
+                  title="Voir le programme"
+                >
+                  <InformationCircleIcon className="size-4" />
+                </button>
                 <button
                   onClick={() => onEdit(formation)}
                   className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
+                  title="Modifier"
                 >
                   <PencilSquareIcon className="size-4" />
                 </button>
                 <button
                   onClick={() => onDelete(formation)}
                   className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-error"
+                  title="Supprimer"
                 >
                   <TrashIcon className="size-4" />
                 </button>

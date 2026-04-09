@@ -9,6 +9,8 @@ export interface Formation {
   id: string
   nom: string
   enseignantResponsable: string
+  enseignantId: string
+  trackId: string
   programme: string
   lieu: string
   filiere: Filiere
