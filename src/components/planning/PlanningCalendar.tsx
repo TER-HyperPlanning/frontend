@@ -127,13 +127,6 @@ function PlanningCalendar({ selectedDate, events = [], isLoading }: PlanningCale
     setTooltip(toTooltipData(arg))
   }
 
-  function handleMouseMove(arg: EventHoveringArg) {
-    setTooltip((prev) => {
-      if (!prev) return toTooltipData(arg)
-      return { ...prev, x: arg.jsEvent.clientX, y: arg.jsEvent.clientY }
-    })
-  }
-
   function handleMouseLeave() {
     setTooltip(null)
   }
@@ -178,7 +171,6 @@ function PlanningCalendar({ selectedDate, events = [], isLoading }: PlanningCale
           eventContent={renderEventContent}
           eventMouseEnter={handleMouseEnter}
           eventMouseLeave={handleMouseLeave}
-          eventMouseMove={handleMouseMove}
           editable={false}
           selectable={false}
         />
