@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import { HiChevronDown } from 'react-icons/hi';
+import type { Teacher } from './types';
 
 interface AddTeacherFormProps {
   isOpen: boolean;
@@ -59,16 +60,70 @@ export default function AddTeacherForm({
     return valid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      onAdd(formData);
-      onSuccess('Enseignant ajouté');
-      onClose();
-      setFormData({ nom: '', prenom: '', email: '', telephone: '', statut: '' });
-    }
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (!validate()) return
 
+  try {
+    const payload = {
+      firstName: formData.prenom,
+      lastName: formData.nom,
+      email: formData.email,
+      phone: formData.telephone,
+      matricule: generateMatricule(), 
+      password: "password123", 
+      title: mapStatutToTitle(formData.statut), 
+}
+
+    const response = await fetch('https://hyper-planning.fr/api/Teachers', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'accept': 'application/json'
+  },
+  body: JSON.stringify(payload)
+})
+
+console.log('Response status:', response.status)
+const data = await response.json()
+console.log('Response data:', data)
+
+
+if (!response.ok) throw new Error(data.message || 'Erreur lors de l’ajout')
+    const newTeacher: Teacher = {
+      id: data.result.id,
+      nom: data.result.lastName,
+      prenom: data.result.firstName,
+      email: data.result.email,
+      telephone: data.result.phone,
+      statut: data.result.title
+    }
+
+    onAdd(newTeacher)         
+    onSuccess('Enseignant ajouté') 
+    onClose()
+    setFormData({ nom: '', prenom: '', email: '', telephone: '', statut: '' })
+
+  } catch (error) {
+    console.error(error)
+    alert('Impossible d’ajouter l’enseignant')
+  }
+}
+function generateMatricule() {
+  return 'MAT' + Date.now(); 
+}
+const mapStatutToTitle = (statut: string) => {
+  switch (statut) {
+    case "Permanent":
+      return "PERMANENT"
+    case "Vacataire":
+      return "VACATAIRE"
+    case "Associé":
+      return "ASSOCIE" 
+    default:
+      return "PERMANENT"
+  }
+}
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div className="bg-white rounded-xl p-6 w-full max-w-md">

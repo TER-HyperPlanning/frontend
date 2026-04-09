@@ -17,6 +17,7 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
+import { Route as appSessionsIndexRouteImport } from './routes/(app)/sessions/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
 import { Route as appModulesIndexRouteImport } from './routes/(app)/modules/index'
@@ -26,6 +27,7 @@ import { Route as appBuildingsIndexRouteImport } from './routes/(app)/buildings/
 import { Route as appAvailabilityIndexRouteImport } from './routes/(app)/availability/index'
 import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
 import { Route as appAdminAccountsIndexRouteImport } from './routes/(app)/admin/accounts/index'
+import { Route as appFormationsFormationIdGroupesIndexRouteImport } from './routes/(app)/formations/$formationId/groupes/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -64,6 +66,11 @@ const AuthForgetPwdIndexRoute = AuthForgetPwdIndexRouteImport.update({
 const appTeachersIndexRoute = appTeachersIndexRouteImport.update({
   id: '/teachers/',
   path: '/teachers/',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appSessionsIndexRoute = appSessionsIndexRouteImport.update({
+  id: '/sessions/',
+  path: '/sessions/',
   getParentRoute: () => appRouteRoute,
 } as any)
 const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
@@ -111,6 +118,12 @@ const appAdminAccountsIndexRoute = appAdminAccountsIndexRouteImport.update({
   path: '/admin/accounts/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appFormationsFormationIdGroupesIndexRoute =
+  appFormationsFormationIdGroupesIndexRouteImport.update({
+    id: '/formations/$formationId/groupes/',
+    path: '/formations/$formationId/groupes/',
+    getParentRoute: () => appRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,11 +137,13 @@ export interface FileRoutesByFullPath {
   '/modules/': typeof appModulesIndexRoute
   '/requests/': typeof appRequestsIndexRoute
   '/scolarite/': typeof appScolariteIndexRoute
+  '/sessions/': typeof appSessionsIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/admin/accounts/': typeof appAdminAccountsIndexRoute
+  '/formations/$formationId/groupes/': typeof appFormationsFormationIdGroupesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,11 +157,13 @@ export interface FileRoutesByTo {
   '/modules': typeof appModulesIndexRoute
   '/requests': typeof appRequestsIndexRoute
   '/scolarite': typeof appScolariteIndexRoute
+  '/sessions': typeof appSessionsIndexRoute
   '/teachers': typeof appTeachersIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
   '/auth/login': typeof AuthLoginIndexRoute
   '/admin/accounts': typeof appAdminAccountsIndexRoute
+  '/formations/$formationId/groupes': typeof appFormationsFormationIdGroupesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -162,11 +179,13 @@ export interface FileRoutesById {
   '/(app)/modules/': typeof appModulesIndexRoute
   '/(app)/requests/': typeof appRequestsIndexRoute
   '/(app)/scolarite/': typeof appScolariteIndexRoute
+  '/(app)/sessions/': typeof appSessionsIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/(app)/admin/accounts/': typeof appAdminAccountsIndexRoute
+  '/(app)/formations/$formationId/groupes/': typeof appFormationsFormationIdGroupesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -182,11 +201,13 @@ export interface FileRouteTypes {
     | '/modules/'
     | '/requests/'
     | '/scolarite/'
+    | '/sessions/'
     | '/teachers/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
     | '/admin/accounts/'
+    | '/formations/$formationId/groupes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -200,11 +221,13 @@ export interface FileRouteTypes {
     | '/modules'
     | '/requests'
     | '/scolarite'
+    | '/sessions'
     | '/teachers'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
     | '/auth/login'
     | '/admin/accounts'
+    | '/formations/$formationId/groupes'
   id:
     | '__root__'
     | '/'
@@ -219,11 +242,13 @@ export interface FileRouteTypes {
     | '/(app)/modules/'
     | '/(app)/requests/'
     | '/(app)/scolarite/'
+    | '/(app)/sessions/'
     | '/(app)/teachers/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
     | '/auth/login/'
     | '/(app)/admin/accounts/'
+    | '/(app)/formations/$formationId/groupes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -291,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appTeachersIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/sessions/': {
+      id: '/(app)/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions/'
+      preLoaderRoute: typeof appSessionsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
     '/(app)/scolarite/': {
       id: '/(app)/scolarite/'
       path: '/scolarite'
@@ -354,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appAdminAccountsIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/formations/$formationId/groupes/': {
+      id: '/(app)/formations/$formationId/groupes/'
+      path: '/formations/$formationId/groupes'
+      fullPath: '/formations/$formationId/groupes/'
+      preLoaderRoute: typeof appFormationsFormationIdGroupesIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
   }
 }
 
@@ -366,8 +405,10 @@ interface appRouteRouteChildren {
   appModulesIndexRoute: typeof appModulesIndexRoute
   appRequestsIndexRoute: typeof appRequestsIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
+  appSessionsIndexRoute: typeof appSessionsIndexRoute
   appTeachersIndexRoute: typeof appTeachersIndexRoute
   appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
+  appFormationsFormationIdGroupesIndexRoute: typeof appFormationsFormationIdGroupesIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
@@ -379,8 +420,11 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appModulesIndexRoute: appModulesIndexRoute,
   appRequestsIndexRoute: appRequestsIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
+  appSessionsIndexRoute: appSessionsIndexRoute,
   appTeachersIndexRoute: appTeachersIndexRoute,
   appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
+  appFormationsFormationIdGroupesIndexRoute:
+    appFormationsFormationIdGroupesIndexRoute,
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(

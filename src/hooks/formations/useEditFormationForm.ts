@@ -19,7 +19,7 @@ export function useEditFormationForm(
   return useForm({
     defaultValues: {
       nom: formation.nom,
-      enseignantId: '',
+      enseignantId: formation.enseignantId,
       programme: formation.programme,
       lieu: formation.lieu,
       filiereId: formation.filiere.id,
