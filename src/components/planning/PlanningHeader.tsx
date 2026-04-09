@@ -92,6 +92,12 @@ function PlanningHeader({
   const { data: tracks = [] } = usePlanningTracks()
   const { data: groups = [] } = usePlanningGroups()
 
+  const defaultProgramId = programs[0]?.id ?? ''
+  const effectiveProgramId = programId || defaultProgramId
+  const defaultTrackId =
+    tracks.find((t) => t.programId === effectiveProgramId)?.id ?? ''
+  const effectiveTrackId = trackId || defaultTrackId
+
   const filteredTracks = programId
     ? tracks.filter((t) => t.programId === programId)
     : tracks
@@ -99,6 +105,23 @@ function PlanningHeader({
   const filteredGroups = trackId
     ? groups.filter((g) => g.trackId === trackId)
     : groups
+
+  React.useEffect(() => {
+    if (programId || !defaultProgramId) return
+    onProgramChange(defaultProgramId)
+  }, [programId, defaultProgramId, onProgramChange])
+
+  React.useEffect(() => {
+    if (trackId || !defaultTrackId) return
+    onTrackChange(defaultTrackId)
+  }, [trackId, defaultTrackId, onTrackChange])
+
+  React.useEffect(() => {
+    if (groupId || !effectiveTrackId) return
+    const defaultGroupId = groups.find((g) => g.trackId === effectiveTrackId)?.id ?? ''
+    if (!defaultGroupId) return
+    onGroupChange(defaultGroupId)
+  }, [groupId, effectiveTrackId, groups, onGroupChange])
 
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onProgramChange(e.target.value)
