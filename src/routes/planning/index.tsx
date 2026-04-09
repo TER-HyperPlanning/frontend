@@ -58,9 +58,14 @@ function PlanningContent() {
     [groupId, trackId, programId, weekBounds],
   )
 
-  const usePersonal = hasToken && !!user && !groupId && !trackId && !programId
-  const publicQuery = usePlanning(filters)
-  const personalQuery = useMyPlanning(filters)
+  /** Admins use GET /Planning; everyone else with a token uses GET /Planning/me. */
+  const isAdmin = user?.role === 'ADMIN'
+  const usePersonal = hasToken && user?.role !== 'ADMIN'
+  const fetchFullPlanning = !hasToken || isAdmin
+  const fetchMyPlanning = hasToken && !isAdmin
+
+  const publicQuery = usePlanning(filters, { enabled: fetchFullPlanning })
+  const personalQuery = useMyPlanning(filters, { enabled: fetchMyPlanning })
   const activeQuery = usePersonal ? personalQuery : publicQuery
 
   return (
