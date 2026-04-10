@@ -1,79 +1,88 @@
 import { X } from 'lucide-react'
 import Button from '../Button'
+import type { UserRole } from '@/hooks/api/mock/sessionApi'
 
 interface ConfirmChangeModalProps {
+  title: string
   oldDate: Date
   newDate: Date
   onConfirm: () => void
   onCancel: () => void
+  userRole?: UserRole
+  isLoading?: boolean
 }
 
 export function ConfirmChangeModal({
+  title,
   oldDate,
   newDate,
   onConfirm,
   onCancel,
+  userRole,
+  isLoading = false,
 }: ConfirmChangeModalProps) {
+  const isAdmin = userRole === 'admin'
+
   const formatDateTime = (date: Date) => {
     return date.toLocaleDateString('fr-FR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    }) +
+      ' à ' +
+      date.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
   }
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={onCancel}
       role="presentation"
     >
       <div
-        className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden"
+        className="mx-4 w-full max-w-md overflow-hidden rounded-xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Confirmer le changement de séance
-          </h2>
+        <div className="flex items-center justify-between border-b border-gray-200 p-6">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Confirmer le changement
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">{title}</p>
+          </div>
+
           <button
+            type="button"
             onClick={onCancel}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Close modal"
+            className="rounded-lg p-1 transition-colors hover:bg-gray-100"
+            aria-label="Fermer"
           >
             <X size={20} className="text-gray-600" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Date Change Info */}
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+        <div className="space-y-5 p-6">
+          <div className="rounded-lg bg-gray-50 p-4">
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                De :
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Ancien créneau
               </p>
               <p className="text-sm font-medium text-gray-900">
                 {formatDateTime(oldDate)}
               </p>
             </div>
-            <div className="relative h-8 flex items-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-gray-300" />
-              </div>
-              <div className="relative mx-auto">
-                <span className="bg-gray-50 px-2 text-gray-500 text-xs">
-                  ↓
-                </span>
-              </div>
+
+            <div className="my-4 flex items-center justify-center text-gray-400">
+              ↓
             </div>
+
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                À :
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Nouveau créneau
               </p>
               <p className="text-sm font-medium text-gray-900">
                 {formatDateTime(newDate)}
@@ -81,28 +90,36 @@ export function ConfirmChangeModal({
             </div>
           </div>
 
-          {/* Message */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <p className="text-sm text-gray-700 leading-relaxed">
-              Vous allez envoyer une demande de changement à la scolarité. Merci
-              d'attendre la confirmation de l'administration.
+          <div
+            className={`rounded-lg border p-4 ${
+              isAdmin
+                ? 'border-green-100 bg-green-50'
+                : 'border-blue-100 bg-blue-50'
+            }`}
+          >
+            <p className="text-sm leading-relaxed text-gray-700">
+              {isAdmin
+                ? 'La séance sera modifiée immédiatement.'
+                : 'La demande sera envoyée à la scolarité. La séance reste en attente tant que la demande n’est pas traitée.'}
             </p>
           </div>
         </div>
 
-        {/* Footer - Action Buttons */}
-        <div className="p-6 bg-gray-50 border-t border-gray-200 flex gap-3">
+        <div className="flex gap-3 border-t border-gray-200 bg-gray-50 p-6">
           <Button
             onClick={onCancel}
-            className="flex-1 px-4 py-2 text-sm font-medium border border-[#003A68] text-[#003A68] bg-white rounded-lg hover:bg-gray-50"
+            disabled={isLoading}
+            className="flex-1 rounded-lg border border-[#003A68] bg-white px-4 py-2 text-sm font-medium text-[#003A68] hover:bg-gray-50 disabled:opacity-50"
           >
-            Refuser
+            Annuler
           </Button>
+
           <Button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#003A68] rounded-lg hover:bg-[#002847]"
+            disabled={isLoading}
+            className="flex-1 rounded-lg bg-[#003A68] px-4 py-2 text-sm font-medium text-white hover:bg-[#002847] disabled:opacity-50"
           >
-            Accepter
+            {isLoading ? 'Envoi...' : isAdmin ? 'Appliquer' : 'Confirmer'}
           </Button>
         </div>
       </div>
