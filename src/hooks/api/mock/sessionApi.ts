@@ -10,9 +10,14 @@ export type UserRole = 'enseignant' | 'admin' | null
 export type SessionStatus = 'active' | 'pending' | 'absent'
 export type TeacherRequestStatus = 'pending' | 'approved' | 'rejected'
 
+export type SessionType = 'TD' | 'TP' | 'CM' | 'Autre'
+
 export interface Session {
   id: string
   title: string
+  type: SessionType
+  moduleId: string
+  moduleName: string
   start: Date
   end: Date
   teacherId: string
@@ -20,11 +25,8 @@ export interface Session {
   groupId: string
   group: string
   room?: string
-  description?: string
-  remarks?: string
-  equipment?: string[]
   studentsCount?: number
-  status: SessionStatus
+  status: 'active' | 'pending' | 'absent'
 }
 
 export interface SessionTooltipData {
@@ -33,7 +35,6 @@ export interface SessionTooltipData {
   time: string
   group: string
   room?: string
-  description?: string
   teacherName: string
 }
 
@@ -115,9 +116,9 @@ function cloneSession(session: Session): Session {
     ...session,
     start: new Date(session.start),
     end: new Date(session.end),
-    equipment: session.equipment ? [...session.equipment] : undefined,
   }
 }
+
 
 function cloneRequest(request: TeacherRequest): TeacherRequest {
   return {
@@ -160,7 +161,10 @@ const weekBase = startOfWeek(new Date())
 let MOCK_SESSIONS: Session[] = [
   {
     id: 'sess_1',
-    title: 'TD 02 - React',
+    title: 'TD - React',
+    type: 'TD',
+    moduleId: 'm1',
+    moduleName: 'React',
     start: createDate(weekBase, 0, 10, 0),
     end: createDate(weekBase, 0, 11, 30),
     teacherId: 'prof_1',
@@ -168,15 +172,15 @@ let MOCK_SESSIONS: Session[] = [
     groupId: 'group_a1',
     group: 'Groupe A1',
     room: 'Salle 101',
-    description: 'Implémentation de composants React',
-    remarks: 'Apporter vos laptops',
-    equipment: ['Vidéoprojecteur', 'Tableau blanc'],
     studentsCount: 28,
     status: 'active',
   },
   {
     id: 'sess_2',
-    title: 'Cours C++',
+    title: 'CM - C++',
+    type: 'CM',
+    moduleId: 'm2',
+    moduleName: 'C++',
     start: createDate(weekBase, 1, 14, 0),
     end: createDate(weekBase, 1, 15, 30),
     teacherId: 'prof_2',
@@ -184,54 +188,6 @@ let MOCK_SESSIONS: Session[] = [
     groupId: 'group_a1',
     group: 'Groupe A1',
     room: 'Amphi 1',
-    description: 'Pointeurs et gestion mémoire',
-    remarks: 'Présence recommandée',
-    equipment: ['Vidéoprojecteur'],
-    studentsCount: 28,
-    status: 'active',
-  },
-  {
-    id: 'sess_3',
-    title: 'TP Réseau',
-    start: createDate(weekBase, 2, 9, 0),
-    end: createDate(weekBase, 2, 10, 30),
-    teacherId: 'prof_1',
-    teacherName: 'Jean Dupont',
-    groupId: 'group_b2',
-    group: 'Groupe B2',
-    room: 'Lab 2',
-    description: 'Configuration TCP/IP',
-    equipment: ['Ordinateurs', 'Équipement réseau'],
-    studentsCount: 25,
-    status: 'active',
-  },
-  {
-    id: 'sess_4',
-    title: 'TP Web',
-    start: createDate(weekBase, 3, 11, 0),
-    end: createDate(weekBase, 3, 12, 30),
-    teacherId: 'prof_2',
-    teacherName: 'Marie Lambert',
-    groupId: 'group_b2',
-    group: 'Groupe B2',
-    room: 'Lab 1',
-    description: 'HTML / CSS / JavaScript',
-    equipment: ['Ordinateurs'],
-    studentsCount: 25,
-    status: 'active',
-  },
-  {
-    id: 'sess_5',
-    title: 'Révision',
-    start: createDate(weekBase, 4, 13, 0),
-    end: createDate(weekBase, 4, 14, 30),
-    teacherId: 'prof_1',
-    teacherName: 'Jean Dupont',
-    groupId: 'group_a1',
-    group: 'Groupe A1',
-    room: 'Salle 103',
-    description: 'Séance de révision',
-    equipment: ['Tableau blanc'],
     studentsCount: 28,
     status: 'active',
   },
@@ -476,14 +432,13 @@ export async function getSessionDetails(
   }
 
   return {
-    id: session.id,
-    title: session.title,
-    time: `${formatTime(session.start)} - ${formatTime(session.end)}`,
-    group: session.group,
-    room: session.room,
-    description: session.description,
-    teacherName: session.teacherName,
-  }
+  id: session.id,
+  title: session.title,
+  time: `${formatTime(session.start)} - ${formatTime(session.end)}`,
+  group: session.group,
+  room: session.room,
+  teacherName: session.teacherName,
+}
 }
 
 export async function getDisponibilities(
@@ -695,32 +650,30 @@ export async function adminRescheduleSession(
 }
 
 export async function createSession(input: {
-  title: string
+  type: SessionType
+  moduleId: string
+  moduleName: string
   start: Date
   teacherId: string
   teacherName: string
   groupId: string
   group: string
   room?: string
-  description?: string
-  remarks?: string
-  equipment?: string[]
   studentsCount?: number
 }): Promise<boolean> {
   await wait(API_DELAY.long)
 
   const end = buildSessionEnd(input.start)
+
   const teacherDispo = MOCK_DISPONIBILITIES[input.teacherId] || []
   const groupDispo = MOCK_DISPONIBILITIES[input.groupId] || []
 
   const teacherAvailable = isRangeInsideDisponibilities(input.start, end, teacherDispo)
   const groupAvailable = isRangeInsideDisponibilities(input.start, end, groupDispo)
 
-  if (!teacherAvailable || !groupAvailable) {
-    return false
-  }
+  if (!teacherAvailable || !groupAvailable) return false
 
-  const hasConflict = hasCollision(
+  const conflict = hasCollision(
     '__new__',
     input.start,
     end,
@@ -728,13 +681,16 @@ export async function createSession(input: {
     input.groupId,
   )
 
-  if (hasConflict) {
-    return false
-  }
+  if (conflict) return false
+
+  const title = `${input.type} - ${input.moduleName}`
 
   MOCK_SESSIONS.push({
     id: `sess_${Date.now()}`,
-    title: input.title,
+    title,
+    type: input.type,
+    moduleId: input.moduleId,
+    moduleName: input.moduleName,
     start: new Date(input.start),
     end,
     teacherId: input.teacherId,
@@ -742,15 +698,13 @@ export async function createSession(input: {
     groupId: input.groupId,
     group: input.group,
     room: input.room,
-    description: input.description,
-    remarks: input.remarks,
-    equipment: input.equipment,
     studentsCount: input.studentsCount,
     status: 'active',
   })
 
   return true
 }
+
 
 export async function updateDisponibilities(
   actorId: string,

@@ -90,11 +90,7 @@ export function SessionTooltip({ sessionId, x, y }: SessionTooltipProps) {
           <span>{data.teacherName}</span>
         </div>
 
-        {data.description && (
-          <div className="border-t pt-2 text-xs italic text-gray-600">
-            {data.description}
-          </div>
-        )}
+      
       </div>
     </div>
   )

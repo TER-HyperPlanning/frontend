@@ -76,6 +76,7 @@ function DateStrip({ selectedDate, onDateChange }: DateStripProps) {
 
   return (
     <div className="flex items-center gap-1 px-3 py-2 overflow-x-auto">
+      
       <button
         onClick={handlePrev}
         className="btn btn-circle btn-ghost btn-sm shrink-0"

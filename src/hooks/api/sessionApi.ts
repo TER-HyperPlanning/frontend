@@ -76,11 +76,66 @@ export function useSessionAPI() {
     }
   }
 
+  /**
+   * Create a new session
+   * POST /sessions
+   * Body: Session data
+   */
+//   export async function createSession(input: {
+//   type: SessionType
+//   moduleId: string
+//   moduleName: string
+//   start: Date
+//   teacherId: string
+//   teacherName: string
+//   groupId: string
+//   group: string
+//   room?: string
+//   studentsCount?: number
+// }): Promise<boolean> {
+//   await wait(300)
+
+  
+// }
+
+  /**
+   * Create a new session
+   * POST /sessions
+   * Body: Session data
+   */
+  const createSession = async (sessionData: {
+    title: string
+    start: Date
+    teacherId: string
+    teacherName: string
+    groupId: string
+    group: string
+    room?: string
+    description?: string
+    remarks?: string
+  }): Promise<Session | null> => {
+    try {
+      const response = await api.post('/sessions', {
+        ...sessionData,
+        start: sessionData.start.toISOString(),
+      })
+      return {
+        ...response.data,
+        start: new Date(response.data.start),
+        end: new Date(response.data.end),
+      }
+    } catch (error) {
+      console.error('Failed to create session:', error)
+      return null
+    }
+  }
+
   return {
     getSessions,
     getDisponibilities,
     declareAbsence,
     requestReschedule,
+    createSession,
   }
 }
 

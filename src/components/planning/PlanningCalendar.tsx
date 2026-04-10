@@ -4,7 +4,6 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import frLocale from '@fullcalendar/core/locales/fr'
 import type {
-  EventApi,
   EventClickArg,
   EventContentArg,
   EventDropArg,
@@ -16,6 +15,7 @@ import './planning-calendar.css'
 import { SessionDetailsModal } from './SessionDetailsModal'
 import { ConfirmChangeModal } from './ConfirmChangeModal'
 import { SessionTooltip } from './SessionTooltip'
+import { CreateSessionModal } from './CreateSessionModal'
 import { useToast } from '@/hooks/useToast'
 import { useUserRole } from '@/hooks/useUserRole'
 import {
@@ -146,16 +146,16 @@ function mapSessionsToEvents(sessions: Awaited<ReturnType<typeof getSessions>>):
       end: session.end,
       ...colors,
       extendedProps: {
-        description: session.description,
+        
         status: session.status,
         teacherId: session.teacherId,
         groupId: session.groupId,
         teacherName: session.teacherName,
         group: session.group,
         room: session.room,
-        remarks: session.remarks,
+       
         studentsCount: session.studentsCount,
-        equipment: session.equipment,
+        
       },
     }
   })
@@ -172,11 +172,13 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
   const [pendingChange, setPendingChange] = useState<PendingChangeState | null>(null)
   const [isConfirmingChange, setIsConfirmingChange] = useState(false)
   const [globalError, setGlobalError] = useState<string | null>(null)
+  const [isCreateSessionOpen, setIsCreateSessionOpen] = useState(false)
 
   const { showToast } = useToast()
   const userRole = useUserRole()
 
   const canDrag = userRole === 'enseignant' || userRole === 'admin'
+  const isAdmin = userRole === 'admin'
 
   const loadSessions = useCallback(async () => {
     setIsLoading(true)
@@ -323,11 +325,28 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
 
   return (
     <div className="planning-calendar flex-1 overflow-auto px-1">
-      {globalError && (
-        <div className="sticky top-0 z-20 mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-          {globalError}
-        </div>
-      )}
+      <div className="mb-3 flex items-center justify-between gap-3">
+        {globalError ? (
+          <div className="flex-1 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {globalError}
+          </div>
+        ) : (
+          <div />
+        )}
+
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => {
+              clearError()
+              setIsCreateSessionOpen(true)
+            }}
+            className="shrink-0 rounded-lg bg-[#003A68] px-4 py-2 text-sm font-medium text-white hover:bg-[#002847]"
+          >
+            Ajouter une séance
+          </button>
+        )}
+      </div>
 
       <div className="min-w-[700px] h-full">
         <FullCalendar
@@ -408,6 +427,19 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
           onCancel={handleCancelChange}
           userRole={userRole}
           isLoading={isConfirmingChange}
+        />
+      )}
+
+      {isCreateSessionOpen && (
+        <CreateSessionModal
+          onClose={() => setIsCreateSessionOpen(false)}
+          onCreated={async () => {
+            setGlobalError(null)
+            setIsCreateSessionOpen(false)
+            await loadSessions()
+            showToast('Séance ajoutée avec succès.', 'success')
+          }}
+          onTopError={setGlobalError}
         />
       )}
 
