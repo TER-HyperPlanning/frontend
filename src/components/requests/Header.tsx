@@ -78,7 +78,7 @@ export default function Header({
         >
           <option value="">Tous les types</option>
           <option value="Changement de salle">Changement de salle</option>
-          <option value="Récupération de séance">Proposition de récupération de séance</option>
+          <option value="Proposition de récupération de séance">Proposition de récupération de séance</option>
         </select>
         <select
           value={filterStatus}
