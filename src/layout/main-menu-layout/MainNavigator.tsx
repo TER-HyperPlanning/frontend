@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock, CalendarRange } from 'lucide-react'
+import { CalendarDays, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock, CalendarRange, CalendarCheck } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
@@ -14,6 +14,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   '/groupes': <UsersRound size={20} />,
   '/buildings': <HiOutlineOfficeBuilding size={20} />,
   '/formations': <BookOpen size={20} />,
+  '/sessions': <CalendarCheck size={20} />,
   '/modules': <BookOpen size={20} />,
   '/requests': <Clock size={20} />,
   '/scolarite': <GraduationCap size={20} />,
@@ -61,7 +62,7 @@ export default function MainNavigator() {
       <motion.nav
         animate={{ width: isOpen ? 240 : 72 }}
         transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden md:flex h-full flex-col py-4 overflow-hidden shrink-0"
+        className="hidden md:flex h-screen flex-col py-4 overflow-hidden shrink-0 sticky top-0"// AJOUT Rosane
       >
         <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center  gap-4 flex-col-reverse'}`}>
           
@@ -95,15 +96,15 @@ export default function MainNavigator() {
         </div>
 
         {/* Bottom: User avatar */}
-        <div className="border-none mt-2 pt-2 px-3">
+        <div className="border-none mt-auto px-2 flex flex-col">
           <UserAvatar fullName={fullName} roleLabel={roleLabel} isOpen={isOpen} />
           <button
             type="button"
             onClick={logout}
             className={`
-              mt-2 w-full flex items-center gap-3 rounded-lg px-3 py-2.5
+               w-full flex items-center rounded-lg py-2.5
               text-gray-500 hover:bg-gray-200/60 hover:text-gray-700 transition-colors
-              ${!isOpen ? 'justify-center' : ''}
+              ${isOpen ? 'gap-3 px-3' : 'justify-center px-0'}
             `}
             aria-label="Se déconnecter"
             title="Se déconnecter"

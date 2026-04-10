@@ -115,7 +115,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             </p>
             {request.currentRoom && (
               <p>
-                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.currentRoom}
+                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.currentRoom} · Type salle : {request.currentRoomType}
               </p>
             )}
             {request.currentBuilding && (
@@ -151,7 +151,12 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             />
 
             <div className="grid md:grid-cols-2 gap-4">
-              {filteredRooms.map((room) => {
+              {filteredRooms.length === 0 ? (
+                <div className="col-span-full text-center py-10 text-gray-400">
+                  Aucune salle disponible pour ce créneau
+                </div>
+              ) : (
+                filteredRooms.map((room) => {
                 const isSelected = selectedRoom?.room === room.room && selectedRoom?.building === room.building
                 return (
                   <div
@@ -170,7 +175,8 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                     {isSelected && <Check className="text-blue-600 w-6 h-6" />}
                   </div>
                 )
-              })}
+              })
+            )}
             </div>
 
             <div className="mt-6 flex gap-4">
@@ -207,9 +213,9 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                   <>
                     Séance du <strong>{request.sessionTime}</strong>
                     <br />
-                    Nouvelle salle : <strong>{selectedRoom?.room}
+                    Nouvelle salle : <strong>{selectedRoom?.room}</strong>
                       <br />
-                    Bâtiment: <strong></strong>{selectedRoom?.building}</strong>
+                    Bâtiment: <strong>{selectedRoom?.building}</strong>
                   </>
                 }
                 confirmColor="green"
@@ -225,6 +231,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             <div>
               <h3 className="font-semibold text-green-800 text-lg mb-2">Salle proposée</h3>
               <p>Salle : {request.proposedRoom}</p>
+              <p>Type salle : {request.proposedRoomType}</p>
               <p>Bâtiment : {request.proposedBuilding}</p>
               <p>Capacité : {request.capacity}</p>
             </div>
@@ -232,7 +239,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
         )}
 
         {/* Récupération de séance */}
-        {request.type === 'Récupération de séance' && (
+        {request.type === 'Proposition de récupération de séance' && (
           <>
             <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
               <User className="w-8 h-8 text-gray-600 mt-1" />
@@ -253,7 +260,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                   </p>
                   {request.currentRoom && (
                     <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.proposedSlotRoom}
+                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.proposedSlotRoom} · Type salle: {request.proposedRoomType}
                     </p>
                   )}
                   {request.currentBuilding && (
@@ -275,7 +282,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                   </p>
                   {request.currentRoom && (
                     <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.alternativeSlotRoom}
+                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.alternativeSlotRoom} · Type salle: {request.alternativeSlotRoomType}
                     </p>
                   )}
                   {request.currentBuilding && (
