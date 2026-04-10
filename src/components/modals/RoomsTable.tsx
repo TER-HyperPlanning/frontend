@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
+import { BADGE_STYLES, ACTION_BUTTON_STYLES, EmptyState } from '@/utils/tableStyles'
 import EditRoomModal from './EditRoomModal';
 import DeleteRoomModal from './DeleteRoomModal';
 
@@ -35,6 +36,17 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
         room.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const getRoomTypeBadge = (type: string) => {
+        switch (type) {
+            case 'Amphi':
+                return BADGE_STYLES['info-outline']
+            case 'TP':
+                return BADGE_STYLES['secondary-outline']
+            default:
+                return BADGE_STYLES['active-outline']
+        }
+    }
+
     return (
         <>
             <Table>
@@ -43,68 +55,69 @@ export default function RoomsTable({ searchTerm, onSuccess }: RoomsTableProps) {
                         <TableHeader>Numéro salle</TableHeader>
                         <TableHeader>Capacité</TableHeader>
                         <TableHeader>Type</TableHeader>
-                        <TableHeader>Actions</TableHeader>
+                        <TableHeader className="text-right">Actions</TableHeader>
                     </TableRow>
                 </TableHead>
 
                 <TableBody>
                     {filteredRooms.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={4} className="py-16 text-center text-base-content/50">
-                                Aucune salle trouvée
+                            <TableCell colSpan={4} className="px-4 py-0">
+                                <EmptyState 
+                                    title="Aucune salle trouvée"
+                                    message={searchTerm ? "Aucune salle ne correspond à votre recherche" : "Aucune salle enregistrée pour le moment"}
+                                />
                             </TableCell>
                         </TableRow>
-                    ) : filteredRooms.map(room => (
-                        <TableRow key={room.id}>
-                            <TableCell className="font-medium text-base-content">
-                                {room.number}
-                            </TableCell>
+                    ) : (
+                        filteredRooms.map(room => (
+                            <TableRow key={room.id}>
+                                <TableCell className="font-semibold text-gray-900">
+                                    {room.number}
+                                </TableCell>
 
-                            <TableCell className="text-sm">
-                                <span className="badge badge-ghost badge-sm font-medium">
-                                    {room.capacity} places
-                                </span>
-                            </TableCell>
+                                <TableCell>
+                                    <span className={BADGE_STYLES['active-outline']}>
+                                        {room.capacity} places
+                                    </span>
+                                </TableCell>
 
-                            <TableCell>
-                                <span
-                                    className={`badge badge-sm font-medium ${
-                                        room.type === 'Amphi'
-                                            ? 'badge-primary badge-outline'
-                                            : room.type === 'TP'
-                                                ? 'badge-secondary badge-outline'
-                                                : 'badge-accent badge-outline'
-                                    }`}
-                                >
-                                    {room.type}
-                                </span>
-                            </TableCell>
+                                <TableCell>
+                                    <span className={getRoomTypeBadge(room.type)}>
+                                        {room.type}
+                                    </span>
+                                </TableCell>
 
-                            <TableCell>
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={() => {
-                                            setSelectedRoom(room);
-                                            setIsEditModalOpen(true);
-                                        }}
-                                        className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
-                                    >
-                                        <HiOutlinePencil size={16} />
-                                    </button>
+                                <TableCell className="text-right">
+                                    <div className="flex items-center justify-end gap-1">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedRoom(room);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            className={ACTION_BUTTON_STYLES.edit}
+                                            title="Modifier"
+                                            aria-label="Modifier salle"
+                                        >
+                                            <Pencil size={16} />
+                                        </button>
 
-                                    <button
-                                        onClick={() => {
-                                            setRoomToDelete(room);
-                                            setIsDeleteModalOpen(true);
-                                        }}
-                                        className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
-                                    >
-                                        <HiOutlineTrash size={16} />
-                                    </button>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                        <button
+                                            onClick={() => {
+                                                setRoomToDelete(room);
+                                                setIsDeleteModalOpen(true);
+                                            }}
+                                            className={ACTION_BUTTON_STYLES.delete}
+                                            title="Supprimer"
+                                            aria-label="Supprimer salle"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
                 </TableBody>
             </Table>
 

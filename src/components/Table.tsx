@@ -3,39 +3,56 @@ import { cn } from '@/utils/cn'
 
 interface TableProps extends ComponentPropsWithoutRef<'table'> {
   children: ReactNode
+  className?: string
 }
 
 interface TableHeadProps extends ComponentPropsWithoutRef<'thead'> {
   children: ReactNode
+  className?: string
 }
 
 interface TableBodyProps extends ComponentPropsWithoutRef<'tbody'> {
   children: ReactNode
+  className?: string
 }
 
 interface TableRowProps extends ComponentPropsWithoutRef<'tr'> {
   children: ReactNode
+  className?: string
 }
 
 interface TableHeaderProps extends ComponentPropsWithoutRef<'th'> {
   children: ReactNode
+  className?: string
 }
 
 interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
   children: ReactNode
+  className?: string
 }
 
 function Table({ children, className, ...props }: TableProps) {
   return (
-    <table className={cn('table table-zebra w-full', className)} {...props}>
-      {children}
-    </table>
+    <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+      <table
+        className={cn(
+          'w-full border-collapse text-sm',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </table>
+    </div>
   )
 }
 
 function TableHead({ children, className, ...props }: TableHeadProps) {
   return (
-    <thead className={cn(className)} {...props}>
+    <thead
+      className={cn('bg-linear-to-r from-gray-50 to-gray-100 border-b border-gray-200', className)}
+      {...props}
+    >
       {children}
     </thead>
   )
@@ -43,7 +60,10 @@ function TableHead({ children, className, ...props }: TableHeadProps) {
 
 function TableBody({ children, className, ...props }: TableBodyProps) {
   return (
-    <tbody className={cn(className)} {...props}>
+    <tbody
+      className={cn('[&>tr:last-child>td]:border-b-0', className)}
+      {...props}
+    >
       {children}
     </tbody>
   )
@@ -51,7 +71,13 @@ function TableBody({ children, className, ...props }: TableBodyProps) {
 
 function TableRow({ children, className, ...props }: TableRowProps) {
   return (
-    <tr className={cn('hover', className)} {...props}>
+    <tr
+      className={cn(
+        'border-b border-gray-200 transition-colors hover:bg-gray-50/50 [&>td]:py-3 [&>td]:px-4 [&>th]:py-3 [&>th]:px-4',
+        className,
+      )}
+      {...props}
+    >
       {children}
     </tr>
   )
@@ -59,7 +85,13 @@ function TableRow({ children, className, ...props }: TableRowProps) {
 
 function TableHeader({ children, className, ...props }: TableHeaderProps) {
   return (
-    <th className={cn('text-base-content/60 text-xs uppercase', className)} {...props}>
+    <th
+      className={cn(
+        'text-left font-semibold text-gray-700 text-xs uppercase tracking-wider whitespace-nowrap',
+        className,
+      )}
+      {...props}
+    >
       {children}
     </th>
   )
@@ -67,7 +99,10 @@ function TableHeader({ children, className, ...props }: TableHeaderProps) {
 
 function TableCell({ children, className, ...props }: TableCellProps) {
   return (
-    <td className={cn(className)} {...props}>
+    <td
+      className={cn('text-gray-600', className)}
+      {...props}
+    >
       {children}
     </td>
   )

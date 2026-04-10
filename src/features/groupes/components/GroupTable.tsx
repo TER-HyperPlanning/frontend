@@ -1,6 +1,7 @@
 import { UserPlus } from 'lucide-react'
 import Button from '@/components/Button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
+import { BADGE_STYLES } from '@/utils/tableStyles'
 import SortableHeader from './SortableHeader'
 import type { Group, SortConfig, SortKey, Student } from '../types'
 
@@ -13,10 +14,20 @@ interface GroupTableProps {
 }
 
 function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTableProps) {
+  const getGroupTypeBadge = (type: string) => {
+    return type === 'FI' ? BADGE_STYLES['info-outline'] : BADGE_STYLES['secondary-outline']
+  }
+
+  const getCapacityColor = (ratio: number) => {
+    if (ratio > 0.9) return 'bg-red-200'
+    if (ratio > 0.7) return 'bg-amber-200'
+    return 'bg-emerald-200'
+  }
+
   return (
     <Table>
       <TableHead>
-        <TableRow className="text-base-content/60 text-xs uppercase">
+        <TableRow>
           <TableHeader>Nom</TableHeader>
           <TableHeader>Type</TableHeader>
           <TableHeader>Formation</TableHeader>
@@ -28,7 +39,7 @@ function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTa
             Effectif
           </SortableHeader>
           <TableHeader>Remplissage</TableHeader>
-          <TableHeader>Actions</TableHeader>
+          <TableHeader className="text-right">Actions</TableHeader>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -38,43 +49,27 @@ function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTa
 
           return (
             <TableRow key={groupe.id}>
-              <TableCell className="font-medium text-base-content">{groupe.nom}</TableCell>
+              <TableCell className="font-semibold text-gray-900">{groupe.nom}</TableCell>
               <TableCell>
-                <span
-                  className={`badge badge-sm font-medium ${
-                    groupe.type === 'FI'
-                      ? 'badge-primary badge-outline'
-                      : 'badge-secondary badge-outline'
-                  }`}
-                >
+                <span className={getGroupTypeBadge(groupe.type)}>
                   {groupe.type}
                 </span>
               </TableCell>
-              <TableCell className="text-sm text-base-content/80">{groupe.formation}</TableCell>
-              <TableCell className="text-sm text-base-content/80">{groupe.classe}</TableCell>
-              <TableCell className="text-sm">{groupe.capacite}</TableCell>
-              <TableCell className="text-sm">{groupe.effectif}</TableCell>
+              <TableCell className="text-gray-600">{groupe.formation}</TableCell>
+              <TableCell className="text-gray-600">{groupe.classe}</TableCell>
+              <TableCell className="text-gray-600">{groupe.capacite}</TableCell>
+              <TableCell className="text-gray-600">{groupe.effectif}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <progress
-                    className={`progress w-16 h-2 ${
-                      ratio > 0.9
-                        ? 'progress-error'
-                        : ratio > 0.7
-                          ? 'progress-warning'
-                          : 'progress-success'
-                    }`}
-                    value={ratio * 100}
-                    max={100}
-                  />
-                  <span className="text-xs text-base-content/50">{Math.round(ratio * 100)}%</span>
+                  <div className={`w-16 h-2 rounded-full ${getCapacityColor(ratio)}`} style={{ width: '64px', background: ratio > 0.9 ? '#fecaca' : ratio > 0.7 ? '#fed7aa' : '#dcfce7' }} />
+                  <span className="text-xs text-gray-600">{Math.round(ratio * 100)}%</span>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="text-right">
                 <Button
                   variant="outlined"
                   leftIcon={<UserPlus size={15} />}
-                  className="btn-sm text-xs"
+                  className="text-xs"
                   onClick={() => onAssign(groupe)}
                 >
                   Assigner

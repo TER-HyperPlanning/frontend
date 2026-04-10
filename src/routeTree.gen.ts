@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TeacherRequestsRouteImport } from './routes/teacher-requests'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +29,16 @@ import { Route as appAvailabilityIndexRouteImport } from './routes/(app)/availab
 import { Route as appBuildingsBuildingIdRouteImport } from './routes/(app)/buildings/$buildingId'
 import { Route as appAdminAccountsIndexRouteImport } from './routes/(app)/admin/accounts/index'
 
+const TeacherRequestsRoute = TeacherRequestsRouteImport.update({
+  id: '/teacher-requests',
+  path: '/teacher-requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -115,6 +127,8 @@ const appAdminAccountsIndexRoute = appAdminAccountsIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/requests': typeof RequestsRoute
+  '/teacher-requests': typeof TeacherRequestsRoute
   '/planning/': typeof PlanningIndexRoute
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/availability/': typeof appAvailabilityIndexRoute
@@ -133,6 +147,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/requests': typeof appRequestsIndexRoute
+  '/teacher-requests': typeof TeacherRequestsRoute
   '/planning': typeof PlanningIndexRoute
   '/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/availability': typeof appAvailabilityIndexRoute
@@ -140,7 +156,6 @@ export interface FileRoutesByTo {
   '/formations': typeof appFormationsIndexRoute
   '/groupes': typeof appGroupesIndexRoute
   '/modules': typeof appModulesIndexRoute
-  '/requests': typeof appRequestsIndexRoute
   '/scolarite': typeof appScolariteIndexRoute
   '/teachers': typeof appTeachersIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
@@ -153,6 +168,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/requests': typeof RequestsRoute
+  '/teacher-requests': typeof TeacherRequestsRoute
   '/planning/': typeof PlanningIndexRoute
   '/(app)/buildings/$buildingId': typeof appBuildingsBuildingIdRoute
   '/(app)/availability/': typeof appAvailabilityIndexRoute
@@ -173,6 +190,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/requests'
+    | '/teacher-requests'
     | '/planning/'
     | '/buildings/$buildingId'
     | '/availability/'
@@ -191,6 +210,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/requests'
+    | '/teacher-requests'
     | '/planning'
     | '/buildings/$buildingId'
     | '/availability'
@@ -198,7 +219,6 @@ export interface FileRouteTypes {
     | '/formations'
     | '/groupes'
     | '/modules'
-    | '/requests'
     | '/scolarite'
     | '/teachers'
     | '/auth/forget-pwd'
@@ -210,6 +230,8 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/auth'
+    | '/requests'
+    | '/teacher-requests'
     | '/planning/'
     | '/(app)/buildings/$buildingId'
     | '/(app)/availability/'
@@ -230,11 +252,27 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   appRouteRoute: typeof appRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  RequestsRoute: typeof RequestsRoute
+  TeacherRequestsRoute: typeof TeacherRequestsRoute
   PlanningIndexRoute: typeof PlanningIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/teacher-requests': {
+      id: '/teacher-requests'
+      path: '/teacher-requests'
+      fullPath: '/teacher-requests'
+      preLoaderRoute: typeof TeacherRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -407,6 +445,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   appRouteRoute: appRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  RequestsRoute: RequestsRoute,
+  TeacherRequestsRoute: TeacherRequestsRoute,
   PlanningIndexRoute: PlanningIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,6 +1,7 @@
 import { type Formation } from '@/types/formation'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { Pencil, Trash2 } from 'lucide-react'
+import { BADGE_STYLES, ACTION_BUTTON_STYLES, EmptyState } from '@/utils/tableStyles'
 
 interface FormationsTableProps {
   formations: Formation[]
@@ -14,61 +15,69 @@ export default function FormationsTable({
   onDelete,
 }: FormationsTableProps) {
   return (
-      <Table>
-        <TableHead>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeader>Nom de la formation</TableHeader>
+          <TableHeader>Enseignant responsable</TableHeader>
+          <TableHeader>Programme</TableHeader>
+          <TableHeader>Lieu</TableHeader>
+          <TableHeader>Filière associée</TableHeader>
+          <TableHeader className="text-right">Actions</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {formations.length === 0 ? (
           <TableRow>
-            <TableHeader>Nom de la formation</TableHeader>
-            <TableHeader>Enseignant responsable</TableHeader>
-            <TableHeader>Programme</TableHeader>
-            <TableHeader>Lieu</TableHeader>
-            <TableHeader>Filière associée</TableHeader>
-            <TableHeader>Actions</TableHeader>
+            <TableCell colSpan={6} className="px-4 py-0">
+              <EmptyState 
+                title="Aucune formation"
+                message="Aucune formation enregistrée pour le moment"
+              />
+            </TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {formations.map(formation => (
+        ) : (
+          formations.map(formation => (
             <TableRow key={formation.id}>
-              <TableCell className="font-medium text-base-content">{formation.nom}</TableCell>
-              <TableCell className="text-sm text-base-content/80">
+              <TableCell className="font-semibold text-gray-900">{formation.nom}</TableCell>
+              <TableCell className="text-gray-600">
                 {formation.enseignantResponsable}
               </TableCell>
               <TableCell>
-                <span className="badge badge-ghost badge-sm font-medium">
+                <span className={BADGE_STYLES['secondary-outline']}>
                   {formation.programme}
                 </span>
               </TableCell>
-              <TableCell className="text-sm text-base-content/80">{formation.lieu}</TableCell>
+              <TableCell className="text-gray-600">{formation.lieu}</TableCell>
               <TableCell>
-                <span className="badge badge-primary badge-outline badge-sm font-medium">
+                <span className={BADGE_STYLES['info-outline']}>
                   {formation.filiere.nom}
                 </span>
               </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1">
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-1">
                   <button
                     onClick={() => onEdit(formation)}
-                    className="btn btn-ghost btn-sm text-base-content/50 hover:text-warning"
+                    className={ACTION_BUTTON_STYLES.edit}
+                    title="Modifier"
+                    aria-label="Modifier formation"
                   >
-                    <PencilSquareIcon className="size-4" />
+                    <Pencil size={16} />
                   </button>
                   <button
                     onClick={() => onDelete(formation)}
-                    className="btn btn-ghost btn-sm text-base-content/50 hover:text-error"
+                    className={ACTION_BUTTON_STYLES.delete}
+                    title="Supprimer"
+                    aria-label="Supprimer formation"
                   >
-                    <TrashIcon className="size-4" />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </TableCell>
             </TableRow>
-          ))}
-          {formations.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center text-base-content/50 py-16">
-                Aucune formation enregistrée
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          ))
+        )}
+      </TableBody>
+    </Table>
   )
 }
