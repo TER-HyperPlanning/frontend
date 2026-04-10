@@ -18,6 +18,7 @@ import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/ind
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appSessionsIndexRouteImport } from './routes/(app)/sessions/index'
+import { Route as appStudentsIndexRouteImport } from './routes/(app)/students/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
 import { Route as appModulesIndexRouteImport } from './routes/(app)/modules/index'
@@ -71,6 +72,9 @@ const appTeachersIndexRoute = appTeachersIndexRouteImport.update({
 const appSessionsIndexRoute = appSessionsIndexRouteImport.update({
   id: '/sessions/',
   path: '/sessions/',
+const appStudentsIndexRoute = appStudentsIndexRouteImport.update({
+  id: '/students/',
+  path: '/students/',
   getParentRoute: () => appRouteRoute,
 } as any)
 const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
@@ -138,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/requests/': typeof appRequestsIndexRoute
   '/scolarite/': typeof appScolariteIndexRoute
   '/sessions/': typeof appSessionsIndexRoute
+  '/students/': typeof appStudentsIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -158,6 +163,7 @@ export interface FileRoutesByTo {
   '/requests': typeof appRequestsIndexRoute
   '/scolarite': typeof appScolariteIndexRoute
   '/sessions': typeof appSessionsIndexRoute
+  '/students': typeof appStudentsIndexRoute
   '/teachers': typeof appTeachersIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd': typeof AuthInitPwdIndexRoute
@@ -180,6 +186,7 @@ export interface FileRoutesById {
   '/(app)/requests/': typeof appRequestsIndexRoute
   '/(app)/scolarite/': typeof appScolariteIndexRoute
   '/(app)/sessions/': typeof appSessionsIndexRoute
+  '/(app)/students/': typeof appStudentsIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
   '/auth/init-pwd/': typeof AuthInitPwdIndexRoute
@@ -202,6 +209,7 @@ export interface FileRouteTypes {
     | '/requests/'
     | '/scolarite/'
     | '/sessions/'
+    | '/students/'
     | '/teachers/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -222,6 +230,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/scolarite'
     | '/sessions'
+    | '/students'
     | '/teachers'
     | '/auth/forget-pwd'
     | '/auth/init-pwd'
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/(app)/requests/'
     | '/(app)/scolarite/'
     | '/(app)/sessions/'
+    | '/(app)/students/'
     | '/(app)/teachers/'
     | '/auth/forget-pwd/'
     | '/auth/init-pwd/'
@@ -321,6 +331,11 @@ declare module '@tanstack/react-router' {
       path: '/sessions'
       fullPath: '/sessions/'
       preLoaderRoute: typeof appSessionsIndexRouteImport
+    '/(app)/students/': {
+      id: '/(app)/students/'
+      path: '/students'
+      fullPath: '/students/'
+      preLoaderRoute: typeof appStudentsIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
     '/(app)/scolarite/': {
@@ -405,7 +420,11 @@ interface appRouteRouteChildren {
   appModulesIndexRoute: typeof appModulesIndexRoute
   appRequestsIndexRoute: typeof appRequestsIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
+<<<<<<< Updated upstream
   appSessionsIndexRoute: typeof appSessionsIndexRoute
+=======
+  appStudentsIndexRoute: typeof appStudentsIndexRoute
+>>>>>>> Stashed changes
   appTeachersIndexRoute: typeof appTeachersIndexRoute
   appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
   appFormationsFormationIdGroupesIndexRoute: typeof appFormationsFormationIdGroupesIndexRoute
@@ -420,7 +439,11 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appModulesIndexRoute: appModulesIndexRoute,
   appRequestsIndexRoute: appRequestsIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
+<<<<<<< Updated upstream
   appSessionsIndexRoute: appSessionsIndexRoute,
+=======
+  appStudentsIndexRoute: appStudentsIndexRoute,
+>>>>>>> Stashed changes
   appTeachersIndexRoute: appTeachersIndexRoute,
   appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
   appFormationsFormationIdGroupesIndexRoute:
