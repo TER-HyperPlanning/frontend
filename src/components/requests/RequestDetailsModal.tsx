@@ -1,4 +1,4 @@
-import { X, User, GraduationCap, Clock, MapPin, Check, XCircle, Calendar, Building, CheckCircle } from 'lucide-react'
+import { X, User, GraduationCap, Clock, MapPin, Check, XCircle, Calendar, Building, CheckCircle, Users, School } from 'lucide-react'
 import { useState } from 'react'
 import type { Request } from '@/routes/(app)/requests'
 import AlternativeSlotModal from './AlternativeSlotModal'
@@ -106,7 +106,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
         <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
           <GraduationCap className="w-8 h-8 text-gray-600 mt-1" />
           <div>
-            <h3 className="font-semibold text-lg mb-2">Séance</h3>
+            <h3 className="font-semibold text-lg mb-2"> Informations actuelles de la séance</h3>
             <p>Matière : {request.subject}</p>
             <p>Formation : {request.formation}</p>
             {request.groups && <p>Groupes : {request.groups}</p>}
@@ -115,7 +115,17 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             </p>
             {request.currentRoom && (
               <p>
-                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.currentRoom} · Type salle : {request.currentRoomType}
+                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.currentRoom} 
+              </p>
+            )}
+            {request.currentRoomType && (
+              <p>
+                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.currentRoomType}
+              </p>
+            )}
+            {request.currentRoomCapacity && (
+              <p>
+                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.currentRoomCapacity}
               </p>
             )}
             {request.currentBuilding && (
@@ -134,7 +144,6 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             <p>{request.reason}</p>
           </div>
         </div>
-
         {/* Changement de salle */}
         {request.type === 'Changement de salle' && request.status === 'En attente' && (
           <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm">
@@ -224,20 +233,28 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
           </div>
         )}
 
+
         {/* Salle proposée déjà approuvée */}
-        {request.type === 'Changement de salle' && request.proposedRoom && request.status !== 'Refusé' && (
-          <div className="bg-green-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-            <MapPin className="w-8 h-8 text-green-800 mt-1" />
+        {request.type === 'Changement de salle' && request.recentRoom && request.status !== 'Refusé' && (
+          <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+            <MapPin className="w-8 h-8 text-gray-800 mt-1" />
             <div>
-              <h3 className="font-semibold text-green-800 text-lg mb-2">Salle proposée</h3>
-              <p>Salle : {request.proposedRoom}</p>
-              <p>Type salle : {request.proposedRoomType}</p>
-              <p>Bâtiment : {request.proposedBuilding}</p>
-              <p>Capacité : {request.capacity}</p>
+              <h3 className="font-semibold text-gray-800 text-lg mb-2">Ancienne salle</h3>
+              <p>
+                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.recentRoom} 
+              </p>
+              <p>
+                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.recentRoomType}
+              </p>
+              <p>
+                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.recentRoomCapacity}
+              </p>
+              <p>
+                <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.recentBuilding}
+              </p>
             </div>
           </div>
         )}
-
         {/* Récupération de séance */}
         {request.type === 'Proposition de récupération de séance' && (
           <>
@@ -250,50 +267,68 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
               </div>
             </div>
 
-            {request.proposedSlot && (
+            {request.recentSlot && (
               <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
                 <Calendar className="w-8 h-8 text-gray-600 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Créneau proposé</h3>
+                  <h3 className="font-semibold text-lg mb-2">Ancien Créneau</h3>
+                  <p>
+                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.recentSlot}
+                  </p>
+                  {request.currentRoom && (
+                    <p>
+                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.recentRoom} 
+                    </p>
+                  )}
+                  {request.recentRoomType && (
+                    <p>
+                      <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.recentRoomType}
+                    </p>
+                  )}
+                  {request.recentRoomCapacity && (
+                    <p>
+                      <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.recentRoomCapacity}
+                    </p>
+                  )}
+                  {request.currentBuilding && (
+                      <p>
+                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.recentBuilding}
+                      </p>
+                    )}
+                </div>
+              </div>
+            )}
+            {request.proposedSlot &&(request.status === 'En attente' || request.status === 'Refusé') && (
+              <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+                <Clock className="w-8 h-8 text-gray-600 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Créneau proposé par le responsable</h3>
                   <p>
                     <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.proposedSlot}
                   </p>
                   {request.currentRoom && (
                     <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.proposedSlotRoom} · Type salle: {request.proposedRoomType}
+                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.proposedRoom}
                     </p>
                   )}
-                  {request.currentBuilding && (
-                      <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.proposedSlotBuilding}
-                      </p>
-                    )}
-                </div>
-              </div>
-            )}
-
-            {request.status === 'Refusé' && request.alternativeSlot && (
-              <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                <Clock className="w-8 h-8 text-gray-600 mt-1" />
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">Créneau alternatif</h3>
-                  <p>
-                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.alternativeSlot}
-                  </p>
-                  {request.currentRoom && (
+                  {request.proposedRoomType && (
                     <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.alternativeSlotRoom} · Type salle: {request.alternativeSlotRoomType}
+                      <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.proposedRoomType}
+                    </p>
+                  )}
+                  {request.proposedRoomCapacity && (
+                    <p>
+                      <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.proposedRoomCapacity}
                     </p>
                   )}
                   {request.currentBuilding && (
                       <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.alternativeSlotBuilding}
+                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.proposedBuilding}
                       </p>
                     )}
                 </div>
               </div>
             )}
-
             {request.status === 'En attente' && (
               <div className="mt-4 flex gap-4">
                 <button
@@ -321,7 +356,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                   description={`Vous êtes sur le point d'accepter le créneau proposé par ${request.teacher}.`}
                   details={
                     <>
-                    La séance aura lieu le <strong>{request.proposedSlot}</strong> en salle <strong>{request.proposedSlotRoom}</strong> Bâtiment: <strong>{request.proposedSlotBuilding}</strong>
+                    La séance aura lieu le <strong>{request.proposedSlot}</strong> en salle <strong>{request.proposedRoom}</strong> Bâtiment: <strong>{request.proposedBuilding}</strong>
                     </>
                   }
                   confirmColor="green"
@@ -360,17 +395,19 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             )}
           </>
         )}
-
+        
         {/* Motif de refus */}
-        {request.status === 'Refusé' && request.refusalReason && (
+        {request.status === 'Refusé' && request.rejectReason && (
           <div className="bg-red-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
             <XCircle className="w-8 h-8 text-red-600 mt-1" />
             <div>
               <h3 className="font-semibold text-lg mb-2 text-red-600">Motif du refus</h3>
-              <p>{request.refusalReason}</p>
+              <p>{request.rejectReason}</p>
             </div>
           </div>
         )}
+
+        
       </div>
     </div>
   )
