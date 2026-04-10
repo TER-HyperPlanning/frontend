@@ -1,6 +1,6 @@
 import { useState } from "react";
+import type { DateAvailability, DayActions } from "../../../types/date";
 import { AvailabilityHoursFormForOneDay } from "../../forms/availability/AvailabilityHoursForms/AvailabilityHoursForOneDay";
-import type { DateAvailability, DayActions } from "../../../interfaces/date";
 
 interface DayInfoPopUpProps {
     posX: number,

@@ -6,6 +6,10 @@
    themes: light --default;
  }
 
+:root {
+  color-scheme: light;
+}
+
 body {
   @apply m-0 w-screen h-screen p-0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -23,12 +27,6 @@ code {
 @utility btn-blue {
   @apply bg-dark-blue text-white hover:brightness-94;
 }
-
-
-
-
-
-
 
 @theme {
   --color-dark-blue: #003A68;
@@ -55,6 +53,4 @@ code {
   --color-secondary-800: oklch(0.41 0.176 301.15);
   --color-secondary-900: oklch(0.318 0.137 301.24);
   --color-secondary-950: oklch(0.282 0.122 301.19);
-
-
 }

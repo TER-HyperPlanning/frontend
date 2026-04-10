@@ -3,7 +3,7 @@ import { DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
 import { twMerge } from "tailwind-merge";
-import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from "../../../interfaces/date";
+import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from "../../../types/date";
 import { AvailabilityButtons } from "./AvailabilityButtons";
 import { CurrentMonthAndYear } from "./CalendarSelector/CurrentMonthAndYear";
 import { DayInfoPopUp } from "./DayInfoPopUp";

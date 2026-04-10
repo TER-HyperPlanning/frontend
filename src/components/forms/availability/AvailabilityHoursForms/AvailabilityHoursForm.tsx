@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { DayActions, TimeOfAvailabilityWithEmptyString } from '../../../../interfaces/date'
+import type { DayActions, TimeOfAvailabilityWithEmptyString } from '../../../../types/date'
 import { AvailabilityHoursFields } from './AvailabilityHoursFields'
 
 type AvailabilityHoursFormProps = {

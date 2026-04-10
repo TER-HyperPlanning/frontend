@@ -25,7 +25,7 @@ type Hours =
   | '22'
   | '23'
 // // prettier-ignore
-type Minutes =
+type timeUnit60 =
   | '00'
   | '01'
   | '02'
@@ -87,7 +87,7 @@ type Minutes =
   | '58'
   | '59'
 
-export type TimeString = `${Hours}:${Minutes}`
+export type TimeString = `${Hours}:${timeUnit60}:${timeUnit60}`
 
 export interface DateAvailability {
   dateMs: number
@@ -136,11 +136,15 @@ export type DayActions =
       timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
     }
   | {
-      type: 'addEditable'
+      type:"addEditable"
       value: Date[]
       groupNumber: number
       availableAllDay: boolean
       timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
+    }
+  | {
+      type:"addSelected"
+      value: DateAvailability[]
     }
   | {
       type: 'addYearToEditable'
@@ -162,6 +166,8 @@ export type DayActions =
       value: TimeOfAvailabilityWithEmptyString[]
     }
 
+    
+
 export interface GroupProps{
   number: number,
   /**
@@ -170,5 +176,34 @@ export interface GroupProps{
    * value so user must change it.
    */
   numberOfDayOfAvailability?:number
+}
+
+
+export interface AvailabilityPost {
+  weekDayId: string
+  startTime: TimeString
+  endTime: TimeString
+  startDate: string
+  endDate: string
+  teacherId: string 
+}
+
+export type AvailabilityPut = AvailabilityPost
+
+export interface AvailabilityGet {
+  id:string
+  weekDay: string
+  startTime: TimeString
+  endTime: TimeString
+  startDate: string
+  endDate: string
+  teacherId: string 
+}
+
+
+export interface WeekDayReponse{
+  weekdayId:string,
+  orderIndex:number,
+  name: string
 }
 

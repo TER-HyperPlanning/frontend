@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
+import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from '../../../types/date'
 import TextField from '../../TextField'
 
 interface AvailabilityTypeCheckboxProps {

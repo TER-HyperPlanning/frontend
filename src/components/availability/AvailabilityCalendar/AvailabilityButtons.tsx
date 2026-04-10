@@ -1,5 +1,5 @@
 import type { ActionDispatch, RefObject } from "react"
-import type { DayActions, TimeOfAvailabilityWithEmptyString } from "../../../interfaces/date"
+import type { DayActions, TimeOfAvailabilityWithEmptyString } from "../../../types/date"
 
 interface AvailabilityButtonsProps {
   dispatchSelectedDays: ActionDispatch<[action: DayActions]>

@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
-import type { TimeOfAvailabilityWithEmptyString } from '../../../../interfaces/date'
-import { HorizontalTextField } from '../../../HorizontalTextField'
+import type { TimeOfAvailabilityWithEmptyString } from '../../../../types/date'
 import { ErrorText } from '../../../ErrorText'
+import { HorizontalTextField } from '../../../HorizontalTextField'
 
 type AvailabilityHoursFieldsProps = {
   currentPage: number

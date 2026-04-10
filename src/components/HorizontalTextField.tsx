@@ -1,5 +1,4 @@
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import type { DetailedHTMLProps, HTMLAttributes } from "react"
+import type { DetailedHTMLProps } from "react"
 import { twMerge } from "tailwind-merge";
 
 interface HorizontalTextFieldProps {

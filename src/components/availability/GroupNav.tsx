@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useMemo } from 'react';
-import type { DayActions, GroupProps } from '../../interfaces/date';
+import type { DayActions, GroupProps } from '../../types/date';
 
 const pageSize: number = 2
 
