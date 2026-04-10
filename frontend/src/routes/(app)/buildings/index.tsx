@@ -1,8 +1,7 @@
-  import { useState, useMemo } from 'react';
+  import { useState } from 'react';
   import { createFileRoute, useNavigate } from '@tanstack/react-router';
   import { useBuildings } from "@/hooks/buildings/useBuildings";
   import type { Building } from "@/hooks/api/buildings";
-  import { useEffect } from "react";
   import {
     HiOutlineSearch,
     HiOutlinePencil,
