@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { HiX } from 'react-icons/hi';
 import Button from '../Button';
 import type { Room, RoomRequest } from "@/hooks/api/rooms";
-import type { AxiosError } from 'axios';
 import { useUpdateRoom } from "@/hooks/rooms/useUpdateRoom";
 
 interface EditRoomModalProps {

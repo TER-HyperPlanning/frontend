@@ -60,7 +60,7 @@ export default function RoomsTable({ rooms, searchTerm, onSuccess, onError }: Ro
                                     <span
                                         className={`badge badge-sm font-medium ${room.type === 'AMPHITHEATRE'
                                             ? 'badge-primary badge-outline'
-                                            : room.type === 'SalleTD'
+                                            : room.type === 'TD'
                                                 ? 'badge-secondary badge-outline'
                                                 : 'badge-accent badge-outline'
                                             }`}
