@@ -5,7 +5,7 @@ import { AvailabilityHoursForm } from '../../../components/forms/availability/Av
 import { AvailabilityTypeCheckbox } from '../../../components/forms/availability/AvailabilityTypeCheckbox'
 import { PatternInfoForm } from '../../../components/forms/availability/PatternInfoForm'
 import type { GroupProps, TimeOfAvailabilityWithEmptyString } from '../../../interfaces/date'
-import { availabilityReducer } from './availabilityReducer'
+import { availabilityReducer } from './-availabilityReducer'
 import { AvailabilityCalendar } from '../../../components/availability/AvailabilityCalendar/AvailabilityCalendar'
 
 export const Route = createFileRoute('/(app)/availability/')({

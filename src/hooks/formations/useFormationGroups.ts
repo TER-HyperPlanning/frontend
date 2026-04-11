@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { type GroupModel } from '@/types/session'
+import { type GroupModel } from '@/types/formation'
 import { type TrackResponse } from '@/types/formation'
-import { useGroupService } from '@/services/groupService'
-import { useTrackService } from '@/services/trackService'
-import { useProgramService } from '@/services/programService'
+import { getGroups } from '@/services/groupService'
+import { getTracks } from '@/services/trackService'
+import { getProgramById } from '@/services/programService'
 
 export interface FormationGroupRow {
   id: string
@@ -13,9 +13,6 @@ export interface FormationGroupRow {
 }
 
 export function useFormationGroups(formationId: string) {
-  const { getGroups } = useGroupService()
-  const { getTracks } = useTrackService()
-  const { getProgramById } = useProgramService()
 
   const [groups, setGroups] = useState<FormationGroupRow[]>([])
   const [formationName, setFormationName] = useState('')
@@ -52,7 +49,7 @@ export function useFormationGroups(formationId: string) {
     } finally {
       setIsLoading(false)
     }
-  }, [formationId, getProgramById, getTracks, getGroups])
+  }, [formationId])
 
   useEffect(() => {
     fetchGroups()

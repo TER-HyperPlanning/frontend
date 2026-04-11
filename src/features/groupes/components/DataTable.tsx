@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import SortableHeader from './SortableHeader'
 
-export interface DataColumn<T> {
+export interface DataColumn<T, _SortKeyType extends string = string> {
   key: string
   label: string
   render: (row: T, index: number) => ReactNode
@@ -10,8 +10,9 @@ export interface DataColumn<T> {
 }
 
 export interface DataTableProps<T, SortKeyType extends string = string> {
-  columns: DataColumn<T>[]
+  columns: DataColumn<T, SortKeyType>[]
   data: T[]
+  getRowKey?: (row: T) => string
   sortConfig?: {
     key: SortKeyType | null
     direction: 'asc' | 'desc'
@@ -25,12 +26,15 @@ export interface DataTableProps<T, SortKeyType extends string = string> {
 function DataTable<T extends { id: string }, SortKeyType extends string = string>({
   columns,
   data,
+  getRowKey,
   sortConfig = { key: null, direction: 'asc' },
   onSort,
   loading = false,
   emptyState,
   className = '',
 }: DataTableProps<T, SortKeyType>) {
+  const rowKey = (row: T) => (getRowKey ? getRowKey(row) : row.id)
+
   return (
     <table className={`table table-zebra w-full ${className}`}>
       <thead>
@@ -67,9 +71,9 @@ function DataTable<T extends { id: string }, SortKeyType extends string = string
           </tr>
         ) : (
           data.map((row, index) => (
-            <tr key={row.id} className="hover">
+            <tr key={rowKey(row)} className="hover">
               {columns.map(column => (
-                <td key={`${row.id}-${column.key}`} className={column.className}>
+                <td key={`${rowKey(row)}-${column.key}`} className={column.className}>
                   {column.render(row, index)}
                 </td>
               ))}

@@ -1,83 +1,70 @@
-import { UserPlus } from 'lucide-react'
+import { Pencil, Trash2, UserPlus } from 'lucide-react'
 import { useMemo } from 'react'
 import Button from '@/components/Button'
-import type { Group, SortConfig, SortKey, Student } from '../types'
 import DataTable, { type DataColumn } from './DataTable'
+import type { Group, SortConfig, SortKey } from '../types'
 
 interface GroupTableProps {
   groupes: Group[]
-  students: Student[]
   sortConfig: SortConfig
   onSort: (key: SortKey) => void
   onAssign: (groupe: Group) => void
+  onEdit: (groupe: Group) => void
+  onDelete: (groupe: Group) => void
 }
 
-function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTableProps) {
-  const columns = useMemo<DataColumn<Group>[]>(
+const GROUP_CAPACITY_LIMIT = 30
+
+function GroupTable({ groupes, sortConfig, onSort, onAssign, onEdit, onDelete }: GroupTableProps) {
+  const columns = useMemo<DataColumn<Group, SortKey>[]>(
     () => [
       {
-        key: 'nom',
+        key: 'name',
         label: 'Nom',
-        render: groupe => <span className="font-medium text-base-content">{groupe.nom}</span>,
+        sortable: true,
+        render: groupe => <span className="font-medium text-base-content">{groupe.name}</span>,
       },
       {
-        key: 'type',
-        label: 'Type',
-        render: groupe => (
-          <span
-            className={`badge badge-sm font-medium ${
-              groupe.type === 'FI'
-                ? 'badge-primary badge-outline'
-                : 'badge-secondary badge-outline'
-            }`}
-          >
-            {groupe.type}
-          </span>
-        ),
+        key: 'academicYear',
+        label: 'Année',
+        sortable: true,
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.academicYear}</span>,
       },
       {
-        key: 'formation',
+        key: 'trackName',
+        label: 'Parcours',
+        sortable: true,
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.trackName}</span>,
+      },
+      {
+        key: 'programName',
         label: 'Formation',
-        render: groupe => <span className="text-sm text-base-content/80">{groupe.formation}</span>,
-      },
-      {
-        key: 'classe',
-        label: 'Classe',
-        render: groupe => <span className="text-sm text-base-content/80">{groupe.classe}</span>,
-      },
-      {
-        key: 'capacite',
-        label: 'Capacité',
         sortable: true,
-        render: groupe => <span className="text-sm">{groupe.capacite}</span>,
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.programName}</span>,
       },
       {
-        key: 'effectif',
-        label: 'Effectif',
+        key: 'studentCount',
+        label: 'Étudiants',
         sortable: true,
-        render: groupe => <span className="text-sm">{groupe.effectif}</span>,
+        render: groupe => <span className="badge badge-neutral badge-outline badge-sm font-medium">{groupe.studentCount}</span>,
       },
       {
-        key: 'remplissage',
+        key: 'actions',
         label: 'Remplissage',
         render: groupe => {
-          const assignedCount = students.filter(student => student.groupeId === groupe.id).length
-          const percentage = (assignedCount / groupe.capacite) * 100
-
+          const ratio = groupe.studentCount / GROUP_CAPACITY_LIMIT
+          const progressValue = Math.min(ratio * 100, 100)
+          const progressLabel = `${Math.round(ratio * 100)}%`
           return (
             <div className="flex items-center gap-2">
               <progress
                 className={`progress w-16 h-2 ${
-                  assignedCount > groupe.capacite * 0.9
-                    ? 'progress-error'
-                    : assignedCount > groupe.capacite * 0.7
-                      ? 'progress-warning'
-                      : 'progress-success'
+                  ratio >= 1 ? 'progress-error' : ratio >= 0.8 ? 'progress-warning' : 'progress-success'
                 }`}
-                value={percentage}
+                value={progressValue}
                 max={100}
               />
-              <span className="text-xs text-base-content/50">{Math.round(percentage)}%</span>
+              <span className="text-xs text-base-content/50">{progressLabel}</span>
             </div>
           )
         },
@@ -86,29 +73,43 @@ function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTa
         key: 'actions',
         label: 'Actions',
         render: groupe => (
-          <Button
-            variant="outlined"
-            leftIcon={<UserPlus size={15} />}
-            className="btn-sm text-xs"
-            onClick={() => onAssign(groupe)}
-          >
-            Assigner
-            {students.filter(student => student.groupeId === groupe.id).length > 0 && (
-              <span className="badge badge-primary badge-sm ml-1">
-                {students.filter(student => student.groupeId === groupe.id).length}
-              </span>
-            )}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outlined"
+              leftIcon={<Pencil size={15} />}
+              className="btn-sm text-xs"
+              onClick={() => onEdit(groupe)}
+            >
+              Modifier
+            </Button>
+            <Button
+              variant="outlined"
+              leftIcon={<UserPlus size={15} />}
+              className="btn-sm text-xs"
+              onClick={() => onAssign(groupe)}
+            >
+              Assigner
+            </Button>
+            <Button
+              variant="outlined"
+              leftIcon={<Trash2 size={15} />}
+              className="btn-sm text-xs border-error text-error hover:bg-error hover:text-white"
+              onClick={() => onDelete(groupe)}
+            >
+              Supprimer
+            </Button>
+          </div>
         ),
       },
     ],
-    [students],
+    [onAssign, onEdit, onDelete],
   )
 
   return (
     <DataTable<Group, SortKey>
       columns={columns}
       data={groupes}
+      getRowKey={groupe => groupe.id}
       sortConfig={sortConfig}
       onSort={onSort}
     />

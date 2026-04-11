@@ -3,21 +3,23 @@ import { Search } from 'lucide-react'
 interface GroupFiltersProps {
   searchTerm: string
   onSearchChange: (value: string) => void
-  formationFilter: string
-  onFormationChange: (value: string) => void
-  typeFilter: string
-  onTypeChange: (value: string) => void
-  formations: string[]
+  academicYearFilter: string
+  onAcademicYearChange: (value: string) => void
+  trackFilter: string
+  onTrackChange: (value: string) => void
+  academicYears: string[]
+  tracks: string[]
 }
 
 function GroupFilters({
   searchTerm,
   onSearchChange,
-  formationFilter,
-  onFormationChange,
-  typeFilter,
-  onTypeChange,
-  formations,
+  academicYearFilter,
+  onAcademicYearChange,
+  trackFilter,
+  onTrackChange,
+  academicYears,
+  tracks,
 }: GroupFiltersProps) {
   return (
     <div className="card bg-base-100 border border-base-200 mb-6">
@@ -35,26 +37,29 @@ function GroupFilters({
           </label>
 
           <select
-            value={formationFilter}
-            onChange={e => onFormationChange(e.target.value)}
+            value={academicYearFilter}
+            onChange={e => onAcademicYearChange(e.target.value)}
             className="select select-bordered w-full text-sm"
           >
-            <option value="all">Toutes les formations</option>
-            {formations.map(formation => (
-              <option key={formation} value={formation}>
-                {formation}
+            <option value="all">Toutes les années</option>
+            {academicYears.map(academicYear => (
+              <option key={academicYear} value={academicYear}>
+                {academicYear}
               </option>
             ))}
           </select>
 
           <select
-            value={typeFilter}
-            onChange={e => onTypeChange(e.target.value)}
+            value={trackFilter}
+            onChange={e => onTrackChange(e.target.value)}
             className="select select-bordered w-full text-sm"
           >
-            <option value="all">Tous les types</option>
-            <option value="FI">Formation Initiale (FI)</option>
-            <option value="FA">Formation par Alternance (FA)</option>
+            <option value="all">Tous les parcours</option>
+            {tracks.map(track => (
+              <option key={track} value={track}>
+                {track}
+              </option>
+            ))}
           </select>
         </div>
       </div>
