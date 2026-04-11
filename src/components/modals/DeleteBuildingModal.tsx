@@ -1,31 +1,46 @@
 import { HiOutlineExclamation } from 'react-icons/hi';
 import Button from '../Button';
-import { useDeleteBuilding } from "@/hooks/buildings/useDeleteBuilding";
 import type { Building } from "@/hooks/api/buildings";
+import { useDeleteBuilding } from "@/hooks/buildings/useDeleteBuilding";
 
 interface DeleteBuildingModalProps {
   isOpen: boolean;
   onClose: () => void;
   building: Building | null;
   onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
-export default function DeleteBuildingModal({ isOpen, onClose, building, onSuccess }: DeleteBuildingModalProps) {
+export default function DeleteBuildingModal({ isOpen, onClose, building, onSuccess, onError }: DeleteBuildingModalProps) {
   // --- HOOK DE SUPPRESSION ---
   const { mutate: deleteBuilding, isPending } = useDeleteBuilding();
 
   if (!isOpen || !building) return null;
 
   const handleDelete = () => {
-    // Utilisation de l'ID du bâtiment sélectionné
     deleteBuilding(building.id, {
       onSuccess: () => {
-        onSuccess(`Le bâtiment "${building.name}" et toutes ses salles ont été supprimés.`);
+        onSuccess(`Le bâtiment "${building.name}" a été supprimé.`);
         onClose();
       },
-      onError: (error) => {
-        console.error("Erreur lors de la suppression:", error);
-        // Optionnel : vous pourriez afficher une notification d'erreur ici
+
+      onError: (error: any) => {
+        console.error("Erreur suppression:", error);
+
+        const apiError = error?.response?.data;
+
+        let message = "Une erreur est survenue.";
+
+        if (apiError) {
+          if (error.response?.status === 409) {
+            message = "Impossible de supprimer ce bâtiment car il contient des salles utilisées dans des séances.";
+          } else {
+            message = apiError.message || "Erreur lors de la suppression";
+          }
+        }
+
+        onError(message);
+        onClose();
       }
     });
   };
