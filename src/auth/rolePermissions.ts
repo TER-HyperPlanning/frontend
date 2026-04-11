@@ -87,7 +87,6 @@ export const MAIN_NAV_ITEMS: NavItemDef[] = [
   { to: '/buildings', label: 'Bâtiments et salles', roles: ['ADMIN'] },
   { to: '/formations', label: 'Formations', roles: ['ADMIN'] },
   { to: '/sessions', label: 'Séances', roles: ['ADMIN'] },
-  { to: '/modules', label: 'Modules', roles: ['ADMIN'] },
   { to: '/requests', label: 'Demandes', roles: ['ADMIN', 'TEACHER'] },
   { to: '/scolarite', label: 'Scolarité', roles: ['ADMIN'] },
   { to: '/availability', label: 'Disponibilités', roles: ['ADMIN'] },

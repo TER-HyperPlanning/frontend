@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ModuleTable from "@/components/modules/ModuleTable";
 import ModuleForm from "@/components/modules/ModuleForm";
 import PageLayout from "@/layout/PageLayout";
@@ -11,6 +11,10 @@ import { useTracks } from "@/hooks/modules/useTracks";
 import Logo from "@/components/Logo";
 
 export const Route = createFileRoute("/(app)/modules/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    formationId:
+      typeof search.formationId === "string" ? search.formationId : "",
+  }),
   component: ModulesPage,
 });
 
@@ -41,129 +45,121 @@ function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
 }
 
 function ModulesPage() {
+  const { formationId } = Route.useSearch();
+  const selectedFormation = formationId;
+
   const { courses, createCourse, updateCourse, deleteCourse } = useCourses();
   const { assigns, createAssign, updateAssign, deleteAssign } = useAssign();
   const { tracks } = useTracks();
 
-  const [selectedFormation, setSelectedFormation] = useState("");
+  console.log("TRACKS 👉", tracks);
+
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (!selectedFormation && tracks.length > 0) {
-      setSelectedFormation(tracks[0].id);
-    }
-  }, [tracks, selectedFormation]);
+  const selectedTrack = tracks.find((track) => track.id === selectedFormation);
 
   const handleAddOrUpdate = async (data: {
-  name: string;
-  code: string;
-  formationId: string;
-  volume?: string;
-  teacher?: string;
-}) => {
-  try {
-    const parsedVolume =
-      Number.parseInt((data.volume || "0").replace(/\D/g, ""), 10) || 0;
+    name: string;
+    code: string;
+    formationId: string;
+    volume?: string;
+    teacher?: string;
+  }) => {
+    try {
+      const parsedVolume =
+        Number.parseInt((data.volume || "0").replace(/\D/g, ""), 10) || 0;
 
-    if (editingModule) {
-      await updateCourse({
-        id: editingModule.id,
-        data: {
-          name: data.name,
-          code: data.code,
-        },
-      });
+      if (editingModule) {
+        await updateCourse({
+          id: editingModule.id,
+          data: {
+            name: data.name,
+            code: data.code,
+          },
+        });
 
-      await updateAssign({
-        trackId: selectedFormation,
-        courseId: editingModule.id,
-        hourlyVolume: parsedVolume,
-      });
+        await updateAssign({
+          trackId: selectedFormation,
+          courseId: editingModule.id,
+          hourlyVolume: parsedVolume,
+        });
 
-      setEditingModule(null);
-      toast.success("Module modifié avec succès");
-      return;
-    }
-
-    //  CAS AJOUT
-    // On cherche d'abord si le module existe déjà globalement
-    const existingCourse = courses.find(
-      (course) => course.code.trim().toLowerCase() === data.code.trim().toLowerCase()
-    );
-
-    if (existingCourse) {
-      // Vérifie s'il est déjà assigné à la formation courante
-      const alreadyAssigned = assigns.some(
-        (a) =>
-          a.trackId === selectedFormation &&
-          a.courseId === existingCourse.id
-      );
-
-      if (alreadyAssigned) {
-        toast.error("Ce module existe déjà dans cette formation");
+        setEditingModule(null);
+        toast.success("Module modifié avec succès");
         return;
       }
 
-      // Le module existe déjà globalement → on crée seulement le lien Assign
+      const existingCourse = courses.find(
+        (course) =>
+          course.code.trim().toLowerCase() === data.code.trim().toLowerCase()
+      );
+
+      if (existingCourse) {
+        const alreadyAssigned = assigns.some(
+          (a) =>
+            a.trackId === selectedFormation &&
+            a.courseId === existingCourse.id
+        );
+
+        if (alreadyAssigned) {
+          toast.error("Ce module existe déjà dans cette formation");
+          return;
+        }
+
+        await createAssign({
+          trackId: selectedFormation,
+          courseId: existingCourse.id,
+          hourlyVolume: parsedVolume,
+        });
+
+        toast.success("Module ajouté à la formation avec succès");
+        return;
+      }
+
+      const createdCourse = await createCourse({
+        name: data.name,
+        code: data.code,
+      });
+
       await createAssign({
         trackId: selectedFormation,
-        courseId: existingCourse.id,
+        courseId: createdCourse.id,
         hourlyVolume: parsedVolume,
       });
 
-      toast.success("Module ajouté à la formation avec succès");
-      return;
+      toast.success("Module ajouté avec succès");
+    } catch {
+      toast.error("Erreur lors de l'opération");
     }
-
-    // Sinon, on crée d'abord le module puis son assignation
-    const createdCourse = await createCourse({
-      name: data.name,
-      code: data.code,
-    });
-
-    await createAssign({
-      trackId: selectedFormation,
-      courseId: createdCourse.id,
-      hourlyVolume: parsedVolume,
-    });
-
-    toast.success("Module ajouté avec succès");
-  } catch {
-    toast.error("Erreur lors de l'opération");
-  }
-};
-
-        
+  };
 
   const handleDelete = async (id: string) => {
-  const confirmDelete = window.confirm(
-    "Voulez-vous vraiment supprimer ce module ?"
-  );
+    const confirmDelete = window.confirm(
+      "Voulez-vous vraiment supprimer ce module ?"
+    );
 
-  if (!confirmDelete) return;
+    if (!confirmDelete) return;
 
-  try {
-    const relatedAssigns = assigns.filter((a) => a.courseId === id);
+    try {
+      const relatedAssigns = assigns.filter((a) => a.courseId === id);
 
-    await deleteAssign({
-      trackId: selectedFormation,
-      courseId: id,
-    });
+      await deleteAssign({
+        trackId: selectedFormation,
+        courseId: id,
+      });
 
-    if (relatedAssigns.length === 1) {
-      await deleteCourse(id);
-      toast.success("Module supprimé avec succès");
-    } else {
-      toast.success("Module retiré de cette formation avec succès");
+      if (relatedAssigns.length === 1) {
+        await deleteCourse(id);
+        toast.success("Module supprimé avec succès");
+      } else {
+        toast.success("Module retiré de cette formation avec succès");
+      }
+    } catch {
+      toast.error("Erreur lors de la suppression");
     }
-  } catch {
-    toast.error("Erreur lors de la suppression");
-  }
-};
-
-     
+  };
 
   const handleEdit = (module: Module) => {
     setEditingModule(module);
@@ -220,20 +216,12 @@ function ModulesPage() {
 
           <div className="w-[420px] shrink-0">
             <label className="mr-2 font-medium block mb-2">
-              Sélectionner une formation
+              Formation sélectionnée
             </label>
 
-            <select
-              className="select select-bordered w-full"
-              value={selectedFormation}
-              onChange={(e) => setSelectedFormation(e.target.value)}
-            >
-              {tracks.map((track) => (
-                <option key={track.id} value={track.id}>
-                  {track.name}
-                </option>
-              ))}
-            </select>
+            <div className="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-gray-700">
+              {selectedTrack?.name || "Aucune formation sélectionnée"}
+            </div>
           </div>
         </div>
 
