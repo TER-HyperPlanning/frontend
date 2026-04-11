@@ -1,23 +1,23 @@
-import { useState} from 'react';
+import { useState } from 'react';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useBuildings } from "@/hooks/buildings/useBuildings";
-import type { Building } from "@/hooks/api/buildings";
-import Logo from '@/components/Logo';
 import {
-  HiOutlineSearch,
-  HiOutlinePencil,
-  HiOutlineTrash,
-  HiOutlineCloudUpload,
-  HiPlus,
-  HiOutlineBell,
+  HiCheckCircle,
   HiChevronLeft,
   HiChevronRight,
-  HiCheckCircle,
+  HiOutlineCloudUpload,
+  HiOutlineExclamation,
+  HiOutlinePencil,
+  HiOutlineSearch,
+  HiOutlineTrash,
+  HiPlus,
 } from 'react-icons/hi';
+import type { Building } from '@/hooks/api/buildings';
+import { useBuildings } from "@/hooks/buildings/useBuildings";
+import Logo from '@/components/Logo';
 
 import Button from '@/components/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
-import TextField from '@/components/TextField'; // Utilisation du composant existant
+import TextField from '@/components/TextField'; 
 import PageLayout from '@/layout/PageLayout';
 import AddBuildingModal from '@/components/modals/AddBuildingModal';
 import EditBuildingModal from '@/components/modals/EditBuildingModal';
@@ -40,10 +40,10 @@ function BuildingsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  //l'appel du hooks  recuperation des données
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { data: allBuildings = [], isLoading } = useBuildings();
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isLoading) {
     return (
       <PageLayout>
@@ -69,6 +69,10 @@ function BuildingsPage() {
     setSuccessMessage(message);
     setTimeout(() => setSuccessMessage(null), 3000);
   };
+  const showError = (message: string) => {
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 4000);
+  };
 
   return (
     <PageLayout>
@@ -84,6 +88,17 @@ function BuildingsPage() {
             </div>
           </div>
         )}
+        {errorMessage && (
+          <div className="toast toast-top toast-end z-[100] mt-4 mr-4">
+            <div className="alert alert-error shadow-lg text-white border-none bg-red-500 flex items-center gap-2">
+              <HiOutlineExclamation size={22} />
+              <span className="font-medium whitespace-pre-line">
+                {errorMessage}
+              </span>
+            </div>
+          </div>
+        )}
+
 
         {/* HEADER : Recherche et Actions */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 w-full shrink-0">
@@ -126,12 +141,7 @@ function BuildingsPage() {
               <span className="whitespace-nowrap font-semibold">Nouveau bâtiment</span>
             </Button>
 
-            <button
-              className="btn btn-ghost btn-circle bg-white shadow-sm shrink-0 h-12 w-12 border border-gray-100"
-              title="Notifications"
-            >
-              <HiOutlineBell size={24} className="text-gray-600" />
-            </button>
+
           </div>
         </div>
         {/* CONTENU : Scrollable avec espacement */}
@@ -253,6 +263,7 @@ function BuildingsPage() {
           onClose={() => { setIsDeleteModalOpen(false); setSelectedBuilding(null); }}
           building={selectedBuilding}
           onSuccess={showSuccess}
+          onError={showError}
         />
         <AddBuildingModal
           isOpen={isAddModalOpen}
