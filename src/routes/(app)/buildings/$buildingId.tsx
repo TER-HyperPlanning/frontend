@@ -8,7 +8,6 @@ import {
   HiOutlineSearch,
   HiPlus
 } from 'react-icons/hi';
-import { toast } from 'react-hot-toast';
 import { useRooms } from "@/hooks/rooms/useRooms";
 import { useBuildings } from "@/hooks/buildings/useBuildings";
 import Logo from '@/components/Logo';

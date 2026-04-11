@@ -25,13 +25,18 @@ export default function AddRoomModal({
   isOpen,
   onClose,
   onSuccess,
+  onError,
   buildingId,
   existingRooms
 }: AddRoomModalProps) {
 
   const { mutate: createRoom, isPending } = useCreateRoom();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    number: string;
+    capacity: string;
+    type: "TD" | "COURS" | "INFO" | "AMPHITHEATRE";
+  }>({
     number: '',
     capacity: '',
     type: 'TD'
@@ -107,7 +112,7 @@ export default function AddRoomModal({
       capacity: parseInt(formData.capacity, 10),
       isAvailable: true,
       buildingId,
-      type: formData.type
+      type: 'TD' as "TD" | "COURS" | "INFO" | "AMPHITHEATRE"
     },
       {
         onSuccess: () => {

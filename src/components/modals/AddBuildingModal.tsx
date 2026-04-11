@@ -129,7 +129,6 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
 
     setErrors(newErrors);
 
-    // 🔥 BLOQUER TOUT SI ERREUR
     return !newErrors.buildingName &&
       (!newErrors.rooms || newErrors.rooms.every(e => e === ""));
   };
@@ -158,7 +157,7 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
               capacity: Number(room.capacity),
               isAvailable: true,
               buildingId: createdBuilding.id,
-              type: room.type.toUpperCase()
+              type: room.type.toUpperCase() as "TD" | "COURS" | "INFO" | "AMPHITHEATRE"
             }));
 
             await createRooms(roomsPayload);
