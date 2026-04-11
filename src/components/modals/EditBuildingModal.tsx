@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { HiX } from 'react-icons/hi';
 import Button from '../Button';
-import { useUpdateBuilding } from "@/hooks/buildings/useUpdateBuilding";
 import type { Building } from "@/hooks/api/buildings";
+import { useUpdateBuilding } from "@/hooks/buildings/useUpdateBuilding";
 
 interface EditBuildingModalProps {
   isOpen: boolean;
@@ -15,10 +15,8 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
   const [buildingName, setBuildingName] = useState('');
   const [error, setError] = useState('');
 
-  // --- HOOK DE MODIFICATION ---
   const { mutate: updateBuilding, isPending } = useUpdateBuilding();
 
-  // Synchronise le nom avec le bâtiment sélectionné à l'ouverture
   useEffect(() => {
     if (building) {
       setBuildingName(building.name);
@@ -51,9 +49,33 @@ export default function EditBuildingModal({ isOpen, onClose, building, onSuccess
           onSuccess(`Le bâtiment a été renommé en "${trimmedName}" avec succès !`);
           onClose();
         },
-        onError: (err) => {
+        onError: (err: any) => {
           console.error("Erreur API:", err);
-          setError("Une erreur est survenue lors de la communication avec le serveur.");
+
+          const apiError = err?.response?.data;
+
+          let message = "Une erreur est survenue";
+
+          if (apiError?.message) {
+
+            if (apiError.message === "Building already exists, choose another name") {
+              message = "Ce bâtiment existe déjà, veuillez choisir un autre nom";
+            }
+
+            else if (apiError.message === "Building content is required") {
+              message = "Le contenu du bâtiment est requis";
+            }
+
+            else if (apiError.message.includes("not found")) {
+              message = "Bâtiment introuvable";
+            }
+
+            else {
+              message = apiError.message;
+            }
+          }
+
+          setError(message);
         }
       }
     );
