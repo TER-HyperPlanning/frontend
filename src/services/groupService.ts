@@ -5,12 +5,8 @@ export function getGroups(): Promise<GroupModel[]> {
   return apiGet<GroupModel[]>('/Groups')
 }
 
-export async function getGroupsByFormation(formationId: string): Promise<GroupModel[]> {
-  try {
-    return await apiGet<GroupModel[]>(`/Groups?formationId=${encodeURIComponent(formationId)}`)
-  } catch {
-    return getGroups()
-  }
+export function getGroupsByFormation(formationId: string): Promise<GroupModel[]> {
+  return apiGet<GroupModel[]>(`/Groups?formationId=${encodeURIComponent(formationId)}`)
 }
 
 export function getGroupById(id: string): Promise<GroupModel> {

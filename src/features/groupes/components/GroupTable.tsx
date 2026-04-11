@@ -32,12 +32,6 @@ function GroupTable({ groupes, sortConfig, onSort, onRowClick, onAssign, onEdit,
         render: groupe => <span className="text-sm text-base-content/80">{groupe.academicYear}</span>,
       },
       {
-        key: 'trackName',
-        label: 'Parcours',
-        sortable: true,
-        render: groupe => <span className="text-sm text-base-content/80">{groupe.trackName}</span>,
-      },
-      {
         key: 'programName',
         label: 'Formation',
         sortable: true,
@@ -79,7 +73,10 @@ function GroupTable({ groupes, sortConfig, onSort, onRowClick, onAssign, onEdit,
               variant="outlined"
               leftIcon={<Pencil size={15} />}
               className="btn-sm text-xs"
-              onClick={() => onEdit(groupe)}
+              onClick={event => {
+                event.stopPropagation()
+                onEdit(groupe)
+              }}
             >
               Modifier
             </Button>
@@ -87,7 +84,10 @@ function GroupTable({ groupes, sortConfig, onSort, onRowClick, onAssign, onEdit,
               variant="outlined"
               leftIcon={<UserPlus size={15} />}
               className="btn-sm text-xs"
-              onClick={() => onAssign(groupe)}
+              onClick={event => {
+                event.stopPropagation()
+                onAssign(groupe)
+              }}
             >
               Assigner
             </Button>
@@ -95,7 +95,10 @@ function GroupTable({ groupes, sortConfig, onSort, onRowClick, onAssign, onEdit,
               variant="outlined"
               leftIcon={<Trash2 size={15} />}
               className="btn-sm text-xs border-error text-error hover:bg-error hover:text-white"
-              onClick={() => onDelete(groupe)}
+              onClick={event => {
+                event.stopPropagation()
+                onDelete(groupe)
+              }}
             >
               Supprimer
             </Button>

@@ -6,7 +6,7 @@ import AssignModal from '@/features/groupes/components/AssignModal'
 import EmptyGroupState from '@/features/groupes/components/EmptyGroupState'
 import GroupFormModal, {
   type GroupFormValues,
-  type TrackOption,
+  type FormationOption,
 } from '@/features/groupes/components/GroupFormModal'
 import GroupFilters from '@/features/groupes/components/GroupFilters'
 import GroupTable from '@/features/groupes/components/GroupTable'
@@ -37,7 +37,7 @@ function RouteComponent() {
   const [groupToEdit, setGroupToEdit] = useState<Group | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [trackOptions, setTrackOptions] = useState<TrackOption[]>([])
+  const [formationOptions, setFormationOptions] = useState<FormationOption[]>([])
 
   const groupesWithLiveEffectif = useMemo(() => {
     const countByGroupId = students.reduce<Record<string, number>>((acc, student) => {
@@ -78,13 +78,7 @@ function RouteComponent() {
           programModels.map((program: ProgramModel) => [program.id, program]),
         )
 
-        setTrackOptions(
-          trackModels.map(track => ({
-            id: track.id,
-            name: track.name,
-            programName: programById.get(track.programId)?.name ?? 'Formation inconnue',
-          })),
-        )
+        setFormationOptions(buildFormationOptions(programModels, trackModels))
         setGroupes(normalizeGroups(groupModels, trackById, programById, studentModels))
         setStudents(normalizeStudents(studentModels))
       } catch (error) {
@@ -188,13 +182,7 @@ function RouteComponent() {
         programModels.map((program: ProgramModel) => [program.id, program]),
       )
 
-      setTrackOptions(
-        trackModels.map(track => ({
-          id: track.id,
-          name: track.name,
-          programName: programById.get(track.programId)?.name ?? 'Formation inconnue',
-        })),
-      )
+      setFormationOptions(buildFormationOptions(programModels, trackModels))
       setGroupes(normalizeGroups(groupModels, trackById, programById, studentModels))
       setStudents(normalizeStudents(studentModels))
     })
@@ -221,13 +209,7 @@ function RouteComponent() {
       programModels.map((program: ProgramModel) => [program.id, program]),
     )
 
-    setTrackOptions(
-      trackModels.map(track => ({
-        id: track.id,
-        name: track.name,
-        programName: programById.get(track.programId)?.name ?? 'Formation inconnue',
-      })),
-    )
+    setFormationOptions(buildFormationOptions(programModels, trackModels))
     setGroupes(normalizeGroups(groupModels, trackById, programById, studentModels))
     setStudents(normalizeStudents(studentModels))
   }
@@ -359,7 +341,7 @@ function RouteComponent() {
           isOpen={Boolean(groupFormMode)}
           mode={groupFormMode}
           group={groupToEdit}
-          tracks={trackOptions}
+          formations={formationOptions}
           onClose={() => {
             setGroupFormMode(null)
             setGroupToEdit(null)
@@ -369,6 +351,24 @@ function RouteComponent() {
       )}
     </PageLayout>
   )
+}
+
+function buildFormationOptions(programModels: ProgramModel[], trackModels: TrackResponse[]): FormationOption[] {
+  return programModels
+    .map(program => {
+      const firstTrack = trackModels.find(track => track.programId === program.id)
+
+      if (!firstTrack) {
+        return null
+      }
+
+      return {
+        id: program.id,
+        name: program.name,
+        trackId: firstTrack.id,
+      }
+    })
+    .filter((formation): formation is FormationOption => formation !== null)
 }
 
 function normalizeStudents(studentModels: StudentModel[]): Student[] {

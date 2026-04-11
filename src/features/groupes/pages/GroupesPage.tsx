@@ -6,7 +6,7 @@ import DeleteGroupTransferModal from '@/features/groupes/components/DeleteGroupT
 import EmptyGroupState from '@/features/groupes/components/EmptyGroupState'
 import GroupFormModal, {
   type GroupFormValues,
-  type TrackOption,
+  type FormationOption,
 } from '@/features/groupes/components/GroupFormModal'
 import GroupFilters from '@/features/groupes/components/GroupFilters'
 import GroupTable from '@/features/groupes/components/GroupTable'
@@ -23,6 +23,7 @@ const GROUP_CAPACITY_LIMIT = 30
 interface GroupesPageProps {
   formationId?: string
   selectedGroupId?: string
+  forceShowBackActions?: boolean
   onSelectGroup?: (groupId: string) => void
   onShowAllGroups?: () => void
   onBackToFormation?: () => void
@@ -31,6 +32,7 @@ interface GroupesPageProps {
 export function GroupesPage({
   formationId,
   selectedGroupId,
+  forceShowBackActions,
   onSelectGroup,
   onShowAllGroups,
   onBackToFormation,
@@ -53,7 +55,7 @@ export function GroupesPage({
   const [isDeletingGroup, setIsDeletingGroup] = useState(false)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [trackOptions, setTrackOptions] = useState<TrackOption[]>([])
+  const [formationOptions, setFormationOptions] = useState<FormationOption[]>([])
 
   const loadData = async (currentFormationId?: string) => {
     const [groupModels, trackModels, programModelsOrProgram, studentModels]: [
@@ -81,13 +83,23 @@ export function GroupesPage({
       relevantTrackModels.map((track: TrackResponse) => [track.id, track]),
     )
 
-    setTrackOptions(
-      relevantTrackModels.map(track => ({
-        id: track.id,
-        name: track.name,
-        programName: programById.get(track.programId)?.name ?? 'Formation inconnue',
-      })),
-    )
+    const formations = programList
+      .map(program => {
+        const firstTrack = relevantTrackModels.find(track => track.programId === program.id)
+
+        if (!firstTrack) {
+          return null
+        }
+
+        return {
+          id: program.id,
+          name: program.name,
+          trackId: firstTrack.id,
+        }
+      })
+      .filter((formation): formation is FormationOption => formation !== null)
+
+    setFormationOptions(currentFormationId ? formations.filter(formation => formation.id === currentFormationId) : formations)
 
     const normalizedGroups = normalizeGroups(groupModels, trackById, programById, studentModels)
     const visibleGroups = currentFormationId
@@ -116,7 +128,7 @@ export function GroupesPage({
     () => groupesWithLiveEffectif.find(groupe => groupe.id === selectedGroupId) ?? null,
     [groupesWithLiveEffectif, selectedGroupId],
   )
-  const showFormationActions = Boolean(formationId || selectedGroup)
+  const showFormationActions = Boolean(formationId || selectedGroup || forceShowBackActions)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -285,38 +297,7 @@ export function GroupesPage({
   }
 
   const reloadData = async () => {
-    const [groupModels, trackModels, programModels, studentModels]: [
-      GroupModel[],
-      TrackResponse[],
-      ProgramModel[],
-      StudentModel[],
-    ] = await Promise.all([
-      getGroups(),
-      getTracks(),
-      getPrograms(),
-      getStudents().catch(() => [] as StudentModel[]),
-    ])
-
-    const trackById = new Map<string, TrackResponse>(
-      trackModels.map((track: TrackResponse) => [track.id, track]),
-    )
-    const programById = new Map<string, ProgramModel>(
-      programModels.map((program: ProgramModel) => [program.id, program]),
-    )
-
-    setTrackOptions(
-      trackModels.map(track => ({
-        id: track.id,
-        name: track.name,
-        programName: programById.get(track.programId)?.name ?? 'Formation inconnue',
-      })),
-    )
-    const normalizedGroups = normalizeGroups(groupModels, trackById, programById, studentModels)
-    const visibleGroups = formationId
-      ? normalizedGroups.filter(group => group.programId === formationId)
-      : normalizedGroups
-    setGroupes(visibleGroups)
-    setStudents(normalizeStudents(studentModels))
+    await loadData(formationId)
   }
 
   const handleCreateGroup = async (values: GroupFormValues) => {
@@ -492,7 +473,7 @@ export function GroupesPage({
         <div className="flex items-center justify-between gap-3 mb-4">
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-circle"
+            className="btn btn-ghost btn-sm gap-2"
             onClick={() => {
               if (onBackToFormation) {
                 onBackToFormation()
@@ -503,22 +484,22 @@ export function GroupesPage({
             disabled={!onBackToFormation}
           >
             <ArrowLeft size={18} />
+            <span>Retour</span>
           </button>
 
           <div className="flex items-center gap-3 ml-auto">
             {selectedGroup && <div className="badge badge-info badge-lg">{selectedGroup.name}</div>}
-            <button
-              type="button"
-              className="btn btn-sm btn-outline"
-              onClick={() => {
-                if (onShowAllGroups) {
+            {onShowAllGroups && (
+              <button
+                type="button"
+                className="btn btn-sm btn-outline"
+                onClick={() => {
                   onShowAllGroups()
-                }
-              }}
-              disabled={!onShowAllGroups}
-            >
-              Voir tous les groupes
-            </button>
+                }}
+              >
+                Voir tous les groupes
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -576,7 +557,7 @@ export function GroupesPage({
           isOpen={Boolean(groupFormMode)}
           mode={groupFormMode}
           group={groupToEdit}
-          tracks={trackOptions}
+          formations={formationOptions}
           onClose={() => {
             setGroupFormMode(null)
             setGroupToEdit(null)

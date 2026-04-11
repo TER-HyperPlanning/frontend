@@ -1,12 +1,12 @@
 import { X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '@/components/Button'
 import type { Group } from '../types'
 
-interface TrackOption {
+interface FormationOption {
   id: string
   name: string
-  programName: string
+  trackId: string
 }
 
 interface GroupFormValues {
@@ -19,19 +19,30 @@ interface GroupFormModalProps {
   isOpen: boolean
   mode: 'create' | 'edit'
   group?: Group | null
-  tracks: TrackOption[]
+  formations: FormationOption[]
   onClose: () => void
   onSubmit: (values: GroupFormValues) => void | Promise<void>
 }
 
-const EMPTY_VALUES: GroupFormValues = {
-  name: '',
-  academicYear: '',
-  trackId: '',
+function getDefaultAcademicYear() {
+  const currentYear = new Date().getFullYear()
+  return `${currentYear}-${currentYear + 1}`
 }
 
-function GroupFormModal({ isOpen, mode, group, tracks, onClose, onSubmit }: GroupFormModalProps) {
-  const [values, setValues] = useState<GroupFormValues>(EMPTY_VALUES)
+interface FormState {
+  name: string
+  academicYear: string
+  formationId: string
+}
+
+const EMPTY_VALUES: FormState = {
+  name: '',
+  academicYear: getDefaultAcademicYear(),
+  formationId: '',
+}
+
+function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: GroupFormModalProps) {
+  const [values, setValues] = useState<FormState>(EMPTY_VALUES)
   const [error, setError] = useState<string | null>(null)
   const title = mode === 'create' ? 'Créer un groupe' : 'Modifier le groupe'
 
@@ -42,22 +53,16 @@ function GroupFormModal({ isOpen, mode, group, tracks, onClose, onSubmit }: Grou
       setValues({
         name: group.name,
         academicYear: group.academicYear,
-        trackId: group.trackId,
+        formationId: group.programId ?? formations.find(formation => formation.trackId === group.trackId)?.id ?? '',
       })
     } else {
-      setValues(EMPTY_VALUES)
+      setValues({
+        ...EMPTY_VALUES,
+        formationId: formations.length === 1 ? formations[0].id : '',
+      })
     }
     setError(null)
-  }, [group, isOpen])
-
-  const trackOptions = useMemo(
-    () =>
-      tracks.map(track => ({
-        ...track,
-        label: `${track.name} · ${track.programName}`,
-      })),
-    [tracks],
-  )
+  }, [group, isOpen, formations])
 
   if (!isOpen) return null
 
@@ -72,15 +77,21 @@ function GroupFormModal({ isOpen, mode, group, tracks, onClose, onSubmit }: Grou
       setError('L\'année académique est obligatoire.')
       return
     }
-    if (!values.trackId.trim()) {
-      setError('Le parcours est obligatoire.')
+    if (!values.formationId.trim()) {
+      setError('La formation est obligatoire.')
+      return
+    }
+
+    const selectedFormation = formations.find(formation => formation.id === values.formationId)
+    if (!selectedFormation?.trackId) {
+      setError('Impossible de déterminer la formation associée à ce groupe.')
       return
     }
 
     await onSubmit({
       name: values.name.trim(),
       academicYear: values.academicYear.trim(),
-      trackId: values.trackId,
+      trackId: selectedFormation.trackId,
     })
 
     onClose()
@@ -93,7 +104,7 @@ function GroupFormModal({ isOpen, mode, group, tracks, onClose, onSubmit }: Grou
           <div>
             <h3 className="text-lg font-semibold text-base-content">{title}</h3>
             <p className="text-sm text-base-content/60 mt-0.5">
-              Remplis les champs `name`, `academicYear` et `trackId`.
+              Remplis les champs nom, année académique et formation.
             </p>
           </div>
           <button className="btn btn-sm btn-ghost btn-circle" onClick={onClose} type="button">
@@ -118,21 +129,21 @@ function GroupFormModal({ isOpen, mode, group, tracks, onClose, onSubmit }: Grou
               className="input input-bordered w-full"
               value={values.academicYear}
               onChange={e => setValues(prev => ({ ...prev, academicYear: e.target.value }))}
-              placeholder="L3, M1, M2..."
+              placeholder="2025-2026"
             />
           </label>
 
           <label className="form-control w-full">
-            <span className="label-text text-sm font-medium mb-2">Parcours</span>
+            <span className="label-text text-sm font-medium mb-2">Formation</span>
             <select
               className="select select-bordered w-full"
-              value={values.trackId}
-              onChange={e => setValues(prev => ({ ...prev, trackId: e.target.value }))}
+              value={values.formationId}
+              onChange={e => setValues(prev => ({ ...prev, formationId: e.target.value }))}
             >
-              <option value="">Sélectionner un parcours</option>
-              {trackOptions.map(track => (
-                <option key={track.id} value={track.id}>
-                  {track.label}
+              <option value="">Sélectionner une formation</option>
+              {formations.map(formation => (
+                <option key={formation.id} value={formation.id}>
+                  {formation.name}
                 </option>
               ))}
             </select>
@@ -154,4 +165,4 @@ function GroupFormModal({ isOpen, mode, group, tracks, onClose, onSubmit }: Grou
 }
 
 export default GroupFormModal
-export type { GroupFormValues, TrackOption }
+export type { GroupFormValues, FormationOption }

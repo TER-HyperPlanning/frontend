@@ -29,12 +29,6 @@ function GroupTable({ groupes, sortConfig, onSort, onAssign, onEdit, onDelete }:
         render: groupe => <span className="text-sm text-base-content/80">{groupe.academicYear}</span>,
       },
       {
-        key: 'trackName',
-        label: 'Parcours',
-        sortable: true,
-        render: groupe => <span className="text-sm text-base-content/80">{groupe.trackName}</span>,
-      },
-      {
         key: 'programName',
         label: 'Formation',
         sortable: true,

@@ -25,6 +25,7 @@ function DeleteGroupTransferModal({
 }: DeleteGroupTransferModalProps) {
   const [targetGroupId, setTargetGroupId] = useState('')
   const [selectionError, setSelectionError] = useState<string | null>(null)
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false)
 
   const sortedCandidates = useMemo(
     () => [...candidateGroups].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' })),
@@ -39,6 +40,11 @@ function DeleteGroupTransferModal({
       return
     }
     setSelectionError(null)
+    setIsConfirmPopupOpen(true)
+  }
+
+  const handlePopupConfirm = async () => {
+    setIsConfirmPopupOpen(false)
     await onConfirm(affectedStudentsCount > 0 ? targetGroupId : null)
   }
 
@@ -113,6 +119,33 @@ function DeleteGroupTransferModal({
               {isSubmitting ? 'Traitement...' : affectedStudentsCount > 0 ? 'Transferer puis supprimer' : 'Supprimer le groupe'}
             </Button>
           </div>
+
+          {isConfirmPopupOpen && (
+            <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center px-4">
+              <div className="bg-base-100 border border-base-200 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+                <h4 className="text-lg font-semibold text-base-content">Confirmer la suppression</h4>
+                <p className="text-sm text-base-content/80">
+                  {affectedStudentsCount > 0
+                    ? 'Voulez-vous vraiment supprimer ce groupe et transferer les etudiants vers le groupe selectionne ?'
+                    : 'Voulez-vous vraiment supprimer ce groupe ?'}
+                </p>
+
+                <div className="flex items-center justify-end gap-3 pt-1">
+                  <Button
+                    variant="outlined"
+                    type="button"
+                    onClick={() => setIsConfirmPopupOpen(false)}
+                    disabled={isSubmitting}
+                  >
+                    Non
+                  </Button>
+                  <Button type="button" onClick={handlePopupConfirm} disabled={isSubmitting}>
+                    Oui, supprimer
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="modal-backdrop" onClick={onClose}></div>
