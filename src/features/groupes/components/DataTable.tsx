@@ -13,6 +13,7 @@ export interface DataTableProps<T, SortKeyType extends string = string> {
   columns: DataColumn<T, SortKeyType>[]
   data: T[]
   getRowKey?: (row: T) => string
+  onRowClick?: (row: T) => void
   sortConfig?: {
     key: SortKeyType | null
     direction: 'asc' | 'desc'
@@ -27,6 +28,7 @@ function DataTable<T extends { id: string }, SortKeyType extends string = string
   columns,
   data,
   getRowKey,
+  onRowClick,
   sortConfig = { key: null, direction: 'asc' },
   onSort,
   loading = false,
@@ -71,7 +73,11 @@ function DataTable<T extends { id: string }, SortKeyType extends string = string
           </tr>
         ) : (
           data.map((row, index) => (
-            <tr key={rowKey(row)} className="hover">
+            <tr
+              key={rowKey(row)}
+              className={onRowClick ? 'cursor-pointer hover' : 'hover'}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+            >
               {columns.map(column => (
                 <td key={`${rowKey(row)}-${column.key}`} className={column.className}>
                   {column.render(row, index)}

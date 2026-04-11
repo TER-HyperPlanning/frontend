@@ -9,7 +9,10 @@ export interface FormationGroupRow {
   id: string
   name: string
   academicYear: string
+  trackId: string
   trackName: string
+  programId: string
+  formationName: string
 }
 
 export function useFormationGroups(formationId: string) {
@@ -40,7 +43,10 @@ export function useFormationGroups(formationId: string) {
           id: g.id,
           name: g.name,
           academicYear: g.academicYear,
+          trackId: g.trackId,
           trackName: trackMap.get(g.trackId) ?? '—',
+          programId: program?.id ?? '',
+          formationName: program?.name ?? '—',
         }))
 
       setGroups(filtered)

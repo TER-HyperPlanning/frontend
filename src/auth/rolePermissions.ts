@@ -83,7 +83,6 @@ export type NavItemDef = {
 export const MAIN_NAV_ITEMS: NavItemDef[] = [
   { to: '/planning', label: 'Planning', roles: ['ADMIN', 'TEACHER'] },
   { to: '/teachers', label: 'Enseignants', roles: ['ADMIN'] },
-  { to: '/groupes', label: 'Groupes', roles: ['ADMIN'] },
   { to: '/buildings', label: 'Bâtiments et salles', roles: ['ADMIN'] },
   { to: '/formations', label: 'Formations', roles: ['ADMIN'] },
   { to: '/sessions', label: 'Séances', roles: ['ADMIN'] },

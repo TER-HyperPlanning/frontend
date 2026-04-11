@@ -8,6 +8,7 @@ interface GroupTableProps {
   groupes: Group[]
   sortConfig: SortConfig
   onSort: (key: SortKey) => void
+  onRowClick?: (groupe: Group) => void
   onAssign: (groupe: Group) => void
   onEdit: (groupe: Group) => void
   onDelete: (groupe: Group) => void
@@ -15,7 +16,7 @@ interface GroupTableProps {
 
 const GROUP_CAPACITY_LIMIT = 30
 
-function GroupTable({ groupes, sortConfig, onSort, onAssign, onEdit, onDelete }: GroupTableProps) {
+function GroupTable({ groupes, sortConfig, onSort, onRowClick, onAssign, onEdit, onDelete }: GroupTableProps) {
   const columns = useMemo<DataColumn<Group, SortKey>[]>(
     () => [
       {
@@ -110,6 +111,7 @@ function GroupTable({ groupes, sortConfig, onSort, onAssign, onEdit, onDelete }:
       columns={columns}
       data={groupes}
       getRowKey={groupe => groupe.id}
+      onRowClick={onRowClick}
       sortConfig={sortConfig}
       onSort={onSort}
     />

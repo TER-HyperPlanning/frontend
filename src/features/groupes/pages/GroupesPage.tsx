@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { ArrowLeft, Check } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/layout/PageLayout'
 import AssignModal from '@/features/groupes/components/AssignModal'
@@ -22,9 +22,19 @@ const GROUP_CAPACITY_LIMIT = 30
 
 interface GroupesPageProps {
   formationId?: string
+  selectedGroupId?: string
+  onSelectGroup?: (groupId: string) => void
+  onShowAllGroups?: () => void
+  onBackToFormation?: () => void
 }
 
-export function GroupesPage({ formationId }: GroupesPageProps) {
+export function GroupesPage({
+  formationId,
+  selectedGroupId,
+  onSelectGroup,
+  onShowAllGroups,
+  onBackToFormation,
+}: GroupesPageProps) {
   const [groupes, setGroupes] = useState<Group[]>([])
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,16 +56,16 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
   const [trackOptions, setTrackOptions] = useState<TrackOption[]>([])
 
   const loadData = async (currentFormationId?: string) => {
-    const [groupModels, studentModels, trackModels, programModelsOrProgram]: [
+    const [groupModels, trackModels, programModelsOrProgram, studentModels]: [
       GroupModel[],
-      StudentModel[],
       TrackResponse[],
       ProgramModel[] | ProgramModel,
+      StudentModel[],
     ] = await Promise.all([
       currentFormationId ? getGroupsByFormation(currentFormationId) : getGroups(),
-      getStudents(),
       getTracks(),
       currentFormationId ? getProgramById(currentFormationId) : getPrograms(),
+      getStudents().catch(() => [] as StudentModel[]),
     ])
 
     const programList = Array.isArray(programModelsOrProgram) ? programModelsOrProgram : [programModelsOrProgram]
@@ -102,6 +112,12 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
     }))
   }, [groupes, students])
 
+  const selectedGroup = useMemo(
+    () => groupesWithLiveEffectif.find(groupe => groupe.id === selectedGroupId) ?? null,
+    [groupesWithLiveEffectif, selectedGroupId],
+  )
+  const showFormationActions = Boolean(formationId || selectedGroup)
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
@@ -137,6 +153,10 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
   )
 
   const filteredAndSortedGroupes = useMemo(() => {
+    if (selectedGroupId) {
+      return selectedGroup ? [selectedGroup] : []
+    }
+
     const filtered = groupesWithLiveEffectif.filter(groupe => {
       const matchesAcademicYear = academicYearFilter === 'all' || groupe.academicYear === academicYearFilter
       const matchesTrack = trackFilter === 'all' || groupe.trackName === trackFilter
@@ -165,7 +185,7 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
         ? String(firstValue ?? '').localeCompare(String(secondValue ?? ''), 'fr', { sensitivity: 'base' })
         : String(secondValue ?? '').localeCompare(String(firstValue ?? ''), 'fr', { sensitivity: 'base' })
     })
-  }, [groupesWithLiveEffectif, academicYearFilter, trackFilter, searchTerm, sortConfig])
+  }, [groupesWithLiveEffectif, academicYearFilter, trackFilter, searchTerm, sortConfig, selectedGroup, selectedGroupId])
 
   const handleSort = (key: SortKey) => {
     setSortConfig(prev =>
@@ -229,6 +249,21 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
           }),
         ),
       ])
+
+      const currentGroupStudentIds = new Set(currentGroupStudents.map(student => student.id))
+      setStudents(prev =>
+        prev.map(student => {
+          if (selectedIds.has(student.id)) {
+            return { ...student, groupId: groupeId }
+          }
+
+          if (currentGroupStudentIds.has(student.id) && !selectedIds.has(student.id)) {
+            return { ...student, groupId: effectiveTransferGroupId }
+          }
+
+          return student
+        }),
+      )
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Operation impossible.'
       if (/Missing required fields:\s*groupId/i.test(rawMessage)) {
@@ -250,12 +285,17 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
   }
 
   const reloadData = async () => {
-    const [groupModels, studentModels, trackModels, programModels]: [
+    const [groupModels, trackModels, programModels, studentModels]: [
       GroupModel[],
-      StudentModel[],
       TrackResponse[],
       ProgramModel[],
-    ] = await Promise.all([getGroups(), getStudents(), getTracks(), getPrograms()])
+      StudentModel[],
+    ] = await Promise.all([
+      getGroups(),
+      getTracks(),
+      getPrograms(),
+      getStudents().catch(() => [] as StudentModel[]),
+    ])
 
     const trackById = new Map<string, TrackResponse>(
       trackModels.map((track: TrackResponse) => [track.id, track]),
@@ -297,7 +337,7 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
     setIsDeletingGroup(true)
 
     try {
-      const freshStudents = normalizeStudents(await getStudents())
+      const freshStudents = normalizeStudents(await getStudents().catch(() => [] as StudentModel[]))
       const affectedStudents = freshStudents.filter(student => student.groupId === group.id)
 
       if (affectedStudents.length > 0 && !targetGroupId) {
@@ -390,7 +430,7 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
     setErrorMsg(null)
 
     try {
-      const freshStudents = normalizeStudents(await getStudents())
+      const freshStudents = normalizeStudents(await getStudents().catch(() => [] as StudentModel[]))
       setStudents(freshStudents)
       const affectedStudents = freshStudents.filter(student => student.groupId === group.id)
       setDeleteAffectedCount(affectedStudents.length)
@@ -448,6 +488,41 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
         </div>
       </div>
 
+      {showFormationActions && (
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-circle"
+            onClick={() => {
+              if (onBackToFormation) {
+                onBackToFormation()
+              }
+            }}
+            aria-label="Retour à la formation"
+            title="Retour à la formation"
+            disabled={!onBackToFormation}
+          >
+            <ArrowLeft size={18} />
+          </button>
+
+          <div className="flex items-center gap-3 ml-auto">
+            {selectedGroup && <div className="badge badge-info badge-lg">{selectedGroup.name}</div>}
+            <button
+              type="button"
+              className="btn btn-sm btn-outline"
+              onClick={() => {
+                if (onShowAllGroups) {
+                  onShowAllGroups()
+                }
+              }}
+              disabled={!onShowAllGroups}
+            >
+              Voir tous les groupes
+            </button>
+          </div>
+        </div>
+      )}
+
       <GroupFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -473,6 +548,7 @@ export function GroupesPage({ formationId }: GroupesPageProps) {
               groupes={filteredAndSortedGroupes}
               sortConfig={sortConfig}
               onSort={handleSort}
+              onRowClick={onSelectGroup ? group => onSelectGroup(group.id) : undefined}
               onAssign={setAssignGroupe}
               onEdit={group => {
                 setGroupToEdit(group)
