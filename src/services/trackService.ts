@@ -7,6 +7,8 @@ export interface UpdateTrackRequest {
   name: string
   teacherId: string
   programId: string
+  description?: string | null
+  lieu?: string | null
 }
 
 export function useTrackService() {

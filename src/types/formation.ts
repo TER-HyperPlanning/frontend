@@ -57,5 +57,7 @@ export interface TrackResponse {
   name: string
   teacherId: string
   programId: string
+  description: string | null
+  lieu: string | null
 }
 

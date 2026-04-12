@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { type GroupModel } from '@/types/session'
+import { type GroupModel } from '@/types/group'
 import { type TrackResponse, type ProgramModel } from '@/types/formation'
 import { useGroupService } from '@/services/groupService'
 import { useTrackService } from '@/services/trackService'
@@ -37,12 +37,12 @@ export function useGroupes() {
       const programMap = new Map(allPrograms.map((p) => [p.id, p]))
 
       const rows: GroupRow[] = allGroups.map((g) => {
-        const track = trackMap.get(g.trackId)
+        const track = g.trackId ? trackMap.get(g.trackId) : undefined
         const program = track ? programMap.get(track.programId) : undefined
         return {
           id: g.id,
           name: g.name,
-          academicYear: g.academicYear,
+          academicYear: g.academicYear ?? '',
           trackName: track?.name ?? '—',
           formationName: program?.name ?? '—',
           formationId: program?.id ?? '',
