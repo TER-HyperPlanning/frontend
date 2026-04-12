@@ -9,6 +9,7 @@ interface SessionsTableProps {
   isLoading: boolean
   onEdit: (session: SessionWithGroup) => void
   onDelete: (session: SessionWithGroup) => void
+  emptyMessage?: string
 }
 
 function formatDateTime(iso: string): string {
@@ -25,6 +26,7 @@ export default function SessionsTable({
   isLoading,
   onEdit,
   onDelete,
+  emptyMessage = 'Aucune séance à afficher',
 }: SessionsTableProps) {
   if (isLoading) {
     return (
@@ -40,9 +42,7 @@ export default function SessionsTable({
   if (sessions.length === 0) {
     return (
       <div className="text-center py-16">
-        <p className="text-base-content/50 text-sm">
-          Aucune séance enregistrée
-        </p>
+        <p className="text-base-content/50 text-sm">{emptyMessage}</p>
       </div>
     )
   }

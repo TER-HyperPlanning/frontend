@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { Plus, UsersRound } from 'lucide-react'
 import Logo from '@/components/Logo'
 import SessionsSearchBar from '@/components/sessions/SessionsSearchBar'
 import SessionsTable from '@/components/sessions/SessionsTable'
@@ -16,7 +16,8 @@ export default function SessionsPage() {
     isLoading,
     searchQuery, setSearchQuery,
     typeFilter, setTypeFilter,
-    groupFilter, setGroupFilter, allGroups,
+    selectedGroupId, setSelectedGroupId,
+    groupOptions,
     dateSort, setDateSort,
     isAddModalOpen, openAddModal, closeAddModal,
     editTarget, openEditModal, closeEditModal,
@@ -25,6 +26,8 @@ export default function SessionsPage() {
   } = useSessions()
 
   const { toast, showToast, hideToast } = useToast()
+
+  const hasGroup = Boolean(selectedGroupId)
 
   return (
     <>
@@ -35,6 +38,7 @@ export default function SessionsPage() {
             onClick={openAddModal}
             leftIcon={<Plus size={18} />}
             className="bg-primary-900 hover:bg-primary-800 text-white"
+            disabled={!hasGroup}
           >
             Nouvelle Séance
           </Button>
@@ -46,27 +50,48 @@ export default function SessionsPage() {
         onSearchChange={setSearchQuery}
         typeFilter={typeFilter}
         onTypeChange={setTypeFilter}
-        groupFilter={groupFilter}
-        onGroupChange={setGroupFilter}
-        allGroups={allGroups}
+        selectedGroupId={selectedGroupId}
+        onGroupChange={setSelectedGroupId}
+        groupOptions={groupOptions}
         dateSort={dateSort}
         onDateSortChange={setDateSort}
+        disabledFilters={!hasGroup}
       />
 
-      <div className="card bg-base-100 border border-base-200">
-        <div className="overflow-x-auto">
-          <SessionsTable
-            sessions={sessions}
-            isLoading={isLoading}
-            onEdit={openEditModal}
-            onDelete={openDeleteModal}
-          />
+      {!hasGroup ? (
+        <div className="card bg-base-100 border border-base-200 border-dashed">
+          <div className="card-body items-center text-center py-16 px-6">
+            <UsersRound className="size-14 text-base-content/25 mb-4" aria-hidden />
+            <h2 className="text-lg font-semibold text-base-content">
+              Choisissez un groupe
+            </h2>
+            <p className="text-sm text-base-content/60 mt-2 max-w-md">
+              Les séances sont affichées par groupe. Sélectionnez un groupe dans le champ prévu
+              à cet effet pour charger et filtrer les séances associées.
+            </p>
+            {isLoading ? (
+              <p className="text-xs text-base-content/40 mt-4">Chargement des données…</p>
+            ) : null}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="card bg-base-100 border border-base-200">
+          <div className="overflow-x-auto">
+            <SessionsTable
+              sessions={sessions}
+              isLoading={isLoading}
+              onEdit={openEditModal}
+              onDelete={openDeleteModal}
+              emptyMessage="Aucune séance pour ce groupe avec les filtres actuels."
+            />
+          </div>
+        </div>
+      )}
 
       <AddSessionModal
         isOpen={isAddModalOpen}
         onClose={closeAddModal}
+        defaultGroupId={selectedGroupId}
         onAdd={async (values) => {
           const error = await addSession(values)
           if (error) {
