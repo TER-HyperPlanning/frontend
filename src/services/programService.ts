@@ -3,6 +3,7 @@ import { type ProgramModel, type CreateProgramRequest, type UpdateProgramRequest
 import { useAppClient } from '@/hooks/api/useAppClient'
 import { type ApiResponse } from '@/services/apiClient'
 
+/** Client HTTP pour `/Programs` (filières). */
 export function useProgramService() {
   const { api } = useAppClient()
 
