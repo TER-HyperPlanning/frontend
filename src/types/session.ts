@@ -15,8 +15,11 @@ export interface SessionResponse {
 }
 
 export interface SessionWithGroup extends SessionResponse {
+  /** Premier groupe lié (affichage) */
   groupId: string | null
   groupName: string | null
+  /** Tous les groupId liés via Attends (une séance peut concerner plusieurs groupes) */
+  groupIds: string[]
 }
 
 export interface CreateSessionRequest {
