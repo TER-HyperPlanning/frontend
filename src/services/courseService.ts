@@ -19,3 +19,4 @@ export function useCourseService() {
   )
 
   return { getCourses, getCourseById }
+}
