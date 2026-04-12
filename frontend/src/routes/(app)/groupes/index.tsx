@@ -328,6 +328,7 @@ function RouteComponent() {
         <AssignModal
           groupe={assignGroupe}
           students={students}
+          availableGroups={groupesWithLiveEffectif.filter(group => group.id !== assignGroupe.id)}
           onClose={() => setAssignGroupe(null)}
           onConfirm={handleAssignConfirm}
         />

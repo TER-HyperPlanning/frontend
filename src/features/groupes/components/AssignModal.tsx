@@ -53,6 +53,11 @@ function AssignModal({ groupe, students, availableGroups, maxStudents, onClose, 
     [availableGroups],
   )
 
+  const groupNameById = useMemo(() => {
+    const allGroups = [groupe, ...availableGroups]
+    return new Map(allGroups.map(group => [group.id, group.name]))
+  }, [groupe, availableGroups])
+
   const toggleSelection = (studentId: string) => {
     if (!selected.includes(studentId) && selected.length >= maxStudents) {
       setModalError(`Capacite atteinte: maximum ${maxStudents} etudiants par groupe.`)
@@ -143,7 +148,14 @@ function AssignModal({ groupe, students, availableGroups, maxStudents, onClose, 
                     <p className="text-xs text-base-content/50 truncate">{student.email}</p>
                   </div>
                   {student.groupId && student.groupId !== groupe.id && (
-                    <span className="badge badge-warning badge-sm shrink-0">Sera transféré</span>
+                    <div className="flex flex-col items-end gap-1 shrink-0 text-right">
+                      <span className="badge badge-warning badge-sm">Sera transféré</span>
+                      <span className="text-[11px] text-base-content/60">
+                        {groupNameById.get(student.groupId)
+                          ? `Dans le groupe ${groupNameById.get(student.groupId)}`
+                          : 'pas de groupe'}
+                      </span>
+                    </div>
                   )}
                   {student.groupId === groupe.id && (
                     <span className="badge badge-success badge-sm shrink-0">Dans ce groupe</span>

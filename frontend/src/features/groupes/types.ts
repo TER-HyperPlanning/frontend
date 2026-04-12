@@ -23,3 +23,5 @@ export interface SortConfig {
   key: SortKey | null
   direction: 'asc' | 'desc'
 }
+
+export {}

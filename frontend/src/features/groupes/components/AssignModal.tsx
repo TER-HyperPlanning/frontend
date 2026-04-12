@@ -6,11 +6,12 @@ import type { Group, Student } from '../types'
 interface AssignModalProps {
   groupe: Group
   students: Student[]
+  availableGroups: Group[]
   onClose: () => void
   onConfirm: (groupeId: string, studentIds: string[]) => void | Promise<void>
 }
 
-function AssignModal({ groupe, students, onClose, onConfirm }: AssignModalProps) {
+function AssignModal({ groupe, students, availableGroups, onClose, onConfirm }: AssignModalProps) {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>(
     students.filter(student => student.groupId === groupe.id).map(student => student.id),
@@ -30,6 +31,11 @@ function AssignModal({ groupe, students, onClose, onConfirm }: AssignModalProps)
       ),
     [students, search],
   )
+
+  const groupNameById = useMemo(() => {
+    const allGroups = [groupe, ...availableGroups]
+    return new Map(allGroups.map(group => [group.id, group.name]))
+  }, [groupe, availableGroups])
 
   const toggleSelection = (studentId: string) => {
     setSelected(prev =>
@@ -97,7 +103,14 @@ function AssignModal({ groupe, students, onClose, onConfirm }: AssignModalProps)
                     <p className="text-xs text-base-content/50 truncate">{student.email}</p>
                   </div>
                   {student.groupId && student.groupId !== groupe.id && (
-                    <span className="badge badge-warning badge-sm shrink-0">Sera transféré</span>
+                    <div className="flex flex-col items-end gap-1 shrink-0 text-right">
+                      <span className="badge badge-warning badge-sm">Sera transféré</span>
+                      <span className="text-[11px] text-base-content/60">
+                        {groupNameById.get(student.groupId)
+                          ? `Dans le groupe ${groupNameById.get(student.groupId)}`
+                          : 'pas de groupe'}
+                      </span>
+                    </div>
                   )}
                   {student.groupId === groupe.id && (
                     <span className="badge badge-success badge-sm shrink-0">Dans ce groupe</span>
