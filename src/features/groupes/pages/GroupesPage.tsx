@@ -453,9 +453,6 @@ export function GroupesPage({
           <p className="text-sm text-base-content/60 mt-1">Gérez et organisez les groupes d'étudiants</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="badge badge-neutral badge-lg">
-            {filteredAndSortedGroupes.length} groupe{filteredAndSortedGroupes.length > 1 ? 's' : ''}
-          </div>
           <button
             type="button"
             className="btn btn-primary btn-sm"
@@ -489,17 +486,6 @@ export function GroupesPage({
 
           <div className="flex items-center gap-3 ml-auto">
             {selectedGroup && <div className="badge badge-info badge-lg">{selectedGroup.name}</div>}
-            {onShowAllGroups && (
-              <button
-                type="button"
-                className="btn btn-sm btn-outline"
-                onClick={() => {
-                  onShowAllGroups()
-                }}
-              >
-                Voir tous les groupes
-              </button>
-            )}
           </div>
         </div>
       )}

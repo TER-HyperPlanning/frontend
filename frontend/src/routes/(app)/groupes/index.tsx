@@ -275,9 +275,6 @@ function RouteComponent() {
           <p className="text-sm text-base-content/60 mt-1">Gérez et organisez les groupes d'étudiants</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="badge badge-neutral badge-lg">
-            {filteredAndSortedGroupes.length} groupe{filteredAndSortedGroupes.length > 1 ? 's' : ''}
-          </div>
           <button
             type="button"
             className="btn btn-primary btn-sm"

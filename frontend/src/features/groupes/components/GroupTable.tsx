@@ -1,6 +1,5 @@
 import { Pencil, Trash2, UserPlus } from 'lucide-react'
 import { useMemo } from 'react'
-import Button from '@/components/Button'
 import DataTable, { type DataColumn } from './DataTable'
 import type { Group, SortConfig, SortKey } from '../types'
 
@@ -63,31 +62,39 @@ function GroupTable({ groupes, sortConfig, onSort, onAssign, onEdit, onDelete }:
         key: 'actions',
         label: 'Actions',
         render: groupe => (
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outlined"
-              leftIcon={<Pencil size={15} />}
-              className="btn-sm text-xs"
-              onClick={() => onEdit(groupe)}
-            >
-              Modifier
-            </Button>
-            <Button
-              variant="outlined"
-              leftIcon={<UserPlus size={15} />}
-              className="btn-sm text-xs"
-              onClick={() => onAssign(groupe)}
-            >
-              Assigner
-            </Button>
-            <Button
-              variant="outlined"
-              leftIcon={<Trash2 size={15} />}
-              className="btn-sm text-xs border-error text-error hover:bg-error hover:text-white"
-              onClick={() => onDelete(groupe)}
-            >
-              Supprimer
-            </Button>
+          <div className="flex items-center flex-nowrap gap-2 whitespace-nowrap">
+            <div className="tooltip" data-tip="Modifier">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline btn-square"
+                aria-label="Modifier"
+                onClick={() => onEdit(groupe)}
+              >
+                <Pencil size={15} />
+              </button>
+            </div>
+
+            <div className="tooltip" data-tip="Assigner">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline btn-square"
+                aria-label="Assigner"
+                onClick={() => onAssign(groupe)}
+              >
+                <UserPlus size={15} />
+              </button>
+            </div>
+
+            <div className="tooltip" data-tip="Supprimer">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline btn-square border-error text-error hover:bg-error hover:text-white"
+                aria-label="Supprimer"
+                onClick={() => onDelete(groupe)}
+              >
+                <Trash2 size={15} />
+              </button>
+            </div>
           </div>
         ),
       },
