@@ -1,110 +1,185 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import {
   type Formation,
-  FILIERE_OPTIONS,
-  ENSEIGNANT_OPTIONS,
+  type ProgramModel,
+  type TrackResponse,
+  type TeacherResponse,
 } from '@/types/formation'
 import { type AddFormationValues } from '@/hooks/formations/useAddFormationForm'
 import { type EditFormationValues } from '@/hooks/formations/useEditFormationForm'
+import { useProgramService } from '@/services/programService'
+import { useTrackService } from '@/services/trackService'
+import { useTeacherService } from '@/services/teacherService'
 
-const MOCK_FORMATIONS: Formation[] = [
-  {
-    id: '1',
-    nom: 'Ingénierie logicielle pour le web',
-    enseignantResponsable: 'Guillaume POSTIC',
-    programme: 'Développement web, bases de données, architecture logicielle',
-    lieu: 'Campus Évry, Bâtiment IBGBI',
-    filiere: { id: 'MIAGE', nom: 'MIAGE' },
-  },
-  {
-    id: '2',
-    nom: 'Cryptographie et Sécurité des Réseaux',
-    enseignantResponsable: 'Nathalie DAVID',
-    programme: 'Cryptographie, sécurité réseau, protocoles',
-    lieu: 'Campus Évry, Bâtiment Maupertuis',
-    filiere: { id: 'INFO', nom: 'INFO' },
-  },
-  {
-    id: '3',
-    nom: 'Conception et Intégration de Logiciels et Systèmes',
-    enseignantResponsable: 'Hanna KLAUDEL',
-    programme: 'Systèmes embarqués, intégration logicielle',
-    lieu: 'Campus Évry, Bâtiment IBGBI',
-    filiere: { id: 'INFO', nom: 'INFO' },
-  },
-]
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function programToFormation(
+  program: ProgramModel,
+  tracksByProgram: Map<string, TrackResponse[]>,
+  trackMap: Map<string, { name: string }>,
+  teacherMap: Map<string, string>,
+): Formation {
+  const tracks = tracksByProgram.get(program.id) ?? []
+  const firstTrack = tracks[0]
+
+  const trackEntry =
+    trackMap.get(program.field) ??
+    Array.from(trackMap.values()).find(
+      (t) => t.name.toLowerCase() === program.field.toLowerCase(),
+    )
+
+  const filiereName = trackEntry
+    ? trackEntry.name
+    : UUID_REGEX.test(program.field)
+      ? ''
+      : program.field
+
+  const teacherName = firstTrack?.teacherId
+    ? (teacherMap.get(firstTrack.teacherId) ?? '')
+    : ''
+
+  return {
+    id: program.id,
+    nom: program.name,
+    enseignantResponsable: teacherName,
+    enseignantId: firstTrack?.teacherId ?? '',
+    trackId: firstTrack?.id ?? '',
+    programme: '',
+    lieu: '',
+    filiere: { id: program.field, nom: filiereName },
+  }
+}
 
 export function useFormations() {
-  const [formations, setFormations] = useState<Formation[]>(MOCK_FORMATIONS)
+  const { getPrograms, createProgram, updateProgram, deleteProgram } = useProgramService()
+  const { getTracks, updateTrack } = useTrackService()
+  const { getTeachers } = useTeacherService()
+  const [formations, setFormations] = useState<Formation[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [filiereFilter, setFiliereFilter] = useState('all')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Formation | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Formation | null>(null)
 
-  const filteredFormations = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim()
-    if (!query) return formations
+  const fetchFormations = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const [programs, tracks, teachers] = await Promise.all([
+        getPrograms(),
+        getTracks().catch(() => [] as TrackResponse[]),
+        getTeachers().catch(() => [] as TeacherResponse[]),
+      ])
 
-    return formations.filter((f) => {
-      const matchNom = f.nom.toLowerCase().includes(query)
-      const matchEnseignant = f.enseignantResponsable
-        .toLowerCase()
-        .includes(query)
-      const matchFiliere = f.filiere.nom.toLowerCase().includes(query)
-      return matchNom || matchEnseignant || matchFiliere
-    })
-  }, [formations, searchQuery])
+      const trackMap = new Map(
+        tracks.map((t) => [t.id, { name: t.name }]),
+      )
 
-  function resolveFiliere(filiereId: string) {
-    const option = FILIERE_OPTIONS.find((o) => o.value === filiereId)
-    return { id: filiereId, nom: option?.label ?? filiereId }
-  }
+      const tracksByProgram = new Map<string, TrackResponse[]>()
+      for (const t of tracks) {
+        const arr = tracksByProgram.get(t.programId) ?? []
+        arr.push(t)
+        tracksByProgram.set(t.programId, arr)
+      }
 
-  function resolveEnseignant(enseignantId: string) {
-    const option = ENSEIGNANT_OPTIONS.find((o) => o.value === enseignantId)
-    return option?.label ?? enseignantId
-  }
+      const teacherMap = new Map(
+        teachers.map((t) => [t.id, `${t.firstName} ${t.lastName}`]),
+      )
 
-  function addFormation(values: AddFormationValues) {
-    const newFormation: Formation = {
-      id: crypto.randomUUID(),
-      nom: values.nom,
-      enseignantResponsable: resolveEnseignant(values.enseignantId),
-      programme: values.programme,
-      lieu: values.lieu,
-      filiere: resolveFiliere(values.filiereId),
+      setFormations(
+        programs.map((p) =>
+          programToFormation(p, tracksByProgram, trackMap, teacherMap),
+        ),
+      )
+    } catch {
+      setFormations([])
+      setError('Impossible de charger les formations.')
+    } finally {
+      setIsLoading(false)
     }
-    setFormations((prev) => [...prev, newFormation])
+  }, [getPrograms, getTracks, getTeachers])
+
+  useEffect(() => {
+    fetchFormations()
+  }, [fetchFormations])
+
+  const filteredFormations = useMemo(() => {
+    return formations.filter((f) => {
+      const matchFiliere =
+        filiereFilter === 'all' || f.filiere.nom === filiereFilter
+
+      const query = searchQuery.toLowerCase().trim()
+      const matchSearch =
+        !query ||
+        f.nom.toLowerCase().includes(query) ||
+        f.filiere.nom.toLowerCase().includes(query) ||
+        f.enseignantResponsable.toLowerCase().includes(query)
+
+      return matchFiliere && matchSearch
+    })
+  }, [formations, searchQuery, filiereFilter])
+
+  async function addFormation(values: AddFormationValues) {
+    const newProgram = await createProgram({
+      name: values.nom,
+      field: values.filiereId,
+    })
+
+    if (values.enseignantId && values.filiereId && newProgram?.id) {
+      const tracks = await getTracks().catch(() => [] as TrackResponse[])
+      const track = tracks.find((t) => t.id === values.filiereId)
+      if (track) {
+        await updateTrack(track.id, {
+          name: track.name,
+          teacherId: values.enseignantId,
+          programId: newProgram.id,
+        }).catch(() => {})
+      }
+    }
+
+    await fetchFormations()
     setIsAddModalOpen(false)
   }
 
-  function editFormation(id: string, values: EditFormationValues) {
-    setFormations((prev) =>
-      prev.map((f) =>
-        f.id === id
-          ? {
-              ...f,
-              nom: values.nom,
-              enseignantResponsable: resolveEnseignant(values.enseignantId),
-              programme: values.programme,
-              lieu: values.lieu,
-              filiere: resolveFiliere(values.filiereId),
-            }
-          : f,
-      ),
-    )
+  async function editFormation(id: string, values: EditFormationValues) {
+    await updateProgram(id, {
+      name: values.nom,
+      field: values.filiereId,
+    })
+
+    const target = formations.find((f) => f.id === id)
+    if (values.enseignantId && target?.trackId) {
+      const track = (await getTracks().catch(() => [])).find((t) => t.id === target.trackId)
+      if (track) {
+        await updateTrack(target.trackId, {
+          name: track.name,
+          teacherId: values.enseignantId,
+          programId: id,
+        }).catch(() => {})
+      }
+    }
+
+    await fetchFormations()
     setEditTarget(null)
   }
 
-  function deleteFormation(id: string) {
-    setFormations((prev) => prev.filter((f) => f.id !== id))
+  async function deleteFormationById(id: string) {
+    await deleteProgram(id)
+    await fetchFormations()
     setDeleteTarget(null)
   }
 
   return {
     formations: filteredFormations,
+    isLoading,
+    error,
     searchQuery,
     setSearchQuery,
+    filiereFilter,
+    setFiliereFilter,
     isAddModalOpen,
     openAddModal: () => setIsAddModalOpen(true),
     closeAddModal: () => setIsAddModalOpen(false),
@@ -116,6 +191,7 @@ export function useFormations() {
     closeDeleteModal: () => setDeleteTarget(null),
     addFormation,
     editFormation,
-    deleteFormation,
+    deleteFormation: deleteFormationById,
+    refetch: fetchFormations,
   }
 }

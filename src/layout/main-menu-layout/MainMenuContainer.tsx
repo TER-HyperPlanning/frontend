@@ -6,8 +6,9 @@ interface Props{
 
 function MainMenuContainer({children}:Props) {
   return (
-    <div className="size-full flex flex-col-reverse md:flex-row bg-gray-100">{children}</div>
-
+    <div className="h-screen w-full flex flex-col-reverse md:flex-row bg-gray-100 overflow-hidden">
+      {children}
+    </div>
   )
 }
 

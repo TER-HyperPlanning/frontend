@@ -8,7 +8,7 @@ export const Route = createFileRoute('/(app)/formations/')({
 
 function RouteComponent() {
   return (
-    <PageLayout>
+    <PageLayout className="p-6 overflow-y-auto">
       <FormationsPage />
     </PageLayout>
   )

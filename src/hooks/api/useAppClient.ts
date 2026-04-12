@@ -39,9 +39,9 @@ export function useAppClient() {
             (response) => response,
             (error: AxiosError) => {
                 if (error.response?.status === 401 || error.response?.status === 403) {
-                    // Token invalide ou expiré — on nettoie et redirige
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('expiresIn');
+                    localStorage.removeItem('currentUser');
                     window.location.href = '/auth/login';
                 }
 

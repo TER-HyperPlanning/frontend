@@ -1,9 +1,15 @@
+import { getAccessToken } from '@/auth/storage'
 import Logo from '@/components/Logo'
 import PageLayout from '@/layout/PageLayout'
-import { createFileRoute, Outlet, useRouterState } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/auth')({
+  beforeLoad: () => {
+    if (getAccessToken()) {
+      throw redirect({ to: '/planning' })
+    }
+  },
   component: RouteComponent,
 })
 

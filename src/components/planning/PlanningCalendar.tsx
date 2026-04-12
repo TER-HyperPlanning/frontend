@@ -11,6 +11,7 @@ import type {
   EventMouseEnterArg,
   EventMouseLeaveArg,
 } from '@fullcalendar/core'
+
 import './planning-calendar.css'
 import { SessionDetailsModal } from './SessionDetailsModal'
 import { ConfirmChangeModal } from './ConfirmChangeModal'
@@ -29,6 +30,8 @@ interface PlanningCalendarProps {
   selectedDate: Date
 }
 
+/* ================= TYPES ================= */
+
 type CalendarEvent = {
   id: string
   title: string
@@ -38,16 +41,13 @@ type CalendarEvent = {
   borderColor: string
   textColor: string
   extendedProps: {
-    description?: string
     status: 'active' | 'pending' | 'absent'
     teacherId: string
     groupId: string
     teacherName: string
     group: string
     room?: string
-    remarks?: string
     studentsCount?: number
-    equipment?: string[]
   }
 }
 
@@ -59,6 +59,8 @@ interface PendingChangeState {
   newStart: Date
   newEnd: Date
 }
+
+/* ================= HELPERS ================= */
 
 function getEventColors(status: 'active' | 'pending' | 'absent') {
   if (status === 'pending') {
@@ -85,39 +87,23 @@ function getEventColors(status: 'active' | 'pending' | 'absent') {
 }
 
 function renderEventContent(eventInfo: EventContentArg) {
-  const description = eventInfo.event.extendedProps?.description as string | undefined
-  const status = eventInfo.event.extendedProps?.status as
-    | 'active'
-    | 'pending'
-    | 'absent'
-    | undefined
+  const { room, description } = eventInfo.event.extendedProps ?? {}
 
   return (
     <div className="p-1.5 h-full flex flex-col justify-between overflow-hidden">
       <div className="min-w-0">
-        <p className="font-semibold text-sm leading-tight truncate">
+        <p className="font-semibold text-sm truncate">
           {eventInfo.event.title}
         </p>
+
+        {room && (
+          <p className="text-xs opacity-70 truncate">{room}</p>
+        )}
+
         {description && (
-          <p className="text-xs text-gray-500 mt-0.5 truncate">{description}</p>
+          <p className="text-xs opacity-60 truncate">{description}</p>
         )}
       </div>
-
-      {status === 'pending' && (
-        <div className="flex items-center gap-1 mt-1">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-yellow-100 text-yellow-800">
-            En attente
-          </span>
-        </div>
-      )}
-
-      {status === 'absent' && (
-        <div className="flex items-center gap-1 mt-1">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-100 text-red-700">
-            Absence
-          </span>
-        </div>
-      )}
     </div>
   )
 }
@@ -125,17 +111,19 @@ function renderEventContent(eventInfo: EventContentArg) {
 function renderDayHeader(arg: DayHeaderContentArg) {
   return (
     <div className="flex flex-col items-center w-full">
-      <span className="text-xs font-semibold capitalize tracking-wide">
+      <span className="text-xs font-semibold capitalize">
         {arg.date.toLocaleDateString('fr-FR', { weekday: 'long' })}
       </span>
-      <span className="text-2xl font-bold leading-none mt-1">
+      <span className="text-2xl font-bold">
         {arg.date.getDate()}
       </span>
     </div>
   )
 }
 
-function mapSessionsToEvents(sessions: Awaited<ReturnType<typeof getSessions>>): CalendarEvent[] {
+function mapSessionsToEvents(
+  sessions: Awaited<ReturnType<typeof getSessions>>
+): CalendarEvent[] {
   return sessions.map((session) => {
     const colors = getEventColors(session.status)
 
@@ -146,31 +134,33 @@ function mapSessionsToEvents(sessions: Awaited<ReturnType<typeof getSessions>>):
       end: session.end,
       ...colors,
       extendedProps: {
-        
         status: session.status,
         teacherId: session.teacherId,
         groupId: session.groupId,
         teacherName: session.teacherName,
         group: session.group,
         room: session.room,
-       
         studentsCount: session.studentsCount,
-        
       },
     }
   })
 }
+
+/* ================= COMPONENT ================= */
 
 function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
   const calendarRef = useRef<FullCalendar>(null)
 
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [isLoading, setIsLoading] = useState(false)
+
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
   const [hoveredEventId, setHoveredEventId] = useState<string | null>(null)
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
+
   const [pendingChange, setPendingChange] = useState<PendingChangeState | null>(null)
   const [isConfirmingChange, setIsConfirmingChange] = useState(false)
+
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [isCreateSessionOpen, setIsCreateSessionOpen] = useState(false)
 
@@ -195,17 +185,14 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
   }, [loadSessions])
 
   useEffect(() => {
-    if (calendarRef.current) {
-      calendarRef.current.getApi().gotoDate(selectedDate)
-    }
+    calendarRef.current?.getApi().gotoDate(selectedDate)
   }, [selectedDate])
 
-  const clearError = () => {
-    setGlobalError(null)
-  }
+  const clearError = () => setGlobalError(null)
 
   const handleEventMouseEnter = (info: EventMouseEnterArg) => {
     setHoveredEventId(info.event.id)
+
     const rect = info.el.getBoundingClientRect()
     setTooltipPos({
       x: rect.right + 10,
@@ -213,7 +200,7 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
     })
   }
 
-  const handleEventMouseLeave = (_info: EventMouseLeaveArg) => {
+  const handleEventMouseLeave = (_: EventMouseLeaveArg) => {
     setHoveredEventId(null)
     setTooltipPos(null)
   }
@@ -229,25 +216,19 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
       return
     }
 
-    clearError()
+    const { start, end } = info.event
+    const { start: oldStart, end: oldEnd } = info.oldEvent
 
-    const newStart = info.event.start
-    const newEnd = info.event.end
-    const oldStart = info.oldEvent.start
-    const oldEnd = info.oldEvent.end
-
-    if (!newStart || !newEnd || !oldStart || !oldEnd) {
+    if (!start || !end || !oldStart || !oldEnd) {
       info.revert()
-      setGlobalError('Impossible de déplacer cette séance.')
       return
     }
 
-    const validation = checkRescheduleAvailability(info.event.id, newStart, newEnd)
+    const validation = checkRescheduleAvailability(info.event.id, start, end)
 
     if (!validation.ok) {
       info.revert()
-      setGlobalError(validation.reason || 'Créneau non disponible.')
-      showToast(validation.reason || 'Créneau non disponible.', 'error')
+      showToast(validation.reason || 'Créneau non disponible', 'error')
       return
     }
 
@@ -256,8 +237,8 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
       eventTitle: info.event.title,
       oldStart,
       oldEnd,
-      newStart,
-      newEnd,
+      newStart: start,
+      newEnd: end,
     })
   }
 
@@ -265,7 +246,6 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
     if (!pendingChange) return
 
     setIsConfirmingChange(true)
-    clearError()
 
     try {
       const success =
@@ -273,132 +253,52 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
           ? await adminRescheduleSession(
               pendingChange.eventId,
               pendingChange.newStart,
-              pendingChange.newEnd,
+              pendingChange.newEnd
             )
           : await requestReschedule(
               pendingChange.eventId,
               pendingChange.newStart,
-              pendingChange.newEnd,
+              pendingChange.newEnd
             )
 
       if (!success) {
-        const calendarApi = calendarRef.current?.getApi()
-        const event = calendarApi?.getEventById(pendingChange.eventId)
-
-        if (event) {
-          event.setStart(pendingChange.oldStart)
-          event.setEnd(pendingChange.oldEnd)
-        }
-
-        setGlobalError('Créneau non disponible. Le déplacement a été annulé.')
-        showToast('Créneau non disponible.', 'error')
-        setPendingChange(null)
+        showToast('Créneau non disponible', 'error')
         return
       }
 
       await loadSessions()
-      showToast(
-        userRole === 'admin'
-          ? 'Séance déplacée avec succès.'
-          : 'Demande de changement envoyée à la scolarité.',
-        'success',
-      )
+      showToast('Séance mise à jour', 'success')
       setPendingChange(null)
     } finally {
       setIsConfirmingChange(false)
     }
   }
 
-  const handleCancelChange = () => {
-    if (!pendingChange) return
-
-    const calendarApi = calendarRef.current?.getApi()
-    const event = calendarApi?.getEventById(pendingChange.eventId)
-
-    if (event) {
-      event.setStart(pendingChange.oldStart)
-      event.setEnd(pendingChange.oldEnd)
-    }
-
-    setPendingChange(null)
-  }
-
   return (
     <div className="planning-calendar flex-1 overflow-auto px-1">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        {globalError ? (
-          <div className="flex-1 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-            {globalError}
-          </div>
-        ) : (
-          <div />
-        )}
 
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => {
-              clearError()
-              setIsCreateSessionOpen(true)
-            }}
-            className="shrink-0 rounded-lg bg-[#003A68] px-4 py-2 text-sm font-medium text-white hover:bg-[#002847]"
-          >
-            Ajouter une séance
-          </button>
-        )}
-      </div>
+      {isAdmin && (
+        <button
+          onClick={() => setIsCreateSessionOpen(true)}
+          className="mb-3 px-4 py-2 bg-[#003A68] text-white rounded"
+        >
+          Ajouter une séance
+        </button>
+      )}
 
-      <div className="min-w-[700px] h-full">
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[timeGridPlugin, interactionPlugin]}
-          locale={frLocale}
-          initialView="timeGridWeek"
-          initialDate={selectedDate}
-          headerToolbar={false}
-          slotMinTime="08:00:00"
-          slotMaxTime="20:00:00"
-          slotDuration="00:30:00"
-          slotLabelInterval="01:00:00"
-          slotLabelFormat={{
-            hour: 'numeric',
-            minute: '2-digit',
-          }}
-          dayHeaderContent={renderDayHeader}
-          allDaySlot={false}
-          weekends={false}
-          nowIndicator
-          height="auto"
-          events={events}
-          eventContent={renderEventContent}
-          editable={canDrag}
-          droppable={false}
-          eventDurationEditable={false}
-          eventStartEditable={canDrag}
-          eventClick={handleEventClick}
-          eventDrop={handleEventDrop}
-          eventMouseEnter={handleEventMouseEnter}
-          eventMouseLeave={handleEventMouseLeave}
-          eventClassNames={(arg) => {
-            const classes: string[] = []
-            const status = arg.event.extendedProps?.status as string | undefined
-
-            if (status === 'pending') {
-              classes.push('opacity-90')
-            }
-
-            if (status === 'absent') {
-              classes.push('opacity-80')
-            }
-
-            if (hoveredEventId === arg.event.id) {
-              classes.push('shadow-lg')
-            }
-
-            return classes
-          }}
-        />
-      </div>
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[timeGridPlugin, interactionPlugin]}
+        locale={frLocale}
+        initialView="timeGridWeek"
+        events={events}
+        eventContent={renderEventContent}
+        editable={canDrag}
+        eventDrop={handleEventDrop}
+        eventClick={handleEventClick}
+        eventMouseEnter={handleEventMouseEnter}
+        eventMouseLeave={handleEventMouseLeave}
+      />
 
       {hoveredEventId && tooltipPos && (
         <SessionTooltip
@@ -424,7 +324,7 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
           oldDate={pendingChange.oldStart}
           newDate={pendingChange.newStart}
           onConfirm={handleConfirmChange}
-          onCancel={handleCancelChange}
+          onCancel={() => setPendingChange(null)}
           userRole={userRole}
           isLoading={isConfirmingChange}
         />
@@ -433,20 +333,9 @@ function PlanningCalendar({ selectedDate }: PlanningCalendarProps) {
       {isCreateSessionOpen && (
         <CreateSessionModal
           onClose={() => setIsCreateSessionOpen(false)}
-          onCreated={async () => {
-            setGlobalError(null)
-            setIsCreateSessionOpen(false)
-            await loadSessions()
-            showToast('Séance ajoutée avec succès.', 'success')
-          }}
+          onCreated={loadSessions}
           onTopError={setGlobalError}
         />
-      )}
-
-      {isLoading && (
-        <div className="fixed bottom-4 right-4 rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm shadow">
-          Chargement...
-        </div>
       )}
     </div>
   )
