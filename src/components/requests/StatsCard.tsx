@@ -14,10 +14,10 @@ export default function StatsCard({
   iconColor,
 }: StatsCardProps) {
   return (
-    <div className="bg-[#F4F6F8] rounded-2xl p-6 flex items-center justify-between transition hover:scale-[1.02]">
+    <div className="bg-[#F4F6F8] rounded-2xl p-4 flex items-center justify-between transition hover:scale-[1.02]">
       <div>
         <p className="text-gray-500 text-sm">{label}</p>
-        <h2 className={`text-3xl font-bold ${valueColor}`}>
+        <h2 className={`text-2xl font-bold ${valueColor}`}>
           {value}
         </h2>
       </div>

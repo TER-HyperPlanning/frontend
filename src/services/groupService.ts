@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { type GroupModel } from '@/types/group'
+import { type GroupModel } from '@/types/session'
 import { useAppClient } from '@/hooks/api/useAppClient'
 import { type ApiResponse } from '@/services/apiClient'
 

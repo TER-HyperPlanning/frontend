@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { HiPlus, HiOutlineTrash, HiX } from 'react-icons/hi';
 import Button from '../Button';
 import { useCreateBuilding } from "@/hooks/buildings/useCreateBuilding";
+import { useCreateMultipleRooms } from "@/hooks/rooms/useCreateRoom";
 
 interface Room {
   number: string;
@@ -15,20 +16,20 @@ interface AddBuildingModalProps {
   onSuccess?: (message: string) => void;
 }
 
-const ROOM_TYPES = ['TD', 'Info', 'Amphi', 'Labo'];
-
+const ROOM_TYPES = [
+  'TD',
+  'COURS',
+  'INFO',
+  'AMPHITHEATRE'
+];
 export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuildingModalProps) {
-  // --- HOOKS (DOIVENT ÊTRE ICI) ---
+  const { createRooms } = useCreateMultipleRooms();
   const { mutate: createBuilding } = useCreateBuilding();
-
-  // --- ÉTATS ---
   const [buildingName, setBuildingName] = useState('');
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<Array<Room>>([]);
   const [errors, setErrors] = useState<{ buildingName?: string; rooms?: string[] }>({});
 
   if (!isOpen) return null;
-
-  // --- LOGIQUE DES SALLES ---
   const addRoom = () => {
     setRooms([...rooms, { number: '', capacity: '', type: 'TD' }]);
   };
@@ -47,9 +48,9 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
     setRooms(newRooms);
   };
 
-  // --- VALIDATION ---
   const validate = () => {
     const newErrors: typeof errors = {};
+
 
     if (!buildingName.trim()) {
       newErrors.buildingName = "Le nom du bâtiment est obligatoire";
@@ -62,41 +63,153 @@ export default function AddBuildingModal({ isOpen, onClose, onSuccess }: AddBuil
     }
 
     if (rooms.length > 0) {
-      newErrors.rooms = rooms.map(room => {
-        if (!room.number.trim()) return "Salle obligatoire";
-        if (!/^[A-Za-z0-9\- ]+$/.test(room.number)) return "Numéro invalide";
-        if (!room.capacity || Number(room.capacity) <= 0) return "Capacité requise";
-        if (!Number.isInteger(Number(room.capacity))) return "Capacité doit être un entier";
-        if (Number(room.capacity) > 500) return "Capacité max 500";
-        if (!ROOM_TYPES.includes(room.type)) return "Type invalide";
+      const validTypes = ['TD', 'COURS', 'INFO', 'AMPHITHEATRE'];
+
+      const roomNumbers = rooms.map(r => r.number.trim().toLowerCase());
+
+      newErrors.rooms = rooms.map((room) => {
+        const number = room.number?.trim();
+        const capacityRaw = room.capacity;
+        const capacity = Number(capacityRaw);
+        const type = room.type?.toUpperCase();
+
+
+        if (!number) return "Numéro de salle obligatoire";
+
+        if (!/^[A-Za-z0-9\- ]+$/.test(number)) return "Numéro invalide";
+
+
+        if (roomNumbers.filter(n => n === number.toLowerCase()).length > 1) {
+          return "Numéro de salle en double";
+        }
+
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (capacityRaw === "" || capacityRaw === null || capacityRaw === undefined) {
+          return "Capacité obligatoire";
+        }
+
+        if (isNaN(capacity)) {
+          return "Capacité invalide";
+        }
+
+
+        if (!Number.isInteger(capacity)) {
+          return "Capacité doit être un entier";
+        }
+
+
+        if (capacity <= 0) {
+          return "Capacité doit être supérieure à 0";
+        }
+
+
+        if (capacity > 1000) {
+          return "Capacité maximale 1000";
+        }
+
+
+        if (!type) {
+          return "Type obligatoire";
+        }
+
+
+        if (!validTypes.includes(type)) {
+          return "Type invalide (TD, COURS, INFO, AMPHITHEATRE)";
+        }
+
         return "";
       });
+
+
       if (newErrors.rooms.every(e => e === "")) {
         delete newErrors.rooms;
       }
     }
 
     setErrors(newErrors);
-    return !newErrors.buildingName && (!newErrors.rooms || newErrors.rooms.every(e => e === ""));
+
+    return !newErrors.buildingName &&
+      (!newErrors.rooms || newErrors.rooms.every(e => e === ""));
   };
 
-  // --- SOUMISSION ---
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // Appel à l'API via le hook de mutation
-    createBuilding(buildingName, {
-      onSuccess: () => {
-        setBuildingName(''); // Reset le champ
-        setRooms([]);        // Reset les salles
-        onSuccess?.(`Bâtiment "${buildingName}" ajouté avec succès !`);
-        onClose();
-      },
-      onError: (error) => {
-        console.error("Erreur lors de la création:", error);
-      }
-    });
+    try {
+      // créer le bâtiment
+      createBuilding(buildingName, {
+        onSuccess: async (createdBuilding) => {
+          try {
+            // Si aucune salle → OK ajout direct
+            if (rooms.length === 0) {
+              onSuccess?.(`Bâtiment "${buildingName}" ajouté avec succès !`);
+              setBuildingName('');
+              setRooms([]);
+              onClose();
+              return;
+            }
+
+            const roomsPayload = rooms.map(room => ({
+              roomNumber: room.number.trim(),
+              capacity: Number(room.capacity),
+              isAvailable: true,
+              buildingId: createdBuilding.id,
+              type: room.type.toUpperCase() as "TD" | "COURS" | "INFO" | "AMPHITHEATRE"
+            }));
+
+            await createRooms(roomsPayload);
+
+            onSuccess?.(`Bâtiment et salles ajoutés avec succès !`);
+            setBuildingName('');
+            setRooms([]);
+            onClose();
+
+          } catch (roomError: any) {
+            console.error("Erreur rooms:", roomError);
+
+            const apiError = roomError?.response?.data;
+
+            let message = "Erreur lors de l'ajout des salles";
+
+            if (apiError?.message) {
+              message = apiError.message;
+            }
+
+            onSuccess?.(`Bâtiment créé, mais : ${message}`);
+
+            setBuildingName('');
+            setRooms([]);
+            onClose();
+          }
+        },
+
+        onError: (error: any) => {
+          console.error("Erreur building:", error);
+
+          const apiError = error?.response?.data;
+
+          let message = "Erreur lors de la création du bâtiment";
+
+          if (apiError?.message) {
+            if (apiError.message === "Building already exists, choose another name") {
+              message = "Ce bâtiment existe déjà, veuillez choisir un autre nom";
+            } else {
+              message = apiError.message;
+            }
+          }
+          setErrors(prev => ({
+            ...prev,
+            buildingName: message
+          }));
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

@@ -5,6 +5,7 @@ interface Slot {
   start: string
   end: string
   room: string
+  typeRoom: string
   building: string
 }
 
@@ -25,9 +26,9 @@ export default function AlternativeSlotModal({
 
   // Exemple de créneaux
   const slots: Slot[] = [
-    { date: '10/03/2026', start: '10:00', end: '12:00', room: '201', building: 'A' },
-    { date: '11/03/2026', start: '14:00', end: '16:00', room: '105', building: 'B' },
-    { date: '12/03/2026', start: '08:00', end: '10:00', room: '302', building: 'C' },
+    { date: '10/03/2026', start: '10:00', end: '12:00', room: '201', typeRoom:'Informatique', building: 'A' },
+    { date: '11/03/2026', start: '14:00', end: '16:00', room: '105', typeRoom:'Amphitheatre', building: 'B' },
+    { date: '12/03/2026', start: '08:00', end: '10:00', room: '302', typeRoom:'Informatique', building: 'C' },
   ]
 
   return (
@@ -63,7 +64,7 @@ export default function AlternativeSlotModal({
                 <div>
                   <p className="font-semibold">{slot.date}</p>
                   <p>{slot.start} - {slot.end}</p>
-                  <p>Salle {slot.room} ({slot.building})</p>
+                  <p>Salle {slot.room} <br />Type: {slot.typeRoom} <br />Batiment: {slot.building}</p>
                 </div>
 
                 {isSelected && (
