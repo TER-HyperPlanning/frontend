@@ -45,8 +45,8 @@ function programToFormation(
     enseignantResponsable: teacherName,
     enseignantId: firstTrack?.teacherId ?? '',
     trackId: firstTrack?.id ?? '',
-    programme: '',
-    lieu: '',
+    programme: firstTrack?.description ?? '',
+    lieu: firstTrack?.lieu ?? '',
     filiere: { id: program.field, nom: filiereName },
   }
 }
@@ -128,14 +128,16 @@ export function useFormations() {
       field: values.filiereId,
     })
 
-    if (values.enseignantId && values.filiereId && newProgram?.id) {
+    if (values.filiereId && newProgram?.id) {
       const tracks = await getTracks().catch(() => [] as TrackResponse[])
       const track = tracks.find((t) => t.id === values.filiereId)
       if (track) {
         await updateTrack(track.id, {
           name: track.name,
-          teacherId: values.enseignantId,
+          teacherId: values.enseignantId || track.teacherId,
           programId: newProgram.id,
+          description: values.programme || null,
+          lieu: values.lieu || null,
         }).catch(() => {})
       }
     }
@@ -151,13 +153,15 @@ export function useFormations() {
     })
 
     const target = formations.find((f) => f.id === id)
-    if (values.enseignantId && target?.trackId) {
-      const track = (await getTracks().catch(() => [])).find((t) => t.id === target.trackId)
+    if (target?.trackId) {
+      const track = (await getTracks().catch(() => [] as TrackResponse[])).find((t) => t.id === target.trackId)
       if (track) {
         await updateTrack(target.trackId, {
           name: track.name,
-          teacherId: values.enseignantId,
+          teacherId: values.enseignantId || track.teacherId,
           programId: id,
+          description: values.programme || null,
+          lieu: values.lieu || null,
         }).catch(() => {})
       }
     }

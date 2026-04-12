@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   useEditFormationForm,
+  editFormationSchema,
   type EditFormationValues,
 } from '@/hooks/formations/useEditFormationForm'
 import { useTeacherOptions } from '@/hooks/formations/useTeacherOptions'
@@ -102,11 +103,14 @@ function EditFormationContent({
           }}
           className="space-y-4"
         >
-          <form.Field name="nom">
+          <form.Field
+            name="nom"
+            validators={{ onChange: editFormationSchema.shape.nom }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-primary-900">
-                  Nom de la formation
+                  Nom de la formation <span className="text-error">*</span>
                 </label>
                 <TextField
                   name={field.name}
@@ -117,6 +121,9 @@ function EditFormationContent({
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                 />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
+                )}
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/150
                 </p>
@@ -124,11 +131,14 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          <form.Field name="enseignantId">
+          <form.Field
+            name="enseignantId"
+            validators={{ onChange: editFormationSchema.shape.enseignantId }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-primary-900">
-                  Enseignant responsable
+                  Enseignant responsable <span className="text-error">*</span>
                 </label>
                 <select
                   value={field.state.value}
@@ -136,22 +146,28 @@ function EditFormationContent({
                   onBlur={() => field.handleBlur()}
                   className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
                 >
-                  <option value="">— Aucun —</option>
+                  <option value="">— Choisir —</option>
                   {enseignantOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
                 </select>
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
+                )}
               </div>
             )}
           </form.Field>
 
-          <form.Field name="programme">
+          <form.Field
+            name="programme"
+            validators={{ onChange: editFormationSchema.shape.programme }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-primary-900">
-                  Programme
+                  Programme <span className="text-error">*</span>
                 </label>
                 <TextAreaField
                   name={field.name}
@@ -163,6 +179,9 @@ function EditFormationContent({
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
                 />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
+                )}
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/500
                 </p>
@@ -170,11 +189,14 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          <form.Field name="lieu">
+          <form.Field
+            name="lieu"
+            validators={{ onChange: editFormationSchema.shape.lieu }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-primary-900">
-                  Lieu
+                  Lieu <span className="text-error">*</span>
                 </label>
                 <TextField
                   name={field.name}
@@ -185,6 +207,9 @@ function EditFormationContent({
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                 />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
+                )}
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/150
                 </p>
@@ -192,11 +217,14 @@ function EditFormationContent({
             )}
           </form.Field>
 
-          <form.Field name="filiereId">
+          <form.Field
+            name="filiereId"
+            validators={{ onChange: editFormationSchema.shape.filiereId }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-primary-900">
-                  Filière
+                  Filière <span className="text-error">*</span>
                 </label>
                 <select
                   value={field.state.value}
@@ -204,13 +232,16 @@ function EditFormationContent({
                   onBlur={() => field.handleBlur()}
                   className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
                 >
-                  <option value="">— Aucune —</option>
+                  <option value="">— Choisir —</option>
                   {filiereOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
                 </select>
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
+                )}
               </div>
             )}
           </form.Field>

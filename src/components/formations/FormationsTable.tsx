@@ -12,7 +12,7 @@ import {
   TrashIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline'
-import { UsersRound } from 'lucide-react'
+import { UsersRound, BookOpen } from 'lucide-react'
 
 interface FormationsTableProps {
   formations: Formation[]
@@ -21,6 +21,7 @@ interface FormationsTableProps {
   onDelete: (formation: Formation) => void
   onViewProgramme: (formation: Formation) => void
   onViewGroups: (formation: Formation) => void
+  onViewModules: (formation: Formation) => void
 }
 
 export default function FormationsTable({
@@ -30,6 +31,7 @@ export default function FormationsTable({
   onDelete,
   onViewProgramme,
   onViewGroups,
+  onViewModules,
 }: FormationsTableProps) {
   if (isLoading) {
     return (
@@ -60,7 +62,8 @@ export default function FormationsTable({
           <TableHeader>Enseignant responsable</TableHeader>
           <TableHeader>Lieu</TableHeader>
           <TableHeader>Filière associée</TableHeader>
-          <TableHeader>Actions</TableHeader>
+          <TableHeader className="whitespace-nowrap">Consultation</TableHeader>
+          <TableHeader className="whitespace-nowrap">Actions</TableHeader>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -78,16 +81,10 @@ export default function FormationsTable({
             <TableCell className="text-sm text-base-content/80">
               {formation.filiere.nom || '—'}
             </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-1">
+            <TableCell className="w-0">
+              <div className="flex items-center justify-end gap-0.5 min-w-0">
                 <button
-                  onClick={() => onViewGroups(formation)}
-                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
-                  title="Voir les groupes"
-                >
-                  <UsersRound size={16} />
-                </button>
-                <button
+                  type="button"
                   onClick={() => onViewProgramme(formation)}
                   className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-info"
                   title="Voir le programme"
@@ -95,6 +92,27 @@ export default function FormationsTable({
                   <InformationCircleIcon className="size-4" />
                 </button>
                 <button
+                  type="button"
+                  onClick={() => onViewGroups(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
+                  title="Voir les groupes"
+                >
+                  <UsersRound size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onViewModules(formation)}
+                  className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-secondary"
+                  title="Voir les modules"
+                >
+                  <BookOpen size={16} />
+                </button>
+              </div>
+            </TableCell>
+            <TableCell className="w-0">
+              <div className="flex items-center justify-end gap-0.5 min-w-0">
+                <button
+                  type="button"
                   onClick={() => onEdit(formation)}
                   className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-primary"
                   title="Modifier"
@@ -102,6 +120,7 @@ export default function FormationsTable({
                   <PencilSquareIcon className="size-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => onDelete(formation)}
                   className="btn btn-ghost btn-sm btn-circle text-base-content/50 hover:text-error"
                   title="Supprimer"
