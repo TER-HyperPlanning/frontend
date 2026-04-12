@@ -11,6 +11,7 @@ import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
 import Button from '@/components/Button'
 import { type Formation } from '@/types/formation'
+import { firstFieldErrorMessage } from '@/utils/formErrors'
 
 interface EditFormationModalProps {
   isOpen: boolean
@@ -105,7 +106,10 @@ function EditFormationContent({
         >
           <form.Field
             name="nom"
-            validators={{ onChange: editFormationSchema.shape.nom }}
+            validators={{
+              onChange: editFormationSchema.shape.nom,
+              onSubmit: editFormationSchema.shape.nom,
+            }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -121,9 +125,11 @@ function EditFormationContent({
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                )}
+                {firstFieldErrorMessage(field.state.meta.errors) ? (
+                  <p className="text-xs text-error" role="alert">
+                    {firstFieldErrorMessage(field.state.meta.errors)}
+                  </p>
+                ) : null}
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/150
                 </p>
@@ -133,7 +139,10 @@ function EditFormationContent({
 
           <form.Field
             name="enseignantId"
-            validators={{ onChange: editFormationSchema.shape.enseignantId }}
+            validators={{
+              onChange: editFormationSchema.shape.enseignantId,
+              onSubmit: editFormationSchema.shape.enseignantId,
+            }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -153,16 +162,21 @@ function EditFormationContent({
                     </option>
                   ))}
                 </select>
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                )}
+                {firstFieldErrorMessage(field.state.meta.errors) ? (
+                  <p className="text-xs text-error" role="alert">
+                    {firstFieldErrorMessage(field.state.meta.errors)}
+                  </p>
+                ) : null}
               </div>
             )}
           </form.Field>
 
           <form.Field
             name="programme"
-            validators={{ onChange: editFormationSchema.shape.programme }}
+            validators={{
+              onChange: editFormationSchema.shape.programme,
+              onSubmit: editFormationSchema.shape.programme,
+            }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -179,9 +193,11 @@ function EditFormationContent({
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                )}
+                {firstFieldErrorMessage(field.state.meta.errors) ? (
+                  <p className="text-xs text-error" role="alert">
+                    {firstFieldErrorMessage(field.state.meta.errors)}
+                  </p>
+                ) : null}
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/500
                 </p>
@@ -191,7 +207,10 @@ function EditFormationContent({
 
           <form.Field
             name="lieu"
-            validators={{ onChange: editFormationSchema.shape.lieu }}
+            validators={{
+              onChange: editFormationSchema.shape.lieu,
+              onSubmit: editFormationSchema.shape.lieu,
+            }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -207,9 +226,11 @@ function EditFormationContent({
                   onBlur={field.handleBlur}
                   className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                )}
+                {firstFieldErrorMessage(field.state.meta.errors) ? (
+                  <p className="text-xs text-error" role="alert">
+                    {firstFieldErrorMessage(field.state.meta.errors)}
+                  </p>
+                ) : null}
                 <p className="text-xs text-gray-400 text-right">
                   {field.state.value.length}/150
                 </p>
@@ -219,7 +240,10 @@ function EditFormationContent({
 
           <form.Field
             name="filiereId"
-            validators={{ onChange: editFormationSchema.shape.filiereId }}
+            validators={{
+              onChange: editFormationSchema.shape.filiereId,
+              onSubmit: editFormationSchema.shape.filiereId,
+            }}
           >
             {(field) => (
               <div className="space-y-1">
@@ -239,9 +263,11 @@ function EditFormationContent({
                     </option>
                   ))}
                 </select>
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                )}
+                {firstFieldErrorMessage(field.state.meta.errors) ? (
+                  <p className="text-xs text-error" role="alert">
+                    {firstFieldErrorMessage(field.state.meta.errors)}
+                  </p>
+                ) : null}
               </div>
             )}
           </form.Field>
@@ -255,13 +281,11 @@ function EditFormationContent({
             >
               Annuler
             </Button>
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-            >
-              {([canSubmit, isSubmitting]) => (
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
                 <Button
                   type="submit"
-                  disabled={!canSubmit}
+                  disabled={isSubmitting}
                   className="bg-primary-900 hover:bg-primary-800"
                 >
                   {isSubmitting ? 'Modification…' : 'Modifier'}

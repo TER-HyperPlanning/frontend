@@ -10,6 +10,7 @@ import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
 import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
 import Button from '@/components/Button'
+import { firstFieldErrorMessage } from '@/utils/formErrors'
 
 interface AddFormationModalProps {
   isOpen: boolean
@@ -71,7 +72,10 @@ export default function AddFormationModal({
               >
                 <form.Field
                   name="nom"
-                  validators={{ onChange: addFormationSchema.shape.nom }}
+                  validators={{
+                    onChange: addFormationSchema.shape.nom,
+                    onSubmit: addFormationSchema.shape.nom,
+                  }}
                 >
                   {(field) => (
                     <div className="space-y-1">
@@ -87,9 +91,11 @@ export default function AddFormationModal({
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                       />
-                      {field.state.meta.errors.length > 0 && (
-                        <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                      )}
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/150
                       </p>
@@ -99,7 +105,10 @@ export default function AddFormationModal({
 
                 <form.Field
                   name="enseignantId"
-                  validators={{ onChange: addFormationSchema.shape.enseignantId }}
+                  validators={{
+                    onChange: addFormationSchema.shape.enseignantId,
+                    onSubmit: addFormationSchema.shape.enseignantId,
+                  }}
                 >
                   {(field) => (
                     <div className="space-y-1">
@@ -119,16 +128,21 @@ export default function AddFormationModal({
                           </option>
                         ))}
                       </select>
-                      {field.state.meta.errors.length > 0 && (
-                        <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                      )}
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </form.Field>
 
                 <form.Field
                   name="programme"
-                  validators={{ onChange: addFormationSchema.shape.programme }}
+                  validators={{
+                    onChange: addFormationSchema.shape.programme,
+                    onSubmit: addFormationSchema.shape.programme,
+                  }}
                 >
                   {(field) => (
                     <div className="space-y-1">
@@ -145,9 +159,11 @@ export default function AddFormationModal({
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
                       />
-                      {field.state.meta.errors.length > 0 && (
-                        <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                      )}
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/500
                       </p>
@@ -157,7 +173,10 @@ export default function AddFormationModal({
 
                 <form.Field
                   name="lieu"
-                  validators={{ onChange: addFormationSchema.shape.lieu }}
+                  validators={{
+                    onChange: addFormationSchema.shape.lieu,
+                    onSubmit: addFormationSchema.shape.lieu,
+                  }}
                 >
                   {(field) => (
                     <div className="space-y-1">
@@ -173,9 +192,11 @@ export default function AddFormationModal({
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                       />
-                      {field.state.meta.errors.length > 0 && (
-                        <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                      )}
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/150
                       </p>
@@ -185,7 +206,10 @@ export default function AddFormationModal({
 
                 <form.Field
                   name="filiereId"
-                  validators={{ onChange: addFormationSchema.shape.filiereId }}
+                  validators={{
+                    onChange: addFormationSchema.shape.filiereId,
+                    onSubmit: addFormationSchema.shape.filiereId,
+                  }}
                 >
                   {(field) => (
                     <div className="space-y-1">
@@ -205,9 +229,11 @@ export default function AddFormationModal({
                           </option>
                         ))}
                       </select>
-                      {field.state.meta.errors.length > 0 && (
-                        <p className="text-xs text-error">{field.state.meta.errors[0]}</p>
-                      )}
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </form.Field>
@@ -221,13 +247,11 @@ export default function AddFormationModal({
                   >
                     Annuler
                   </Button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => (
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(isSubmitting) => (
                       <Button
                         type="submit"
-                        disabled={!canSubmit}
+                        disabled={isSubmitting}
                         className="bg-primary-900 hover:bg-primary-800"
                       >
                         {isSubmitting ? 'Création…' : 'Créer'}

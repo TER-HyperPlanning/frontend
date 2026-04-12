@@ -3,7 +3,8 @@ import { type TrackResponse } from '@/types/formation'
 import { useTrackService } from '@/services/trackService'
 import { useProgramService } from '@/services/programService'
 import { useAssignService, type AssignResponse } from '@/services/assignService'
-import { useCourseService, type CourseResponse } from '@/services/courseService'
+import { type CourseResponse } from '@/types/session'
+import { useCourseService } from '@/services/courseService'
 
 export interface FormationModuleRow {
   id: string

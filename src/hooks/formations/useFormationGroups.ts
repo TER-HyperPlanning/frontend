@@ -38,13 +38,16 @@ export function useFormationGroups(formationId: string) {
       const trackMap = new Map(allTracks.map((t) => [t.id, t.name]))
 
       const filtered = allGroups
-        .filter((g): g is typeof g & { trackId: string } => !!g.trackId && trackIds.has(g.trackId))
-        .map((g) => ({
-          id: g.id,
-          name: g.name,
-          academicYear: g.academicYear ?? '',
-          trackName: trackMap.get(g.trackId) ?? '—',
-        }))
+        .filter((g) => g.trackId != null && trackIds.has(g.trackId))
+        .map((g) => {
+          const tid = g.trackId as string
+          return {
+            id: g.id,
+            name: g.name,
+            academicYear: g.academicYear ?? '',
+            trackName: trackMap.get(tid) ?? '—',
+          }
+        })
 
       setGroups(filtered)
     } catch {
