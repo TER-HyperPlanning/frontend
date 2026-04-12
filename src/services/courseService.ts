@@ -3,7 +3,6 @@ import { type CourseResponse } from '@/types/session'
 import { useAppClient } from '@/hooks/api/useAppClient'
 import { type ApiResponse } from '@/services/apiClient'
 
-
 export function useCourseService() {
   const { api } = useAppClient()
 
@@ -19,3 +18,4 @@ export function useCourseService() {
   )
 
   return { getCourses, getCourseById }
+}
