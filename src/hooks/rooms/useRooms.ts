@@ -8,7 +8,7 @@ export function useRooms() {
         queryKey: ["rooms"],
         queryFn: async () => {
             const res = await getRooms();
-            return res || [];
+            return res;
         },
         initialData: [],
     });
