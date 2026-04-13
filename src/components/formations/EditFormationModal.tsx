@@ -6,7 +6,7 @@ import {
   type EditFormationValues,
 } from '@/hooks/formations/useEditFormationForm'
 import { useTeacherOptions } from '@/hooks/formations/useTeacherOptions'
-import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
+import { useFiliereOptions } from '@/hooks/formations/useFiliereOptions'
 import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
 import Button from '@/components/Button'
@@ -27,7 +27,7 @@ export default function EditFormationModal({
   onEdit,
 }: EditFormationModalProps) {
   const enseignantOptions = useTeacherOptions()
-  const filiereOptions = useTrackOptions()
+  const filiereOptions = useFiliereOptions()
 
   return (
     <AnimatePresence>

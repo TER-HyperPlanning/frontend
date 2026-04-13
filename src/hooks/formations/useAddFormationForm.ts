@@ -13,6 +13,7 @@ export type AddFormationValues = z.infer<typeof addFormationSchema>
 
 export function useAddFormationForm(
   onSubmit: (values: AddFormationValues) => Promise<void>,
+  defaultFiliereId?: string,
 ) {
   return useForm({
     defaultValues: {
@@ -20,7 +21,7 @@ export function useAddFormationForm(
       enseignantId: '',
       programme: '',
       lieu: '',
-      filiereId: '',
+      filiereId: defaultFiliereId ?? '',
     },
     onSubmit: async ({ value }) => {
       await onSubmit(value)
