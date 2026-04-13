@@ -76,6 +76,9 @@ export default function FormationsPage() {
             onViewGroups={(f) =>
               navigate({ to: '/formations/$formationId/groupes', params: { formationId: f.id } })
             }
+            onViewModules={(f) =>
+              navigate({ to: '/formations/$formationId/modules', params: { formationId: f.id } })
+            }
           />
         </div>
       </div>

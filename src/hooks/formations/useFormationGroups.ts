@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { type GroupModel } from '@/types/session'
+import { type GroupModel } from '@/types/group'
 import { type TrackResponse } from '@/types/formation'
 import { useGroupService } from '@/services/groupService'
 import { useTrackService } from '@/services/trackService'
@@ -38,13 +38,16 @@ export function useFormationGroups(formationId: string) {
       const trackMap = new Map(allTracks.map((t) => [t.id, t.name]))
 
       const filtered = allGroups
-        .filter((g) => trackIds.has(g.trackId))
-        .map((g) => ({
-          id: g.id,
-          name: g.name,
-          academicYear: g.academicYear,
-          trackName: trackMap.get(g.trackId) ?? '—',
-        }))
+        .filter((g) => g.trackId != null && trackIds.has(g.trackId))
+        .map((g) => {
+          const tid = g.trackId as string
+          return {
+            id: g.id,
+            name: g.name,
+            academicYear: g.academicYear ?? '',
+            trackName: trackMap.get(tid) ?? '—',
+          }
+        })
 
       setGroups(filtered)
     } catch {

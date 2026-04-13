@@ -45,7 +45,8 @@ export default function DeleteSessionModal({
                 Voulez-vous vraiment supprimer cette séance ?
               </h3>
               <p className="text-gray-500 mt-1">
-                {SESSION_TYPE_LABELS[session.type]} — {session.course || 'Sans module'}
+                {(SESSION_TYPE_LABELS as Record<string, string>)[session.type] ?? session.type} —{' '}
+                {session.course || 'Sans module'}
               </p>
             </div>
 

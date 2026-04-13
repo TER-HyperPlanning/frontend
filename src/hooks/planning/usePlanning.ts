@@ -80,9 +80,8 @@ type PlanningQueryOptions = {
 }
 
 /**
- * Fetch the general planning (public-ish — works without auth via apiGet).
- * Used for the public planning view or when filtering by group/track/program.
- * When `enabled` is false, no request is made (e.g. teachers/students must use `/Planning/me` only).
+ * Fetch general planning via GET /Planning (unauthenticated `apiGet`, or authed client if ever enabled).
+ * On the planning page this runs only for visitors; logged-in users use `useMyPlanning` (/Planning/me).
  */
 export function usePlanning(filters: PlanningFilters, options?: PlanningQueryOptions) {
   const hasToken = !!getAccessToken()
@@ -109,7 +108,7 @@ export function usePlanning(filters: PlanningFilters, options?: PlanningQueryOpt
 }
 
 /**
- * Fetch the current user's personal planning (requires auth).
+ * Fetch planning for the signed-in user via GET /Planning/me (requires auth).
  */
 export function useMyPlanning(filters: PlanningFilters, options?: PlanningQueryOptions) {
   const { api } = useAppClient()

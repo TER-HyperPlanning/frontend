@@ -43,19 +43,26 @@ function extractErrorMessage(err: unknown): string {
   return 'Erreur inconnue'
 }
 
+export interface GroupOption {
+  id: string
+  name: string
+}
+
 export function useSessions() {
   const {
     getSessions, createSession, updateSession, deleteSession,
-    createAttend, getAllAttends,
+    createAttend, getAllAttends, getAttendsBySession, deleteAttend,
   } = useSessionService()
   const { getGroups } = useGroupService()
 
   const [sessions, setSessions] = useState<SessionWithGroup[]>([])
   const [groupMap, setGroupMap] = useState<Record<string, string>>({})
+  const [groupOptions, setGroupOptions] = useState<GroupOption[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
-  const [groupFilter, setGroupFilter] = useState('all')
+  /** Vide = aucun groupe choisi : pas d’affichage des séances (filtre par ID, pas par nom) */
+  const [selectedGroupId, setSelectedGroupId] = useState('')
   const [dateSort, setDateSort] = useState<'asc' | 'desc'>('asc')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<SessionWithGroup | null>(null)
@@ -74,18 +81,26 @@ export function useSessions() {
       const gMap: Record<string, string> = {}
       for (const g of groups) gMap[g.id] = g.name
       setGroupMap(gMap)
+      setGroupOptions(
+        [...groups]
+          .sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+          .map((g) => ({ id: g.id, name: g.name })),
+      )
 
-      const attendBySession = new Map<string, string>()
+      const attendsBySession = new Map<string, string[]>()
       for (const a of allAttends) {
-        if (!attendBySession.has(a.sessionId)) {
-          attendBySession.set(a.sessionId, a.groupId)
-        }
+        if (!a.sessionId || !a.groupId) continue
+        const list = attendsBySession.get(a.sessionId) ?? []
+        if (!list.includes(a.groupId)) list.push(a.groupId)
+        attendsBySession.set(a.sessionId, list)
       }
 
       const enriched: SessionWithGroup[] = rawSessions.map((s) => {
-        const gId = attendBySession.get(s.id) ?? null
+        const gIds = attendsBySession.get(s.id) ?? []
+        const gId = gIds[0] ?? null
         return {
           ...s,
+          groupIds: gIds,
           groupId: gId,
           groupName: gId ? (gMap[gId] ?? null) : null,
         }
@@ -103,27 +118,22 @@ export function useSessions() {
     fetchSessions()
   }, [fetchSessions])
 
-  const allGroups = useMemo(() => {
-    const names = new Set<string>()
-    for (const s of sessions) {
-      if (s.groupName) names.add(s.groupName)
-    }
-    return Array.from(names).sort()
-  }, [sessions])
-
   const filteredSessions = useMemo(() => {
+    if (!selectedGroupId) return []
+
     const filtered = sessions.filter((s) => {
+      const matchGroup = s.groupIds.includes(selectedGroupId)
       const matchType = typeFilter === 'all' || s.type === typeFilter
-      const matchGroup = groupFilter === 'all' || s.groupName === groupFilter
       const query = searchQuery.toLowerCase().trim()
+      const typeLabel = (SESSION_TYPE_LABELS as Record<string, string | undefined>)[s.type] ?? String(s.type)
       const matchSearch =
         !query ||
         (s.course ?? '').toLowerCase().includes(query) ||
         (s.groupName ?? '').toLowerCase().includes(query) ||
         (s.description ?? '').toLowerCase().includes(query) ||
-        SESSION_TYPE_LABELS[s.type].toLowerCase().includes(query) ||
+        typeLabel.toLowerCase().includes(query) ||
         SESSION_MODE_LABELS[s.mode].toLowerCase().includes(query)
-      return matchType && matchGroup && matchSearch
+      return matchGroup && matchType && matchSearch
     })
 
     const dir = dateSort === 'asc' ? 1 : -1
@@ -132,7 +142,7 @@ export function useSessions() {
     )
 
     return filtered
-  }, [sessions, searchQuery, typeFilter, groupFilter, dateSort])
+  }, [sessions, searchQuery, typeFilter, selectedGroupId, dateSort])
 
   async function addSession(values: AddSessionValues): Promise<string | null> {
     try {
@@ -183,6 +193,12 @@ export function useSessions() {
 
   async function deleteSessionById(id: string): Promise<string | null> {
     try {
+      const attends = await getAttendsBySession(id).catch(() => [])
+      for (const a of attends) {
+        if (a.groupId && a.sessionId) {
+          await deleteAttend(a.groupId, a.sessionId).catch(() => {})
+        }
+      }
       await deleteSession(id)
       await fetchSessions()
       setDeleteTarget(null)
@@ -198,9 +214,9 @@ export function useSessions() {
     isLoading,
     searchQuery, setSearchQuery,
     typeFilter, setTypeFilter,
-    groupFilter, setGroupFilter,
+    selectedGroupId, setSelectedGroupId,
     dateSort, setDateSort,
-    allGroups, groupMap,
+    groupOptions, groupMap,
     isAddModalOpen,
     openAddModal: () => setIsAddModalOpen(true),
     closeAddModal: () => setIsAddModalOpen(false),
