@@ -24,11 +24,9 @@ export function useAppClient() {
             (config: InternalAxiosRequestConfig) => {
                 const token = localStorage.getItem('accessToken');
 
-                if (!token) {
-                    return Promise.reject(new Error('Aucun token trouvé'));
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
                 }
-
-                config.headers.Authorization = `Bearer ${token}`;
                 return config;
             },
             (error) => Promise.reject(error),

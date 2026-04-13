@@ -25,6 +25,7 @@ interface GroupFormModalProps {
   mode: 'create' | 'edit'
   group?: Group | null
   formations: FormationOption[]
+  lockedFormationId?: string
   onClose: () => void
   onSubmit: (values: GroupFormValues) => void | Promise<void>
 }
@@ -41,7 +42,7 @@ const EMPTY_VALUES: FormState = {
   formationId: '',
 }
 
-function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: GroupFormModalProps) {
+function GroupFormModal({ isOpen, mode, group, formations, lockedFormationId, onClose, onSubmit }: GroupFormModalProps) {
   const [values, setValues] = useState<FormState>(EMPTY_VALUES)
   const [error, setError] = useState<string | null>(null)
   const title = mode === 'create' ? 'Créer un groupe' : 'Modifier le groupe'
@@ -53,16 +54,19 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
       setValues({
         name: group.name,
         academicYear: group.academicYear,
-        formationId: group.programId ?? formations.find(formation => formation.trackId === group.trackId)?.id ?? '',
+        formationId:
+          lockedFormationId ??
+          formations.find(formation => formation.trackId === group.trackId)?.id ??
+          '',
       })
     } else {
       setValues({
         ...EMPTY_VALUES,
-        formationId: formations.length === 1 ? formations[0].id : '',
+        formationId: lockedFormationId ?? (formations.length === 1 ? formations[0].id : ''),
       })
     }
     setError(null)
-  }, [group, isOpen, formations])
+  }, [group, isOpen, formations, lockedFormationId])
 
   if (!isOpen) return null
 
@@ -78,12 +82,14 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
       setError("L'année académique est obligatoire.")
       return
     }
-    if (!values.formationId.trim()) {
+    const selectedFormationId = lockedFormationId ?? values.formationId
+
+    if (!selectedFormationId.trim()) {
       setError('La formation est obligatoire.')
       return
     }
 
-    const selectedFormation = formations.find(formation => formation.id === values.formationId)
+    const selectedFormation = formations.find(formation => formation.id === selectedFormationId)
     if (!selectedFormation?.trackId) {
       setError('Impossible de déterminer la formation associée à ce groupe.')
       return
@@ -110,7 +116,9 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
           <div>
             <h3 className="text-lg font-semibold text-base-content">{title}</h3>
             <p className="text-sm text-base-content/60 mt-0.5">
-              Remplis les champs nom, année académique et formation.
+              {lockedFormationId
+                ? 'La formation est préremplie depuis la page en cours.'
+                : 'Remplis les champs nom, année académique et formation.'}
             </p>
           </div>
           <button className="btn btn-sm btn-ghost btn-circle" onClick={onClose} type="button">
@@ -149,7 +157,8 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
             <span className="label-text text-sm font-medium mb-2">Formation</span>
             <select
               className="select select-bordered w-full"
-              value={values.formationId}
+              value={lockedFormationId ?? values.formationId}
+              disabled={Boolean(lockedFormationId)}
               onChange={e => {
                 setValues(prev => ({ ...prev, formationId: e.target.value }))
                 if (error) setError(null)

@@ -78,35 +78,24 @@ export function GroupesPage({
       programList.map((program: ProgramModel) => [program.id, program]),
     )
 
-    const filteredTrackModels = currentFormationId
-      ? trackModels.filter(track => track.programId === currentFormationId)
-      : trackModels
-
     const trackById = new Map<string, TrackResponse>(
       trackModels.map((track: TrackResponse) => [track.id, track]),
     )
 
-    const formations = programList
-      .map(program => {
-        const firstTrack = filteredTrackModels.find(track => track.programId === program.id)
-
-        if (!firstTrack) {
-          return null
-        }
-
-        return {
-          id: program.id,
-          name: program.name,
-          trackId: firstTrack.id,
-        }
-      })
-      .filter((formation): formation is FormationOption => formation !== null)
+    const formations: FormationOption[] = trackModels.map(track => {
+      const program = programById.get(track.programId)
+      return {
+        id: track.id,
+        name: program ? `${track.name} - ${program.name}` : track.name,
+        trackId: track.id,
+      }
+    })
 
     setFormationOptions(currentFormationId ? formations.filter(formation => formation.id === currentFormationId) : formations)
 
     const normalizedGroups = normalizeGroups(groupModels, trackById, programById, studentModels)
     const visibleGroups = currentFormationId
-      ? normalizedGroups.filter(group => group.programId === currentFormationId)
+      ? normalizedGroups.filter(group => group.trackId === currentFormationId)
       : normalizedGroups
 
     setAllGroups(normalizedGroups)
@@ -218,17 +207,20 @@ export function GroupesPage({
   ) => {
     setErrorMsg(null)
 
+    const sourceGroup = allGroups.find(group => group.id === groupeId)
+    const sourceCapacity = sourceGroup?.capacity ?? GROUP_CAPACITY_LIMIT
+
     const selectedIds = new Set(studentIds)
     const currentGroupStudents = students.filter(student => student.groupId === groupeId)
     const assignments = students.filter(student => selectedIds.has(student.id) && student.groupId !== groupeId)
     const unassignments = currentGroupStudents.filter(student => !selectedIds.has(student.id))
     const sourceCurrentCount = currentGroupStudents.length
     const sourceFinalCount = studentIds.length
-    const isReducingOverCapacity = sourceCurrentCount > GROUP_CAPACITY_LIMIT && sourceFinalCount < sourceCurrentCount
+    const isReducingOverCapacity = sourceCurrentCount > sourceCapacity && sourceFinalCount < sourceCurrentCount
     const effectiveTransferGroupId = transferGroupIdForRemoved
 
-    if (sourceFinalCount > GROUP_CAPACITY_LIMIT && !isReducingOverCapacity) {
-      const message = `Capacite depassee: ${sourceFinalCount}/${GROUP_CAPACITY_LIMIT} pour ce groupe.`
+    if (sourceFinalCount > sourceCapacity && !isReducingOverCapacity) {
+      const message = `Capacite depassee: ${sourceFinalCount}/${sourceCapacity} pour ce groupe.`
       setErrorMsg(message)
       throw new Error(message)
     }
@@ -236,9 +228,11 @@ export function GroupesPage({
     if (effectiveTransferGroupId) {
       const targetGroupCurrentCount = students.filter(student => student.groupId === effectiveTransferGroupId).length
       const targetAfterTransfer = targetGroupCurrentCount + unassignments.length
+      const targetGroup = allGroups.find(group => group.id === effectiveTransferGroupId)
+      const targetCapacity = targetGroup?.capacity ?? GROUP_CAPACITY_LIMIT
 
-      if (targetAfterTransfer > GROUP_CAPACITY_LIMIT) {
-        const message = `Le groupe de destination depasserait la capacite (${targetAfterTransfer}/${GROUP_CAPACITY_LIMIT}).`
+      if (targetAfterTransfer > targetCapacity) {
+        const message = `Le groupe de destination depasserait la capacite (${targetAfterTransfer}/${targetCapacity}).`
         setErrorMsg(message)
         throw new Error(message)
       }
@@ -282,6 +276,13 @@ export function GroupesPage({
       )
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Operation impossible.'
+
+      if (/capac|capacity|full|plein|maximum/i.test(rawMessage)) {
+        const message = "Le backend a refuse l'operation car la capacite du groupe serait depassee."
+        setErrorMsg(message)
+        throw new Error(message)
+      }
+
       if (/Missing required fields:\s*groupId/i.test(rawMessage)) {
         const message = "Le backend n'autorise pas encore le mode \"sans groupe\". Il faut choisir un groupe de destination."
         setErrorMsg(message)
@@ -543,7 +544,7 @@ export function GroupesPage({
           students={students}
           availableGroups={groupesWithLiveEffectif.filter(group => group.id !== assignGroupe.id)}
           allGroups={allGroups}
-          maxStudents={GROUP_CAPACITY_LIMIT}
+          maxStudents={assignGroupe.capacity}
           onClose={() => setAssignGroupe(null)}
           onConfirm={handleAssignConfirm}
         />
@@ -555,6 +556,7 @@ export function GroupesPage({
           mode={groupFormMode}
           group={groupToEdit}
           formations={formationOptions}
+          lockedFormationId={formationId}
           onClose={() => {
             setGroupFormMode(null)
             setGroupToEdit(null)
@@ -615,6 +617,7 @@ function normalizeGroups(
       id: group.id,
       name: group.name,
       academicYear: group.academicYear,
+      capacity: group.capacity ?? GROUP_CAPACITY_LIMIT,
       trackId: group.trackId,
       programId: track?.programId ?? null,
       trackName: track?.name ?? 'Parcours inconnu',

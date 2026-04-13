@@ -2,6 +2,7 @@ export interface Group {
   id: string
   name: string
   academicYear: string
+  capacity: number
   trackId: string
   programId: string | null
   trackName: string
