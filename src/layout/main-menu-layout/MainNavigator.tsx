@@ -95,8 +95,8 @@ export default function MainNavigator() {
           ))}
         </div>
 
-        {/* Bottom: User avatar */}
-        <div className="border-none mt-auto px-2 flex flex-col">
+        <div className="border-none mt-auto px-1.5 flex flex-col gap-2">
+
           <UserAvatar fullName={fullName} roleLabel={roleLabel} isOpen={isOpen} />
           <button
             type="button"
