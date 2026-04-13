@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
   HiCheckCircle,
@@ -12,16 +13,16 @@ import {
   HiPlus,
 } from 'react-icons/hi';
 import type { Building } from '@/hooks/api/buildings';
-import { useBuildings } from "@/hooks/buildings/useBuildings";
 import Logo from '@/components/Logo';
 
 import Button from '@/components/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
-import TextField from '@/components/TextField'; 
+import TextField from '@/components/TextField';
 import PageLayout from '@/layout/PageLayout';
 import AddBuildingModal from '@/components/modals/AddBuildingModal';
 import EditBuildingModal from '@/components/modals/EditBuildingModal';
 import DeleteBuildingModal from '@/components/modals/DeleteBuildingModal';
+import { useSearchBuilding } from "@/hooks/buildings/useSearchBuilding";
 
 export const Route = createFileRoute('/(app)/buildings/')({
   component: BuildingsPage,
@@ -30,20 +31,21 @@ export const Route = createFileRoute('/(app)/buildings/')({
 function BuildingsPage() {
   const navigate = useNavigate();
 
-  // --- ÉTATS ---
+  // --- STATES ---
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Augmenté pour mieux remplir l'espace
+  const itemsPerPage = 8;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
+
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { data: allBuildings = [], isLoading } = useBuildings();
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const { data: buildings = [], isLoading } = useSearchBuilding(searchTerm);
+
   if (isLoading) {
     return (
       <PageLayout>
@@ -51,14 +53,11 @@ function BuildingsPage() {
       </PageLayout>
     );
   }
-  // --- LOGIQUE ---
-  const filteredBuildings = allBuildings.filter((b) =>
-    b.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
-  const totalPages = Math.ceil(filteredBuildings.length / itemsPerPage);
+  // pagination based on backend result
+  const totalPages = Math.ceil(buildings.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = filteredBuildings.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = buildings.slice(startIndex, startIndex + itemsPerPage);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -69,6 +68,7 @@ function BuildingsPage() {
     setSuccessMessage(message);
     setTimeout(() => setSuccessMessage(null), 3000);
   };
+
   const showError = (message: string) => {
     setErrorMessage(message);
     setTimeout(() => setErrorMessage(null), 4000);
