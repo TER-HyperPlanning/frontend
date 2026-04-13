@@ -10,7 +10,7 @@ import { useAssign } from "@/hooks/modules/useAssign";
 import { useTracks } from "@/hooks/modules/useTracks";
 import Logo from "@/components/Logo";
 
-export const Route = createFileRoute("/(app)/modules/")({
+export const Route = createFileRoute("/(app)/formations/$formationId/modules/")({
   validateSearch: (search: Record<string, unknown>) => ({
     formationId:
       typeof search.formationId === "string" ? search.formationId : "",
@@ -45,14 +45,12 @@ function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
 }
 
 function ModulesPage() {
-  const { formationId } = Route.useSearch();
+  const { formationId } = Route.useParams();
   const selectedFormation = formationId;
 
   const { courses, createCourse, updateCourse, deleteCourse } = useCourses();
   const { assigns, createAssign, updateAssign, deleteAssign } = useAssign();
   const { tracks } = useTracks();
-
-  console.log("TRACKS 👉", tracks);
 
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [search, setSearch] = useState("");
