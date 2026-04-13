@@ -9,7 +9,9 @@ export interface GroupRow {
   id: string
   name: string
   academicYear: string
-  trackName: string
+  /** Filière (Program) */
+  filiereName: string
+  /** Formation (Track) */
   formationName: string
   formationId: string
 }
@@ -38,14 +40,14 @@ export function useGroupes() {
 
       const rows: GroupRow[] = allGroups.map((g) => {
         const track = g.trackId ? trackMap.get(g.trackId) : undefined
-        const program = track ? programMap.get(track.programId) : undefined
+        const program = track?.programId ? programMap.get(track.programId) : undefined
         return {
           id: g.id,
           name: g.name,
           academicYear: g.academicYear ?? '',
-          trackName: track?.name ?? '—',
-          formationName: program?.name ?? '—',
-          formationId: program?.id ?? '',
+          filiereName: program?.name ?? '—',
+          formationName: track?.name ?? '—',
+          formationId: track?.id ?? '',
         }
       })
 
@@ -77,7 +79,7 @@ export function useGroupes() {
       const matchSearch =
         !q ||
         g.name.toLowerCase().includes(q) ||
-        g.trackName.toLowerCase().includes(q) ||
+        g.filiereName.toLowerCase().includes(q) ||
         g.formationName.toLowerCase().includes(q) ||
         g.academicYear.toLowerCase().includes(q)
       return matchFormation && matchSearch

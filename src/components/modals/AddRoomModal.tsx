@@ -112,7 +112,7 @@ export default function AddRoomModal({
       capacity: parseInt(formData.capacity, 10),
       isAvailable: true,
       buildingId,
-      type: 'TD' as "TD" | "COURS" | "INFO" | "AMPHITHEATRE"
+      type: formData.type
     },
       {
         onSuccess: () => {

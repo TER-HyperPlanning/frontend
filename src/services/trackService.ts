@@ -1,5 +1,8 @@
 import { useCallback } from 'react'
-import { type TrackResponse } from '@/types/formation'
+import {
+  type TrackResponse,
+  type CreateTrackRequest,
+} from '@/types/formation'
 import { useAppClient } from '@/hooks/api/useAppClient'
 import { type ApiResponse } from '@/services/apiClient'
 
@@ -11,11 +14,24 @@ export interface UpdateTrackRequest {
   lieu?: string | null
 }
 
+/** Client HTTP pour `/Tracks` (formations). */
 export function useTrackService() {
   const { api } = useAppClient()
 
   const getTracks = useCallback(
     () => api.get<ApiResponse<TrackResponse[]>>('/Tracks').then((r) => r.data.result),
+    [api],
+  )
+
+  const getTrackById = useCallback(
+    (id: string) =>
+      api.get<ApiResponse<TrackResponse>>(`/Tracks/${id}`).then((r) => r.data.result),
+    [api],
+  )
+
+  const createTrack = useCallback(
+    (data: CreateTrackRequest) =>
+      api.post<ApiResponse<TrackResponse>>('/Tracks', data).then((r) => r.data.result),
     [api],
   )
 
@@ -25,5 +41,10 @@ export function useTrackService() {
     [api],
   )
 
-  return { getTracks, updateTrack }
+  const deleteTrack = useCallback(
+    (id: string) => api.delete<ApiResponse<string>>(`/Tracks/${id}`).then((r) => r.data.result),
+    [api],
+  )
+
+  return { getTracks, getTrackById, createTrack, updateTrack, deleteTrack }
 }
