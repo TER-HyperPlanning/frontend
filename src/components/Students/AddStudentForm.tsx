@@ -4,6 +4,7 @@ import TextField from '@/components/TextField'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { type CreateStudentRequest } from './types'
+import { buildStudentEmail, isValidFrenchPhone, normalizeFrenchPhone } from './studentUtils'
 
 interface AddStudentFormProps {
   isOpen: boolean
@@ -26,23 +27,6 @@ const initialForm: AddFormState = {
   firstName: '',
   lastName: '',
   phone: '',
-}
-
-function slugifyNamePart(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '.')
-    .replace(/^\.+|\.+$/g, '')
-    .toLowerCase()
-}
-
-function buildStudentEmail(firstName: string, lastName: string): string {
-  const first = slugifyNamePart(firstName)
-  const last = slugifyNamePart(lastName)
-
-  if (!first || !last) return ''
-  return `${first}.${last}@etud.fr`
 }
 
 export default function AddStudentForm({
@@ -78,19 +62,24 @@ export default function AddStudentForm({
       return
     }
 
+    if (form.phone && !isValidFrenchPhone(form.phone)) {
+      onValidationError('Le téléphone doit être au format français: 06/07 xx xx xx xx ou 6/7 xx xx xx xx')
+      return
+    }
+
     try {
       await onCreate({
         email: form.email,
         password: form.email,
         firstName: form.firstName,
         lastName: form.lastName,
-        phone: form.phone || null,
+        phone: form.phone ? normalizeFrenchPhone(form.phone) : null,
         groupId: defaultGroupId,
       })
       setForm(initialForm)
       onClose()
     } catch {
-      // L'erreur est déjà gérée par le parent (toast).
+  
     }
   }
 
@@ -169,7 +158,7 @@ export default function AddStudentForm({
                 label="Téléphone"
                 value={form.phone}
                 onChange={(e) => onFieldChange('phone', e.target.value)}
-                placeholder="Téléphone"
+                placeholder="06 12 34 56 78"
                 className="h-12 placeholder:text-gray-600 text-gray-800"
               />
 

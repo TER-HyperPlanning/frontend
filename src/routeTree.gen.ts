@@ -17,8 +17,8 @@ import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/index'
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
-import { Route as appSessionsIndexRouteImport } from './routes/(app)/sessions/index'
 import { Route as appStudentsIndexRouteImport } from './routes/(app)/students/index'
+import { Route as appSessionsIndexRouteImport } from './routes/(app)/sessions/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
 import { Route as appModulesIndexRouteImport } from './routes/(app)/modules/index'
@@ -71,12 +71,14 @@ const appTeachersIndexRoute = appTeachersIndexRouteImport.update({
   path: '/teachers/',
   getParentRoute: () => appRouteRoute,
 } as any)
-const appSessionsIndexRoute = appSessionsIndexRouteImport.update({
-  id: '/sessions/',
-  path: '/sessions/',
 const appStudentsIndexRoute = appStudentsIndexRouteImport.update({
   id: '/students/',
   path: '/students/',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appSessionsIndexRoute = appSessionsIndexRouteImport.update({
+  id: '/sessions/',
+  path: '/sessions/',
   getParentRoute: () => appRouteRoute,
 } as any)
 const appScolariteIndexRoute = appScolariteIndexRouteImport.update({
@@ -351,16 +353,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appTeachersIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
-    '/(app)/sessions/': {
-      id: '/(app)/sessions/'
-      path: '/sessions'
-      fullPath: '/sessions/'
-      preLoaderRoute: typeof appSessionsIndexRouteImport
     '/(app)/students/': {
       id: '/(app)/students/'
       path: '/students'
       fullPath: '/students/'
       preLoaderRoute: typeof appStudentsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/sessions/': {
+      id: '/(app)/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions/'
+      preLoaderRoute: typeof appSessionsIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
     '/(app)/scolarite/': {
@@ -460,11 +464,8 @@ interface appRouteRouteChildren {
   appModulesIndexRoute: typeof appModulesIndexRoute
   appRequestsIndexRoute: typeof appRequestsIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
-<<<<<<< Updated upstream
   appSessionsIndexRoute: typeof appSessionsIndexRoute
-=======
   appStudentsIndexRoute: typeof appStudentsIndexRoute
->>>>>>> Stashed changes
   appTeachersIndexRoute: typeof appTeachersIndexRoute
   appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
   appFormationsFormationIdGroupesIndexRoute: typeof appFormationsFormationIdGroupesIndexRoute
@@ -481,11 +482,8 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appModulesIndexRoute: appModulesIndexRoute,
   appRequestsIndexRoute: appRequestsIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
-<<<<<<< Updated upstream
   appSessionsIndexRoute: appSessionsIndexRoute,
-=======
   appStudentsIndexRoute: appStudentsIndexRoute,
->>>>>>> Stashed changes
   appTeachersIndexRoute: appTeachersIndexRoute,
   appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
   appFormationsFormationIdGroupesIndexRoute:
