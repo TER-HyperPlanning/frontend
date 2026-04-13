@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
@@ -227,7 +227,7 @@ function BuildingsPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-8 py-5 bg-gray-50/30 border-t border-gray-50">
                 <div className="text-sm text-gray-500 font-medium">
-                  Affichage de <span className="text-[#003366]">{startIndex + 1}</span> à <span className="text-[#003366]">{Math.min(startIndex + itemsPerPage, filteredBuildings.length)}</span> sur {filteredBuildings.length}
+                  Affichage de <span className="text-[#003366]">{startIndex + 1}</span> à <span className="text-[#003366]">{Math.min(startIndex + itemsPerPage, buildings.length)}</span> sur {buildings.length}
                 </div>
                 <div className="flex gap-3">
                   <button
