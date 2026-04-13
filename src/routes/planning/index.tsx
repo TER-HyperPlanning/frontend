@@ -42,7 +42,6 @@ function PlanningContent() {
   const [trackId, setTrackId] = useState('')
   const [groupId, setGroupId] = useState('')
 
-  const { data: user } = useCurrentUser()
   const hasToken = !!getAccessToken()
 
   const weekBounds = useMemo(() => getWeekBounds(selectedDate), [selectedDate])
@@ -58,15 +57,13 @@ function PlanningContent() {
     [groupId, trackId, programId, weekBounds],
   )
 
-  /** Admins use GET /Planning; everyone else with a token uses GET /Planning/me. */
-  const isAdmin = user?.role === 'ADMIN'
-  const usePersonal = hasToken && user?.role !== 'ADMIN'
-  const fetchFullPlanning = !hasToken || isAdmin
-  const fetchMyPlanning = hasToken && !isAdmin
+  /** Visitors: GET /Planning. Logged-in users (any role): GET /Planning/me. */
+  const fetchFullPlanning = !hasToken
+  const fetchMyPlanning = hasToken
 
   const publicQuery = usePlanning(filters, { enabled: fetchFullPlanning })
   const personalQuery = useMyPlanning(filters, { enabled: fetchMyPlanning })
-  const activeQuery = usePersonal ? personalQuery : publicQuery
+  const activeQuery = hasToken ? personalQuery : publicQuery
 
   return (
     <PageLayout className="flex flex-col">

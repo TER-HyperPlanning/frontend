@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { useBuildingService, type Building } from "@/hooks/api/buildings";
+import { useBuildingService } from "@/hooks/api/buildings";
 
-export function useBuildings() {
+
+export function useBuildings(search: string) {
     const { getBuildings } = useBuildingService();
 
-    return useQuery<Building[]>({
-        queryKey: ["buildings"],
-        queryFn: getBuildings,
+    return useQuery({
+        queryKey: ["buildings", search],
+        queryFn: () => getBuildings(search),
         initialData: [],
     });
 }

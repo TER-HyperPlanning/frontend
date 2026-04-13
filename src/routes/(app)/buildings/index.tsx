@@ -1,27 +1,28 @@
-import { useState} from 'react';
+import { useState } from "react";
+
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useBuildings } from "@/hooks/buildings/useBuildings";
-import type { Building } from "@/hooks/api/buildings";
-import Logo from '@/components/Logo';
 import {
-  HiOutlineSearch,
-  HiOutlinePencil,
-  HiOutlineTrash,
-  HiOutlineCloudUpload,
-  HiPlus,
-  HiOutlineBell,
+  HiCheckCircle,
   HiChevronLeft,
   HiChevronRight,
-  HiCheckCircle,
+  HiOutlineCloudUpload,
+  HiOutlineExclamation,
+  HiOutlinePencil,
+  HiOutlineSearch,
+  HiOutlineTrash,
+  HiPlus,
 } from 'react-icons/hi';
+import type { Building } from '@/hooks/api/buildings';
+import Logo from '@/components/Logo';
 
 import Button from '@/components/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
-import TextField from '@/components/TextField'; // Utilisation du composant existant
+import TextField from '@/components/TextField';
 import PageLayout from '@/layout/PageLayout';
 import AddBuildingModal from '@/components/modals/AddBuildingModal';
 import EditBuildingModal from '@/components/modals/EditBuildingModal';
 import DeleteBuildingModal from '@/components/modals/DeleteBuildingModal';
+import { useSearchBuilding } from "@/hooks/buildings/useSearchBuilding";
 
 export const Route = createFileRoute('/(app)/buildings/')({
   component: BuildingsPage,
@@ -30,19 +31,20 @@ export const Route = createFileRoute('/(app)/buildings/')({
 function BuildingsPage() {
   const navigate = useNavigate();
 
-  // --- ÉTATS ---
+  // --- STATES ---
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Augmenté pour mieux remplir l'espace
+  const itemsPerPage = 8;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  //l'appel du hooks  recuperation des données
-  const { data: allBuildings = [], isLoading } = useBuildings();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { data: buildings = [], isLoading } = useSearchBuilding(searchTerm);
 
   if (isLoading) {
     return (
@@ -51,14 +53,11 @@ function BuildingsPage() {
       </PageLayout>
     );
   }
-  // --- LOGIQUE ---
-  const filteredBuildings = allBuildings.filter((b) =>
-    b.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
-  const totalPages = Math.ceil(filteredBuildings.length / itemsPerPage);
+  // pagination based on backend result
+  const totalPages = Math.ceil(buildings.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = filteredBuildings.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = buildings.slice(startIndex, startIndex + itemsPerPage);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -68,6 +67,11 @@ function BuildingsPage() {
   const showSuccess = (message: string) => {
     setSuccessMessage(message);
     setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
+  const showError = (message: string) => {
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 4000);
   };
 
   return (
@@ -84,6 +88,17 @@ function BuildingsPage() {
             </div>
           </div>
         )}
+        {errorMessage && (
+          <div className="toast toast-top toast-end z-[100] mt-4 mr-4">
+            <div className="alert alert-error shadow-lg text-white border-none bg-red-500 flex items-center gap-2">
+              <HiOutlineExclamation size={22} />
+              <span className="font-medium whitespace-pre-line">
+                {errorMessage}
+              </span>
+            </div>
+          </div>
+        )}
+
 
         {/* HEADER : Recherche et Actions */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 w-full shrink-0">
@@ -126,12 +141,7 @@ function BuildingsPage() {
               <span className="whitespace-nowrap font-semibold">Nouveau bâtiment</span>
             </Button>
 
-            <button
-              className="btn btn-ghost btn-circle bg-white shadow-sm shrink-0 h-12 w-12 border border-gray-100"
-              title="Notifications"
-            >
-              <HiOutlineBell size={24} className="text-gray-600" />
-            </button>
+
           </div>
         </div>
         {/* CONTENU : Scrollable avec espacement */}
@@ -217,7 +227,7 @@ function BuildingsPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-8 py-5 bg-gray-50/30 border-t border-gray-50">
                 <div className="text-sm text-gray-500 font-medium">
-                  Affichage de <span className="text-[#003366]">{startIndex + 1}</span> à <span className="text-[#003366]">{Math.min(startIndex + itemsPerPage, filteredBuildings.length)}</span> sur {filteredBuildings.length}
+                  Affichage de <span className="text-[#003366]">{startIndex + 1}</span> à <span className="text-[#003366]">{Math.min(startIndex + itemsPerPage, buildings.length)}</span> sur {buildings.length}
                 </div>
                 <div className="flex gap-3">
                   <button
@@ -253,6 +263,7 @@ function BuildingsPage() {
           onClose={() => { setIsDeleteModalOpen(false); setSelectedBuilding(null); }}
           building={selectedBuilding}
           onSuccess={showSuccess}
+          onError={showError}
         />
         <AddBuildingModal
           isOpen={isAddModalOpen}

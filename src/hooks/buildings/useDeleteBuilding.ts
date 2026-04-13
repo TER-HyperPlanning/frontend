@@ -7,8 +7,13 @@ export function useDeleteBuilding() {
 
     return useMutation({
         mutationFn: deleteBuilding,
+
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["buildings"] });
         },
+
+        onError: (error: any) => {
+            console.error("Erreur API:", error);
+        }
     });
 }

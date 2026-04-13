@@ -95,14 +95,16 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
         <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
           <User className="w-8 h-8 text-gray-600 mt-1" />
           <div>
-            <h3 className="font-semibold text-lg mb-2">Enseignant</h3>
+            <h3 className="font-semibold text-lg mb-2">Enseignant demandeur</h3>
             <p>Nom : {request.teacher}</p>
             <p>Email : {request.email || 'non renseigné'}</p>
             <p>Date de la demande : {request.requestDate}</p>
           </div>
         </div>
 
-        {/* Séance */}
+        {request.type === 'Changement de salle' && (
+          <>
+          {/* Séance */}
         <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
           <GraduationCap className="w-8 h-8 text-gray-600 mt-1" />
           <div>
@@ -144,6 +146,27 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             <p>{request.reason}</p>
           </div>
         </div>
+        {/* Salle proposée déjà approuvée */}
+        {request.type === 'Changement de salle' && request.recentRoom && request.status !== 'Refusé' && (
+          <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+            <MapPin className="w-8 h-8 text-gray-800 mt-1" />
+            <div>
+              <h3 className="font-semibold text-gray-800 text-lg mb-2">Ancienne salle</h3>
+              <p>
+                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.recentRoom} 
+              </p>
+              <p>
+                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.recentRoomType}
+              </p>
+              <p>
+                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.recentRoomCapacity}
+              </p>
+              <p>
+                <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.recentBuilding}
+              </p>
+            </div>
+          </div>
+        )}
         {/* Changement de salle */}
         {request.type === 'Changement de salle' && request.status === 'En attente' && (
           <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm">
@@ -232,169 +255,258 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             </div>
           </div>
         )}
+        </>
+)}
 
-
-        {/* Salle proposée déjà approuvée */}
-        {request.type === 'Changement de salle' && request.recentRoom && request.status !== 'Refusé' && (
-          <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-            <MapPin className="w-8 h-8 text-gray-800 mt-1" />
-            <div>
-              <h3 className="font-semibold text-gray-800 text-lg mb-2">Ancienne salle</h3>
-              <p>
-                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.recentRoom} 
-              </p>
-              <p>
-                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.recentRoomType}
-              </p>
-              <p>
-                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.recentRoomCapacity}
-              </p>
-              <p>
-                <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.recentBuilding}
-              </p>
-            </div>
-          </div>
-        )}
-        {/* Récupération de séance */}
-        {request.type === 'Proposition de récupération de séance' && (
-          <>
-            <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-              <User className="w-8 h-8 text-gray-600 mt-1" />
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Enseignant concerné</h3>
-                <p>Nom : {request.concernedTeacher}</p>
-                <p>Email : {request.concernedTeacherEmail}</p>
-              </div>
-            </div>
-
-            {request.recentSlot && (
+          {request.type === 'Proposition de récupération de séance' && (
+            <>
+            {/* Séance */}
               <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                <Calendar className="w-8 h-8 text-gray-600 mt-1" />
+                <GraduationCap className="w-8 h-8 text-gray-600 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Ancien Créneau</h3>
+                  <h3 className="font-semibold text-lg mb-2"> Informations de la séance ratée</h3>
+                  <p>Matière : {request.subject}</p>
+                  <p>Formation : {request.formation}</p>
+                  {request.groups && <p>Groupes : {request.groups}</p>}
                   <p>
-                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.recentSlot}
+                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.missedSlot}
                   </p>
-                  {request.currentRoom && (
+                  {request.missedRoom && (
                     <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.recentRoom} 
+                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.missedRoom} 
                     </p>
                   )}
-                  {request.recentRoomType && (
+                  {request.missedRoomType && (
                     <p>
-                      <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.recentRoomType}
+                      <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.missedRoomType}
                     </p>
                   )}
-                  {request.recentRoomCapacity && (
+                  {request.missedRoomCapacity && (
                     <p>
-                      <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.recentRoomCapacity}
+                      <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.missedRoomCapacity}
                     </p>
                   )}
-                  {request.currentBuilding && (
+                  {request.missedBuilding && (
                       <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.recentBuilding}
+                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.missedBuilding}
                       </p>
                     )}
                 </div>
               </div>
-            )}
-            {request.proposedSlot &&(request.status === 'En attente' || request.status === 'Refusé') && (
               <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                <Clock className="w-8 h-8 text-gray-600 mt-1" />
+                <User className="w-8 h-8 text-gray-600 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Créneau proposé par le responsable</h3>
-                  <p>
-                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.proposedSlot}
-                  </p>
-                  {request.currentRoom && (
-                    <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.proposedRoom}
-                    </p>
-                  )}
-                  {request.proposedRoomType && (
-                    <p>
-                      <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.proposedRoomType}
-                    </p>
-                  )}
-                  {request.proposedRoomCapacity && (
-                    <p>
-                      <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.proposedRoomCapacity}
-                    </p>
-                  )}
-                  {request.currentBuilding && (
-                      <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.proposedBuilding}
-                      </p>
-                    )}
+                  <h3 className="font-semibold text-lg mb-2">Enseignant concerné par la récupération</h3>
+                  <p>Nom : {request.concernedTeacher}</p>
+                  <p>Email : {request.concernedTeacherEmail}</p>
                 </div>
               </div>
+              {request.status === 'Approuvé' && ( 
+                <div className="bg-yellow-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+                  <Clock className="w-8 h-8 text-yellow-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2 text-yellow-700">
+                      Proposition du professeur validée
+                    </h3>
+
+                    <p>
+                      <Clock className="inline w-4 h-4 text-gray-600 mr-1" />
+                      Nouveau créneau : {request.teacherProposalSlot}
+                    </p>
+
+                    {request.teacherProposalRoom && (
+                      <p>
+                        <MapPin className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Salle : {request.teacherProposalRoom}
+                      </p>
+                    )}
+
+                    {request.teacherProposalRoomType && (
+                      <p>
+                        <School className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Type salle : {request.teacherProposalRoomType}
+                      </p>
+                    )}
+
+                    {request.teacherProposalRoomCapacity && (
+                      <p>
+                        <Users className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Capacité : {request.teacherProposalRoomCapacity}
+                      </p>
+                    )}
+
+                    {request.teacherProposalBuilding && (
+                      <p>
+                        <Building className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Bâtiment : {request.teacherProposalBuilding}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
+              )}
+              {request.type === 'Proposition de récupération de séance' &&
+              (request.status === 'En attente' || request.status === 'Refusé') && (
+              <div className="bg-yellow-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+                <Clock className="w-8 h-8 text-yellow-600 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-lg mb-2 text-yellow-700">
+                    Proposition du professeur
+                  </h3>
+
+                  <p>
+                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" />
+                    Créneau proposé : {request.teacherProposalSlot}
+                  </p>
+
+                  {request.teacherProposalRoom && (
+                    <p>
+                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" />
+                      Salle : {request.teacherProposalRoom}
+                    </p>
+                  )}
+
+                  {request.teacherProposalRoomType && (
+                    <p>
+                      <School className="inline w-4 h-4 text-gray-600 mr-1" />
+                      Type : {request.teacherProposalRoomType}
+                    </p>
+                  )}
+                  {request.teacherProposalRoomCapacity && (
+                      <p>
+                        <Users className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Capacité : {request.teacherProposalRoomCapacity}
+                      </p>
+                    )}
+
+                  {request.teacherProposalBuilding && (
+                    <p>
+                      <Building className="inline w-4 h-4 text-gray-600 mr-1" />
+                      Bâtiment : {request.teacherProposalBuilding}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
             )}
-            {request.status === 'En attente' && (
-              <div className="mt-4 flex gap-4">
-                <button
-                  onClick={() => setShowAlternativeModal(true)}
-                  className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl flex justify-center items-center gap-2"
-                >
-                  <XCircle className="w-5 h-5" /> Refuser / Proposer autre
-                </button>
-                <button
-                  onClick={() => setShowConfirmAccept(true)}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-xl flex justify-center items-center gap-2"
-                >
-                  <Check className="w-5 h-5" /> Accepter
-                </button>
+            {request.type === 'Proposition de récupération de séance' &&
+              request.status === 'En attente' && (
+                <div className="mt-4 flex gap-4">
+                  
+                  <button
+                    onClick={() => setShowAlternativeModal(true)}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl flex justify-center items-center gap-2"
+                  >
+                    <XCircle className="w-5 h-5" />
+                    Refuser / Proposer autre
+                  </button>
 
-                <ConfirmModal
-                  isOpen={showConfirmAccept}
-                  onClose={() => setShowConfirmAccept(false)}
-                  onConfirm={() => {
-                    setToast({ message: 'Demande approuvée', type: 'success' })
-                    setShowConfirmAccept(false)
-                    onClose()
-                  }}
-                  title="Confirmer l'acceptation"
-                  description={`Vous êtes sur le point d'accepter le créneau proposé par ${request.teacher}.`}
-                  details={
-                    <>
-                    La séance aura lieu le <strong>{request.proposedSlot}</strong> en salle <strong>{request.proposedRoom}</strong> Bâtiment: <strong>{request.proposedBuilding}</strong>
-                    </>
-                  }
-                  confirmColor="green"
-                />
+                  <button
+                    onClick={() => setShowConfirmAccept(true)}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-xl flex justify-center items-center gap-2"
+                  >
+                    <Check className="w-5 h-5" />
+                    Accepter
+                  </button>
 
-                <AlternativeSlotModal
-                  isOpen={showAlternativeModal}
-                  onClose={() => setShowAlternativeModal(false)}
-                  onConfirm={(slot) => {
-                    setSelectedSlot(slot)
-                    setShowAlternativeModal(false)
-                    setShowConfirmAlternative(true)
-                  }}
-                />
-
-                <ConfirmModal
-                  isOpen={showConfirmAlternative}
-                  onClose={() => setShowConfirmAlternative(false)}
-                  onConfirm={() => {
-                    setToast({ message: 'Créneau alternatif proposé', type: 'success' })
-                    setShowConfirmAlternative(false)
-                    onClose()
-                  }}
-                  title="Confirmer le créneau alternatif"
-                  description="Vous êtes sur le point de refuser la proposition et de suggérer un créneau alternatif."
-                  details={
-                    selectedSlot && (
+                  {/* Confirm accept */}
+                  <ConfirmModal
+                    isOpen={showConfirmAccept}
+                    onClose={() => setShowConfirmAccept(false)}
+                    onConfirm={() => {
+                      setToast({ message: 'Demande approuvée', type: 'success' })
+                      setShowConfirmAccept(false)
+                      onClose()
+                    }}
+                    title="Confirmer l'acceptation"
+                    description={`Vous êtes sur le point d'accepter le créneau proposé par ${request.teacher}.`}
+                    details={
                       <>
-                        Nouveau créneau : <strong>{selectedSlot.date} de {selectedSlot.start} à {selectedSlot.end}</strong> en salle <strong>{selectedSlot.room}</strong> Bâtiment: <strong>{selectedSlot.building}</strong>
+                        Créneau : <strong>{request.teacherProposalSlot}</strong><br />
+                        Salle : <strong>{request.teacherProposalRoom}</strong><br />
+                        Bâtiment : <strong>{request.teacherProposalBuilding}</strong>
                       </>
-                    )
-                  }
-                  confirmColor="red"
-                />
-              </div>
-            )}
-          </>
-        )}
+                    }
+                    confirmColor="green"
+                  />
+
+                  {/* Alternative slot */}
+                  <AlternativeSlotModal
+                    isOpen={showAlternativeModal}
+                    onClose={() => setShowAlternativeModal(false)}
+                    onConfirm={(slot) => {
+                      setSelectedSlot(slot)
+                      setShowAlternativeModal(false)
+                      setShowConfirmAlternative(true)
+                    }}
+                  />
+
+                  <ConfirmModal
+                    isOpen={showConfirmAlternative}
+                    onClose={() => setShowConfirmAlternative(false)}
+                    onConfirm={() => {
+                      setToast({ message: 'Créneau alternatif proposé', type: 'success' })
+                      setShowConfirmAlternative(false)
+                      onClose()
+                    }}
+                    title="Confirmer le créneau alternatif"
+                    description="Vous êtes sur le point de refuser la proposition et de suggérer un créneau alternatif."
+                    details={
+                      selectedSlot && (
+                        <>
+                          Nouveau créneau : <strong>
+                            {selectedSlot.date} de {selectedSlot.start} à {selectedSlot.end}
+                          </strong>
+                          <br />
+                          Salle : <strong>{selectedSlot.room}</strong><br />
+                          Bâtiment : <strong>{selectedSlot.building}</strong>
+                        </>
+                      )
+                    }
+                    confirmColor="red"
+                  />
+                </div>
+              )}
+              {request.status === 'Refusé' && (
+                <div className="bg-green-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+                  <Clock className="w-8 h-8 text-green-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2 text-green-700">
+                      Créneau alternatif
+                    </h3>
+
+                    <p>
+                      <Clock className="inline w-4 h-4 text-gray-600 mr-1" />
+                      Créneau alternatif : {request.adminSlot}
+                    </p>
+
+                    {request.adminRoom && (
+                      <p>
+                        <MapPin className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Salle : {request.adminRoom}
+                      </p>
+                    )}
+
+                    {request.adminRoomType && (
+                      <p>
+                        <School className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Type : {request.adminRoomType}
+                      </p>
+                    )}
+
+                    {request.adminBuilding && (
+                      <p>
+                        <Building className="inline w-4 h-4 text-gray-600 mr-1" />
+                        Bâtiment : {request.adminBuilding}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+              )}
+
+            </>
+          )}
         
         {/* Motif de refus */}
         {request.status === 'Refusé' && request.rejectReason && (

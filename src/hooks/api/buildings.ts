@@ -1,17 +1,23 @@
 import { useCallback } from 'react';
+import type { ApiResponse } from '@/services/apiClient';
 import { useAppClient } from '@/hooks/api/useAppClient';
-import { type ApiResponse } from '@/services/apiClient';
 
 export type Building = {
-    id: string;
+    id: string
     name: string;
 };
 
 export function useBuildingService() {
     const { api } = useAppClient();
 
+   
     const getBuildings = useCallback(
-        () => api.get<ApiResponse<Building[]>>('/Buildings').then((r) => r.data.result),
+        (q?: string) =>
+            api
+                .get<ApiResponse<Array<Building>>>('/Buildings', {
+                    params: q ? { q } : {},
+                })
+                .then((r) => r.data.result),
         [api],
     );
 

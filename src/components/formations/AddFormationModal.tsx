@@ -2,32 +2,36 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   useAddFormationForm,
+  addFormationSchema,
   type AddFormationValues,
 } from '@/hooks/formations/useAddFormationForm'
 import { useTeacherOptions } from '@/hooks/formations/useTeacherOptions'
-import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
+import { useFiliereOptions } from '@/hooks/formations/useFiliereOptions'
 import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
 import Button from '@/components/Button'
+import { firstFieldErrorMessage } from '@/utils/formErrors'
 
 interface AddFormationModalProps {
   isOpen: boolean
   onClose: () => void
   onAdd: (values: AddFormationValues) => Promise<void>
+  defaultFiliereId?: string
 }
 
 export default function AddFormationModal({
   isOpen,
   onClose,
   onAdd,
+  defaultFiliereId,
 }: AddFormationModalProps) {
   const form = useAddFormationForm(async (values) => {
     await onAdd(values)
     form.reset()
-  })
+  }, defaultFiliereId)
 
   const enseignantOptions = useTeacherOptions()
-  const filiereOptions = useTrackOptions()
+  const filiereOptions = useFiliereOptions()
 
   return (
     <AnimatePresence>
@@ -68,11 +72,17 @@ export default function AddFormationModal({
                 }}
                 className="space-y-4"
               >
-                <form.Field name="nom">
+                <form.Field
+                  name="nom"
+                  validators={{
+                    onChange: addFormationSchema.shape.nom,
+                    onSubmit: addFormationSchema.shape.nom,
+                  }}
+                >
                   {(field) => (
                     <div className="space-y-1">
                       <label className="text-sm font-semibold text-primary-900">
-                        Nom de la formation
+                        Nom de la formation <span className="text-error">*</span>
                       </label>
                       <TextField
                         name={field.name}
@@ -83,6 +93,11 @@ export default function AddFormationModal({
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                       />
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/150
                       </p>
@@ -90,11 +105,17 @@ export default function AddFormationModal({
                   )}
                 </form.Field>
 
-                <form.Field name="enseignantId">
+                <form.Field
+                  name="enseignantId"
+                  validators={{
+                    onChange: addFormationSchema.shape.enseignantId,
+                    onSubmit: addFormationSchema.shape.enseignantId,
+                  }}
+                >
                   {(field) => (
                     <div className="space-y-1">
                       <label className="text-sm font-semibold text-primary-900">
-                        Enseignant responsable
+                        Enseignant responsable <span className="text-error">*</span>
                       </label>
                       <select
                         value={field.state.value}
@@ -102,22 +123,33 @@ export default function AddFormationModal({
                         onBlur={() => field.handleBlur()}
                         className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
                       >
-                        <option value="">— Aucun —</option>
+                        <option value="">— Choisir —</option>
                         {enseignantOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
                           </option>
                         ))}
                       </select>
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </form.Field>
 
-                <form.Field name="programme">
+                <form.Field
+                  name="programme"
+                  validators={{
+                    onChange: addFormationSchema.shape.programme,
+                    onSubmit: addFormationSchema.shape.programme,
+                  }}
+                >
                   {(field) => (
                     <div className="space-y-1">
                       <label className="text-sm font-semibold text-primary-900">
-                        Programme
+                        Programme <span className="text-error">*</span>
                       </label>
                       <TextAreaField
                         name={field.name}
@@ -129,6 +161,11 @@ export default function AddFormationModal({
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300 resize-none"
                       />
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/500
                       </p>
@@ -136,11 +173,17 @@ export default function AddFormationModal({
                   )}
                 </form.Field>
 
-                <form.Field name="lieu">
+                <form.Field
+                  name="lieu"
+                  validators={{
+                    onChange: addFormationSchema.shape.lieu,
+                    onSubmit: addFormationSchema.shape.lieu,
+                  }}
+                >
                   {(field) => (
                     <div className="space-y-1">
                       <label className="text-sm font-semibold text-primary-900">
-                        Lieu
+                        Lieu <span className="text-error">*</span>
                       </label>
                       <TextField
                         name={field.name}
@@ -151,6 +194,11 @@ export default function AddFormationModal({
                         onBlur={field.handleBlur}
                         className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
                       />
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                       <p className="text-xs text-gray-400 text-right">
                         {field.state.value.length}/150
                       </p>
@@ -158,11 +206,17 @@ export default function AddFormationModal({
                   )}
                 </form.Field>
 
-                <form.Field name="filiereId">
+                <form.Field
+                  name="filiereId"
+                  validators={{
+                    onChange: addFormationSchema.shape.filiereId,
+                    onSubmit: addFormationSchema.shape.filiereId,
+                  }}
+                >
                   {(field) => (
                     <div className="space-y-1">
                       <label className="text-sm font-semibold text-primary-900">
-                        Filière
+                        Filière <span className="text-error">*</span>
                       </label>
                       <select
                         value={field.state.value}
@@ -170,13 +224,18 @@ export default function AddFormationModal({
                         onBlur={() => field.handleBlur()}
                         className="select select-bordered w-full bg-white text-gray-900 border-gray-300"
                       >
-                        <option value="">— Aucune —</option>
+                        <option value="">— Choisir —</option>
                         {filiereOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
                           </option>
                         ))}
                       </select>
+                      {firstFieldErrorMessage(field.state.meta.errors) ? (
+                        <p className="text-xs text-error" role="alert">
+                          {firstFieldErrorMessage(field.state.meta.errors)}
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </form.Field>
@@ -190,13 +249,11 @@ export default function AddFormationModal({
                   >
                     Annuler
                   </Button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => (
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(isSubmitting) => (
                       <Button
                         type="submit"
-                        disabled={!canSubmit}
+                        disabled={isSubmitting}
                         className="bg-primary-900 hover:bg-primary-800"
                       >
                         {isSubmitting ? 'Création…' : 'Créer'}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import Logo from '@/components/Logo'
@@ -11,11 +11,21 @@ import ProgrammeInfoModal from '@/components/formations/ProgrammeInfoModal'
 import Toast from '@/components/Toast'
 import Button from '@/components/Button'
 import { useFormations } from '@/hooks/formations/useFormations'
-import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
+import { useFiliereOptions } from '@/hooks/formations/useFiliereOptions'
 import { useToast } from '@/hooks/useToast'
 import { type Formation } from '@/types/formation'
 
-export default function FormationsPage() {
+interface FormationsPageProps {
+  /** Pré-sélectionne la filière dans le modal d'ajout (venant de la page Filières) */
+  defaultFiliereId?: string
+  /** Ouvre automatiquement le modal d'édition pour cette formation */
+  autoEditId?: string
+}
+
+export default function FormationsPage({
+  defaultFiliereId,
+  autoEditId,
+}: FormationsPageProps) {
   const {
     formations,
     isLoading,
@@ -37,10 +47,44 @@ export default function FormationsPage() {
     deleteFormation,
   } = useFormations()
 
-  const trackOptions = useTrackOptions()
+  const filiereFilterOptions = useFiliereOptions()
   const { toast, showToast, hideToast } = useToast()
   const navigate = useNavigate()
   const [programmeTarget, setProgrammeTarget] = useState<Formation | null>(null)
+
+  // Auto-ouvrir le modal d'ajout si on arrive avec un filiereId dans l'URL
+  useEffect(() => {
+    if (defaultFiliereId) {
+      openAddModal()
+    }
+  }, [defaultFiliereId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-ouvrir le modal d'édition si on arrive avec un editId dans l'URL
+  useEffect(() => {
+    if (autoEditId && !isLoading && formations.length > 0) {
+      const target = formations.find((f) => f.id === autoEditId)
+      if (target) {
+        openEditModal(target)
+      }
+    }
+  }, [autoEditId, isLoading, formations.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Nettoie les search params de l'URL après fermeture d'un modal */
+  function clearSearchParams() {
+    if (defaultFiliereId || autoEditId) {
+      navigate({ to: '/formations', search: {}, replace: true })
+    }
+  }
+
+  function handleCloseAddModal() {
+    closeAddModal()
+    clearSearchParams()
+  }
+
+  function handleCloseEditModal() {
+    closeEditModal()
+    clearSearchParams()
+  }
 
   return (
     <>
@@ -62,7 +106,7 @@ export default function FormationsPage() {
         onSearchChange={setSearchQuery}
         filiereFilter={filiereFilter}
         onFiliereChange={setFiliereFilter}
-        filieres={trackOptions}
+        filieres={filiereFilterOptions}
       />
 
       <div className="card bg-base-100 border border-base-200">
@@ -76,17 +120,22 @@ export default function FormationsPage() {
             onViewGroups={(f) =>
               navigate({ to: '/formations/$formationId/groupes', params: { formationId: f.id } })
             }
+            onViewModules={(f) =>
+              navigate({ to: '/formations/$formationId/modules', params: { formationId: f.id } })
+            }
           />
         </div>
       </div>
 
       <AddFormationModal
         isOpen={isAddModalOpen}
-        onClose={closeAddModal}
+        onClose={handleCloseAddModal}
+        defaultFiliereId={defaultFiliereId}
         onAdd={async (values) => {
           try {
             await addFormation(values)
             showToast('Formation créée avec succès', 'success')
+            clearSearchParams()
           } catch {
             showToast('Erreur lors de la création de la formation', 'error')
           }
@@ -96,12 +145,13 @@ export default function FormationsPage() {
       <EditFormationModal
         isOpen={!!editTarget}
         formation={editTarget}
-        onClose={closeEditModal}
+        onClose={handleCloseEditModal}
         onEdit={async (values) => {
           if (!editTarget) return
           try {
             await editFormation(editTarget.id, values)
             showToast('Formation modifiée avec succès', 'success')
+            clearSearchParams()
           } catch {
             showToast('Erreur lors de la modification de la formation', 'error')
           }

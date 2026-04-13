@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { type GroupModel } from '@/types/session'
+import { type GroupModel } from '@/types/group'
 import { type TrackResponse, type ProgramModel } from '@/types/formation'
 import { useGroupService } from '@/services/groupService'
 import { useTrackService } from '@/services/trackService'
@@ -9,7 +9,9 @@ export interface GroupRow {
   id: string
   name: string
   academicYear: string
-  trackName: string
+  /** Filière (Program) */
+  filiereName: string
+  /** Formation (Track) */
   formationName: string
   formationId: string
 }
@@ -37,15 +39,15 @@ export function useGroupes() {
       const programMap = new Map(allPrograms.map((p) => [p.id, p]))
 
       const rows: GroupRow[] = allGroups.map((g) => {
-        const track = trackMap.get(g.trackId)
-        const program = track ? programMap.get(track.programId) : undefined
+        const track = g.trackId ? trackMap.get(g.trackId) : undefined
+        const program = track?.programId ? programMap.get(track.programId) : undefined
         return {
           id: g.id,
           name: g.name,
-          academicYear: g.academicYear,
-          trackName: track?.name ?? '—',
-          formationName: program?.name ?? '—',
-          formationId: program?.id ?? '',
+          academicYear: g.academicYear ?? '',
+          filiereName: program?.name ?? '—',
+          formationName: track?.name ?? '—',
+          formationId: track?.id ?? '',
         }
       })
 
@@ -77,7 +79,7 @@ export function useGroupes() {
       const matchSearch =
         !q ||
         g.name.toLowerCase().includes(q) ||
-        g.trackName.toLowerCase().includes(q) ||
+        g.filiereName.toLowerCase().includes(q) ||
         g.formationName.toLowerCase().includes(q) ||
         g.academicYear.toLowerCase().includes(q)
       return matchFormation && matchSearch

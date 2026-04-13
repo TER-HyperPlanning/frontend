@@ -1,15 +1,31 @@
 // ── Frontend model (US7/US8) ──
 
+/** Filière (Program) associée à une formation affichée */
 export interface Filiere {
   id: string
   nom: string
 }
 
+/** Formation (API Track) listée sous une filière — page Filières */
+export interface FiliereFormationRow {
+  id: string
+  name: string
+}
+
+/** Filière (API Program) et la liste de ses formations (Tracks) */
+export interface FiliereSummary {
+  id: string
+  nom: string
+  formations: Array<FiliereFormationRow>
+}
+
+/** Ligne affichée page Formations : une formation (Track) et sa filière (Program) */
 export interface Formation {
   id: string
   nom: string
   enseignantResponsable: string
   enseignantId: string
+  /** Identifiant API du Track (= formation) — identique à `id` */
   trackId: string
   programme: string
   lieu: string
@@ -21,8 +37,9 @@ export interface SelectOption {
   label: string
 }
 
-// ── API models (Swagger) ──
+// ── API models (Swagger) — Program = filière, Track = formation ──
 
+/** Filière (API `/Programs`) */
 export interface ProgramModel {
   id: string
   name: string
@@ -52,10 +69,20 @@ export interface TeacherResponse {
   updatedAt: string
 }
 
+/** Formation (API `/Tracks`) */
 export interface TrackResponse {
   id: string
   name: string
   teacherId: string
   programId: string
+  description: string | null
+  lieu: string | null
 }
 
+export interface CreateTrackRequest {
+  name: string
+  teacherId: string
+  programId: string
+  description?: string | null
+  lieu?: string | null
+}

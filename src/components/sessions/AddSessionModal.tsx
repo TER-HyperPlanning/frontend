@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
@@ -16,18 +17,26 @@ interface AddSessionModalProps {
   isOpen: boolean
   onClose: () => void
   onAdd: (values: AddSessionValues) => Promise<boolean>
+  /** Préremplit le groupe (ex. groupe choisi sur la page) */
+  defaultGroupId?: string
 }
 
 export default function AddSessionModal({
   isOpen,
   onClose,
   onAdd,
+  defaultGroupId = '',
 }: AddSessionModalProps) {
   const form = useAddSessionForm(async (values) => {
     const ok = await onAdd(values)
     if (ok) form.reset()
-    else throw new Error('create failed')
   })
+
+  useEffect(() => {
+    if (isOpen && defaultGroupId) {
+      form.setFieldValue('groupId', defaultGroupId)
+    }
+  }, [isOpen, defaultGroupId, form])
 
   const courseOptions = useCourseOptions()
   const groupOptions = useGroupOptions()

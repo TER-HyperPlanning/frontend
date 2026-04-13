@@ -16,27 +16,40 @@ export interface Request {
   type: RequestType
   subject: string
   formation: string
-  sessionTime: string
+  sessionTime?: string
   requestDate: string
   groups?: string
   currentRoom?: string
   currentRoomType?: string
   currentRoomCapacity?: string
   currentBuilding?: string
-  recentSlot?: string
   recentRoom?: string
   recentRoomCapacity?: string
   recentRoomType?: string
   recentBuilding?: string
-  proposedSlot?: string
-  proposedRoom?: string
-  proposedRoomCapacity?: string
-  proposedRoomType?: string
-  proposedBuilding?: string
   reason?: string
   rejectReason?:string
-  concernedTeacher?: string
-  concernedTeacherEmail?: string
+  concernedTeacher?:string
+  concernedTeacherEmail?:string
+  // séance ratée (celle du planning original)
+  missedSlot?: string
+  missedRoom?: string
+  missedRoomType?: string
+  missedRoomCapacity?: string
+  missedBuilding?: string
+
+  // proposition du professeur
+  teacherProposalSlot?: string
+  teacherProposalRoom?: string
+  teacherProposalRoomType?: string
+  teacherProposalRoomCapacity?: string
+  teacherProposalBuilding?: string
+  // alternantive
+  adminSlot?: string
+  adminRoom?: string
+  adminRoomType?: string
+  adminRoomCapacity?: string
+  adminBuilding?: string
 }
 
 const mockRequests: Request[] = [
@@ -98,87 +111,91 @@ const mockRequests: Request[] = [
     reason: 'Salle trop petite pour le groupe',
     rejectReason: 'Aucune salle disponible dans le bâtiment A',
   },
-
-  // ----------------- Récupération de séance approuvée -----------------
+  // ----------------- proposition en attente -----------------
   {
-    status: 'Approuvé',
-    teacher: 'Sophie Laurent',
-    email: 'sophie.laurent@example.com',
-    type: 'Proposition de récupération de séance',
-    subject: 'Systèmes distribués',
-    formation: 'M2 MIAGE Informatique décisionnelle',
-    sessionTime: '18/02/2026 · 09:00 - 11:00',
-    requestDate: '11/02/2026 à 13:20',
-    groups: 'G1, G2',
-    currentRoom: '101',
-    currentRoomType: 'Salle TD',
-    currentRoomCapacity: '20',
-    currentBuilding: 'A',
-    recentSlot: '18/02/2026 · 09:00 - 11:00',
-    recentRoom: '101',
-    recentRoomType: 'Salle TD',
-    recentRoomCapacity: '20',
-    recentBuilding: 'A',
-    reason: 'Proposition de récupération de séance manquée',
-    concernedTeacher: 'Sophie Laurent',
-    concernedTeacherEmail: 'sophie.laurent@example.com',
-  },
+  status: 'En attente',
+  type: 'Proposition de récupération de séance',
+  teacher: 'Sophie Laurent',
+  email: 'sophie.laurent@example.com',
+  subject: 'Systèmes distribués',
+  formation: 'M2 MIAGE Informatique décisionnelle',
+  requestDate: '11/02/2026 à 13:20',
+  groups: 'G1, G2',
+  concernedTeacher:'Sophie Bourse',
+  concernedTeacherEmail:'sophie.bourse@gmail.com',
 
-  // ----------------- Récupération de séance refusée -----------------
-  {
-    status: 'Refusé',
-    teacher: 'Sophie Laurent',
-    email: 'sophie.laurent@example.com',
-    type: 'Proposition de récupération de séance',
-    subject: 'Réseaux et systèmes',
-    formation: 'M2 MIAGE Informatique décisionnelle',
-    sessionTime: '20/02/2026 · 10:00 - 12:00',
-    requestDate: '12/02/2026 à 09:10',
-    groups: 'G3',
-    currentRoom: '101',
-    currentRoomType: 'Salle TD',
-    currentRoomCapacity: '20',
-    currentBuilding: 'A',
-    recentSlot: '20/02/2026 · 10:00 - 12:00',
-    recentRoom: '101',
-    recentRoomType: 'Salle TD',
-    recentRoomCapacity: '20',
-    recentBuilding: 'A',
-    proposedSlot: '21/02/2026 · 14:00 - 16:00',
-    proposedRoom: '202',
-    proposedRoomType: 'Salle TD',
-    proposedRoomCapacity: '25',
-    proposedBuilding: 'B',
-    reason: 'Proposition de récupération de séance manquée',
-    concernedTeacher: 'Sophie Laurent',
-    concernedTeacherEmail: 'sophie.laurent@example.com',
-    rejectReason: 'Créneau mieux compatible avec le planning',
-  },
+  missedSlot: '15/02/2026 · 10:00 - 12:00',
+  missedRoom: '101',
+  missedRoomType: 'Salle TD',
+  missedRoomCapacity: '20',
+  missedBuilding: 'A',
 
-  // ----------------- Récupération de séance en attente -----------------
-  {
-    status: 'En attente',
-    teacher: 'Sophie Laurent',
-    email: 'sophie.laurent@example.com',
-    type: 'Proposition de récupération de séance',
-    subject: 'Intelligence artificielle',
-    formation: 'M2 MIAGE Informatique décisionnelle',
-    sessionTime: '22/02/2026 · 15:00 - 17:00',
-    requestDate: '13/02/2026 à 16:45',
-    groups: 'G1',
-    currentRoom: '101',
-    currentRoomType: 'Salle TD',
-    currentRoomCapacity: '20',
-    currentBuilding: 'A',
-    proposedSlot: '23/02/2026 · 09:00 - 11:00',
-    proposedRoom: '203',
-    proposedRoomType: 'Salle informatique',
-    proposedRoomCapacity: '30',
-    proposedBuilding: 'C',
-    reason: 'Proposition de récupération de séance manquée',
-    concernedTeacher: 'Sophie Laurent',
-    concernedTeacherEmail: 'sophie.laurent@example.com',
-  },
+  teacherProposalSlot: '20/02/2026 · 14:00 - 16:00',
+  teacherProposalRoom: '202',
+  teacherProposalRoomType: 'Salle informatique',
+  teacherProposalRoomCapacity: '30',
+  teacherProposalBuilding: 'B'
+},
+{
+  status: 'Approuvé',
+  type: 'Proposition de récupération de séance',
+  teacher: 'Sophie Laurent',
+  email: 'sophie.laurent@example.com',
+  subject: 'Systèmes distribués',
+  formation: 'M2 MIAGE Informatique décisionnelle',
+  sessionTime: '18/02/2026 · 09:00 - 11:00',
+  requestDate: '11/02/2026 à 13:20',
+  groups: 'G1, G2',
+  concernedTeacher:'Maria Bourse',
+  concernedTeacherEmail:'maria.bourse@gmail.com',
+
+  missedSlot: '15/02/2026 · 10:00 - 12:00',
+  missedRoom: '101',
+  missedRoomType: 'Salle TD',
+  missedRoomCapacity: '20',
+  missedBuilding: 'A',
+
+  teacherProposalSlot: '20/02/2026 · 14:00 - 16:00',
+  teacherProposalRoom: '202',
+  teacherProposalRoomType: 'Salle informatique',
+  teacherProposalRoomCapacity: '30',
+  teacherProposalBuilding: 'B'
+},
+{
+  status: 'Refusé',
+  type: 'Proposition de récupération de séance',
+  teacher: 'Sophie Laurent',
+  email: 'sophie.laurent@example.com',
+  subject: 'Réseaux et systèmes',
+  formation: 'M2 MIAGE Informatique décisionnelle',
+  sessionTime: '20/02/2026 · 10:00 - 12:00',
+  requestDate: '12/02/2026 à 09:10',
+  groups: 'G3',
+  concernedTeacher:'Portic Yani',
+  concernedTeacherEmail:'postic.yani@gmail.com',
+
+  missedSlot: '16/02/2026 · 08:00 - 10:00',
+  missedRoom: '101',
+  missedRoomType: 'Salle TD',
+  missedRoomCapacity: '20',
+  missedBuilding: 'A',
+
+  teacherProposalSlot: '20/02/2026 · 14:00 - 16:00',
+  teacherProposalRoom: '202',
+  teacherProposalRoomType: 'Salle informatique',
+  teacherProposalRoomCapacity: '30',
+  teacherProposalBuilding: 'B',
+  
+  adminSlot: '20/02/2026 · 14:00 - 16:00',
+  adminRoom: '202',
+  adminRoomType: 'Salle informatique',
+  adminRoomCapacity: '30',
+  adminBuilding: 'B',
+  
+  rejectReason: 'Créneau mieux adapté avec le planning'
+}
+
+
 ]
 
 export const Route = createFileRoute('/(app)/requests/')({
