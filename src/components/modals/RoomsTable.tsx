@@ -14,7 +14,7 @@ interface RoomsTableProps {
     existingRooms: Array<Room>;
 }
 
-export default function RoomsTable({ rooms, searchTerm, onSuccess, onError, filterType, }: RoomsTableProps) {
+export default function RoomsTable({ rooms, onSuccess, onError }: RoomsTableProps) {
     const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
