@@ -68,6 +68,7 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setError(null)
 
     if (!values.name.trim()) {
       setError('Le nom du groupe est obligatoire.')
@@ -88,13 +89,18 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
       return
     }
 
-    await onSubmit({
-      name: values.name.trim(),
-      academicYear: values.academicYear.trim(),
-      trackId: selectedFormation.trackId,
-    })
+    try {
+      await onSubmit({
+        name: values.name.trim(),
+        academicYear: values.academicYear.trim(),
+        trackId: selectedFormation.trackId,
+      })
 
-    onClose()
+      onClose()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Impossible d'enregistrer ce groupe."
+      setError(message)
+    }
   }
 
   return (
@@ -118,7 +124,10 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
             <input
               className="input input-bordered w-full"
               value={values.name}
-              onChange={e => setValues(prev => ({ ...prev, name: e.target.value }))}
+              onChange={e => {
+                setValues(prev => ({ ...prev, name: e.target.value }))
+                if (error) setError(null)
+              }}
               placeholder="Groupe A"
             />
           </label>
@@ -128,7 +137,10 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
             <input
               className="input input-bordered w-full"
               value={values.academicYear}
-              onChange={e => setValues(prev => ({ ...prev, academicYear: e.target.value }))}
+              onChange={e => {
+                setValues(prev => ({ ...prev, academicYear: e.target.value }))
+                if (error) setError(null)
+              }}
               placeholder="2025-2026"
             />
           </label>
@@ -138,7 +150,10 @@ function GroupFormModal({ isOpen, mode, group, formations, onClose, onSubmit }: 
             <select
               className="select select-bordered w-full"
               value={values.formationId}
-              onChange={e => setValues(prev => ({ ...prev, formationId: e.target.value }))}
+              onChange={e => {
+                setValues(prev => ({ ...prev, formationId: e.target.value }))
+                if (error) setError(null)
+              }}
             >
               <option value="">Sélectionner une formation</option>
               {formations.map(formation => (

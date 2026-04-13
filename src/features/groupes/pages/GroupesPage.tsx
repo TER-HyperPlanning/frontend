@@ -12,9 +12,9 @@ import GroupFilters from '@/features/groupes/components/GroupFilters'
 import GroupTable from '@/features/groupes/components/GroupTable'
 import type { Group, SortKey, Student } from '@/features/groupes/types'
 import { deleteAttend, deleteAttendsByGroup, getAttendsByGroup } from '@/services/attendService'
-import { createGroup, deleteGroup, getGroups, getGroupsByFormation, updateGroup } from '@/services/groupService'
+import { createGroup, deleteGroup, getGroups, updateGroup } from '@/services/groupService'
 import { getStudents, updateStudent } from '@/services/studentService'
-import { getProgramById, getPrograms } from '@/services/programService'
+import { getPrograms } from '@/services/programService'
 import { getTracks } from '@/services/trackService'
 import type { GroupModel, ProgramModel, StudentModel, TrackResponse } from '@/types/formation'
 
@@ -37,7 +37,10 @@ export function GroupesPage({
   onShowAllGroups,
   onBackToFormation,
 }: GroupesPageProps) {
+  void onShowAllGroups
+
   const [groupes, setGroupes] = useState<Group[]>([])
+  const [allGroups, setAllGroups] = useState<Group[]>([])
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
   const [academicYearFilter, setAcademicYearFilter] = useState('all')
@@ -58,34 +61,34 @@ export function GroupesPage({
   const [formationOptions, setFormationOptions] = useState<FormationOption[]>([])
 
   const loadData = async (currentFormationId?: string) => {
-    const [groupModels, trackModels, programModelsOrProgram, studentModels]: [
+    const [groupModels, trackModels, programModels, studentModels]: [
       GroupModel[],
       TrackResponse[],
-      ProgramModel[] | ProgramModel,
+      ProgramModel[],
       StudentModel[],
     ] = await Promise.all([
-      currentFormationId ? getGroupsByFormation(currentFormationId) : getGroups(),
+      getGroups(),
       getTracks(),
-      currentFormationId ? getProgramById(currentFormationId) : getPrograms(),
+      getPrograms(),
       getStudents().catch(() => [] as StudentModel[]),
     ])
 
-    const programList = Array.isArray(programModelsOrProgram) ? programModelsOrProgram : [programModelsOrProgram]
+    const programList = programModels
     const programById = new Map<string, ProgramModel>(
       programList.map((program: ProgramModel) => [program.id, program]),
     )
 
-    const relevantTrackModels = currentFormationId
+    const filteredTrackModels = currentFormationId
       ? trackModels.filter(track => track.programId === currentFormationId)
       : trackModels
 
     const trackById = new Map<string, TrackResponse>(
-      relevantTrackModels.map((track: TrackResponse) => [track.id, track]),
+      trackModels.map((track: TrackResponse) => [track.id, track]),
     )
 
     const formations = programList
       .map(program => {
-        const firstTrack = relevantTrackModels.find(track => track.programId === program.id)
+        const firstTrack = filteredTrackModels.find(track => track.programId === program.id)
 
         if (!firstTrack) {
           return null
@@ -106,6 +109,7 @@ export function GroupesPage({
       ? normalizedGroups.filter(group => group.programId === currentFormationId)
       : normalizedGroups
 
+    setAllGroups(normalizedGroups)
     setGroupes(visibleGroups)
     setStudents(normalizeStudents(studentModels))
   }
@@ -301,14 +305,20 @@ export function GroupesPage({
   }
 
   const handleCreateGroup = async (values: GroupFormValues) => {
-    await createGroup(values)
+    await createGroup({
+      ...values,
+      capacity: GROUP_CAPACITY_LIMIT,
+    })
     await reloadData()
     setSuccessMsg(`Le groupe ${values.name} a été créé.`)
   }
 
   const handleEditGroup = async (values: GroupFormValues) => {
     if (!groupToEdit) return
-    await updateGroup(groupToEdit.id, values)
+    await updateGroup(groupToEdit.id, {
+      ...values,
+      capacity: GROUP_CAPACITY_LIMIT,
+    })
     await reloadData()
     setSuccessMsg(`Le groupe ${values.name} a été modifié.`)
   }
@@ -532,6 +542,7 @@ export function GroupesPage({
           groupe={assignGroupe}
           students={students}
           availableGroups={groupesWithLiveEffectif.filter(group => group.id !== assignGroupe.id)}
+          allGroups={allGroups}
           maxStudents={GROUP_CAPACITY_LIMIT}
           onClose={() => setAssignGroupe(null)}
           onConfirm={handleAssignConfirm}

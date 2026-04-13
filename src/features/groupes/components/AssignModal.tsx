@@ -7,12 +7,13 @@ interface AssignModalProps {
   groupe: Group
   students: Student[]
   availableGroups: Group[]
+  allGroups: Group[]
   maxStudents: number
   onClose: () => void
   onConfirm: (groupeId: string, studentIds: string[], transferGroupIdForRemoved: string | null) => void | Promise<void>
 }
 
-function AssignModal({ groupe, students, availableGroups, maxStudents, onClose, onConfirm }: AssignModalProps) {
+function AssignModal({ groupe, students, availableGroups, allGroups, maxStudents, onClose, onConfirm }: AssignModalProps) {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>(
     students.filter(student => student.groupId === groupe.id).map(student => student.id),
@@ -53,10 +54,10 @@ function AssignModal({ groupe, students, availableGroups, maxStudents, onClose, 
     [availableGroups],
   )
 
-  const groupNameById = useMemo(() => {
-    const allGroups = [groupe, ...availableGroups]
-    return new Map(allGroups.map(group => [group.id, group.name]))
-  }, [groupe, availableGroups])
+  const groupInfoById = useMemo(() => {
+    const mergedGroups = [groupe, ...allGroups]
+    return new Map(mergedGroups.map(group => [group.id, group]))
+  }, [groupe, allGroups])
 
   const toggleSelection = (studentId: string) => {
     if (!selected.includes(studentId) && selected.length >= maxStudents) {
@@ -129,6 +130,7 @@ function AssignModal({ groupe, students, availableGroups, maxStudents, onClose, 
           ) : (
             filteredStudents.map(student => {
               const isSelected = selected.includes(student.id)
+              const originGroup = student.groupId ? groupInfoById.get(student.groupId) : undefined
               return (
                 <label
                   key={student.id}
@@ -150,11 +152,18 @@ function AssignModal({ groupe, students, availableGroups, maxStudents, onClose, 
                   {student.groupId && student.groupId !== groupe.id && (
                     <div className="flex flex-col items-end gap-1 shrink-0 text-right">
                       <span className="badge badge-warning badge-sm">Sera transféré</span>
-                      <span className="text-[11px] text-base-content/60">
-                        {groupNameById.get(student.groupId)
-                          ? `Dans le groupe ${groupNameById.get(student.groupId)}`
-                          : 'pas de groupe'}
-                      </span>
+                      {originGroup ? (
+                        <>
+                          <span className="text-[11px] text-base-content/60">
+                            Dans le groupe {originGroup.name}
+                          </span>
+                          <span className="text-[11px] text-base-content/50">
+                            Formation {originGroup.programName}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[11px] text-base-content/60">pas de groupe</span>
+                      )}
                     </div>
                   )}
                   {student.groupId === groupe.id && (

@@ -63,18 +63,21 @@ export interface GroupModel {
   id: string
   name: string
   academicYear: string
+  capacity?: number
   trackId: string
 }
 
 export interface CreateGroupRequest {
   name: string
   academicYear: string
+  capacity: number
   trackId: string
 }
 
 export interface UpdateGroupRequest {
   name: string
   academicYear: string
+  capacity: number
   trackId: string
 }
 
