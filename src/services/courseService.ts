@@ -11,5 +11,11 @@ export function useCourseService() {
     [api],
   )
 
-  return { getCourses }
+  const getCourseById = useCallback(
+    (id: string) =>
+      api.get<ApiResponse<CourseResponse>>(`/Courses/${id}`).then((r) => r.data.result),
+    [api],
+  )
+
+  return { getCourses, getCourseById }
 }

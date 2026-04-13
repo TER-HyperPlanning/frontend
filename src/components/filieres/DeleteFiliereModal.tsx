@@ -1,24 +1,24 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Button from '@/components/Button'
-import { type SessionResponse, SESSION_TYPE_LABELS } from '@/types/session'
+import { type FiliereSummary } from '@/types/formation'
 
-interface DeleteSessionModalProps {
+interface DeleteFiliereModalProps {
   isOpen: boolean
-  session: SessionResponse | null
+  filiere: FiliereSummary | null
   onClose: () => void
   onConfirm: () => void
 }
 
-export default function DeleteSessionModal({
+export default function DeleteFiliereModal({
   isOpen,
-  session,
+  filiere,
   onClose,
   onConfirm,
-}: DeleteSessionModalProps) {
+}: DeleteFiliereModalProps) {
   return (
     <AnimatePresence>
-      {isOpen && session && (
+      {isOpen && filiere && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -35,19 +35,28 @@ export default function DeleteSessionModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end">
-              <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <XMarkIcon className="size-5" />
               </button>
             </div>
 
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
-                Voulez-vous vraiment supprimer cette séance ?
+                Supprimer cette filière ?
               </h3>
-              <p className="text-gray-500 mt-1">
-                {(SESSION_TYPE_LABELS as Record<string, string>)[session.type] ?? session.type} —{' '}
-                {session.course || 'Sans module'}
-              </p>
+              <p className="text-gray-500 mt-1">{filiere.nom}</p>
+              {filiere.formations.length > 0 ? (
+                <p className="text-amber-600 text-sm mt-3">
+                  Cette filière a encore {filiere.formations.length} formation(s). Supprimez ou
+                  déplacez-les avant de supprimer la filière.
+                </p>
+              ) : (
+                <p className="text-gray-400 text-sm mt-2">Aucune formation liée.</p>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -58,7 +67,11 @@ export default function DeleteSessionModal({
               >
                 Annuler
               </Button>
-              <Button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+              <Button
+                onClick={onConfirm}
+                disabled={filiere.formations.length > 0}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 Confirmer
               </Button>
             </div>

@@ -24,6 +24,7 @@ export function deleteProgram(id: string): Promise<string> {
   return apiDelete<string>(`/Programs/${id}`)
 }
 
+/** Client HTTP pour `/Programs` (filières). */
 export function useProgramService() {
   const { api } = useAppClient()
 

@@ -8,7 +8,6 @@ import {
   HiOutlineSearch,
   HiPlus
 } from 'react-icons/hi';
-import { useRooms } from "@/hooks/rooms/useRooms";
 import { useBuildings } from "@/hooks/buildings/useBuildings";
 import Logo from '@/components/Logo';
 
@@ -17,6 +16,8 @@ import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import RoomsTable from '@/components/modals/RoomsTable';
 import AddRoomModal from '@/components/modals/AddRoomModal';
+import { useSearchRoom } from '@/hooks/rooms/useSearchRoom';
+import RoomsFilters from '@/components/modals/RoomsFilters';
 
 export const Route = createFileRoute('/(app)/buildings/$buildingId')({
   component: BuildingDetailsPage,
@@ -34,13 +35,15 @@ export default function BuildingDetailsPage() {
     setTimeout(() => setErrorMessage(null), 3000);
   };
 
+  const [filterType, setFilterType] = useState('');
+  const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false);
 
-  // 1. Récupérer toutes les salles (Données réelles de l'API)
-  const { data: allRooms = [], isLoading: roomsLoading } = useRooms();
 
+  // 1. Récupérer toutes les salles (Données réelles de l'API)
+  const { data: allRooms = [], isLoading: roomsLoading } = useSearchRoom(searchTerm, filterType);
   // 2. Récupérer les infos du bâtiment pour le titre
-  const { data: buildings = [] } = useBuildings();
+  const { data: buildings = [] } = useBuildings('');
   const currentBuilding = buildings.find(b => b.id === buildingId);
 
   // 3. Filtrer les salles par BuildingId provenant de l'URL
@@ -101,6 +104,15 @@ export default function BuildingDetailsPage() {
                 name="searchRoom"
               />
             </div>
+            {/* FILTER */}
+            <RoomsFilters
+              filterType={filterType}
+              setFilterType={setFilterType}
+              showTypeMenu={showTypeMenu}
+              setShowTypeMenu={setShowTypeMenu}
+            />
+
+
           </div>
 
           {/* RIGHT: BUTTON (reste bien à droite) */}
@@ -143,6 +155,8 @@ export default function BuildingDetailsPage() {
               searchTerm={searchTerm}
               onSuccess={showSuccess}
               onError={handleError}
+              filterType={filterType}
+
               existingRooms={[]} />
           </div>
         </div>
@@ -151,7 +165,7 @@ export default function BuildingDetailsPage() {
           isOpen={isAddRoomModalOpen}
           onClose={() => setIsAddRoomModalOpen(false)}
           onSuccess={showSuccess}
-          onError={handleError} 
+          onError={handleError}
           buildingId={buildingId}
           existingRooms={buildingRooms}
         />

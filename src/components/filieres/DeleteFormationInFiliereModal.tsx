@@ -1,24 +1,23 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Button from '@/components/Button'
-import { type SessionResponse, SESSION_TYPE_LABELS } from '@/types/session'
 
-interface DeleteSessionModalProps {
+interface DeleteFormationInFiliereModalProps {
   isOpen: boolean
-  session: SessionResponse | null
+  formation: { id: string; name: string } | null
   onClose: () => void
   onConfirm: () => void
 }
 
-export default function DeleteSessionModal({
+export default function DeleteFormationInFiliereModal({
   isOpen,
-  session,
+  formation,
   onClose,
   onConfirm,
-}: DeleteSessionModalProps) {
+}: DeleteFormationInFiliereModalProps) {
   return (
     <AnimatePresence>
-      {isOpen && session && (
+      {isOpen && formation && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -35,19 +34,20 @@ export default function DeleteSessionModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end">
-              <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <XMarkIcon className="size-5" />
               </button>
             </div>
 
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
-                Voulez-vous vraiment supprimer cette séance ?
+                Supprimer cette formation ?
               </h3>
-              <p className="text-gray-500 mt-1">
-                {(SESSION_TYPE_LABELS as Record<string, string>)[session.type] ?? session.type} —{' '}
-                {session.course || 'Sans module'}
-              </p>
+              <p className="text-gray-500 mt-1">{formation.name}</p>
             </div>
 
             <div className="flex gap-3">
@@ -58,8 +58,11 @@ export default function DeleteSessionModal({
               >
                 Annuler
               </Button>
-              <Button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white">
-                Confirmer
+              <Button
+                onClick={onConfirm}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Supprimer
               </Button>
             </div>
           </motion.div>

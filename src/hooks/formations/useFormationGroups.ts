@@ -1,21 +1,21 @@
 import { useState, useEffect, useCallback } from 'react'
-import { type GroupModel } from '@/types/formation'
-import { type TrackResponse } from '@/types/formation'
-import { getGroups } from '@/services/groupService'
-import { getTracks } from '@/services/trackService'
-import { getProgramById } from '@/services/programService'
+import { type GroupModel } from '@/types/group'
+import { useGroupService } from '@/services/groupService'
+import { useTrackService } from '@/services/trackService'
+import { useProgramService } from '@/services/programService'
 
 export interface FormationGroupRow {
   id: string
   name: string
   academicYear: string
-  trackId: string
-  trackName: string
-  programId: string
-  formationName: string
+  /** Filière (Program) */
+  filiereName: string
 }
 
 export function useFormationGroups(formationId: string) {
+  const { getGroups } = useGroupService()
+  const { getTrackById } = useTrackService()
+  const { getProgramById } = useProgramService()
 
   const [groups, setGroups] = useState<FormationGroupRow[]>([])
   const [formationName, setFormationName] = useState('')
@@ -24,29 +24,23 @@ export function useFormationGroups(formationId: string) {
   const fetchGroups = useCallback(async () => {
     setIsLoading(true)
     try {
-      const [program, allTracks, allGroups] = await Promise.all([
-        getProgramById(formationId).catch(() => null),
-        getTracks().catch(() => [] as TrackResponse[]),
-        getGroups().catch(() => [] as GroupModel[]),
-      ])
+      const track = await getTrackById(formationId).catch(() => null)
+      const program = track?.programId
+        ? await getProgramById(track.programId).catch(() => null)
+        : null
 
-      setFormationName(program?.name ?? '')
+      setFormationName(track?.name ?? '')
 
-      const trackIds = new Set(
-        allTracks.filter((t) => t.programId === formationId).map((t) => t.id),
-      )
-      const trackMap = new Map(allTracks.map((t) => [t.id, t.name]))
+      const allGroups = await getGroups().catch(() => [] as GroupModel[])
+      const filiereLabel = program?.name ?? '—'
 
       const filtered = allGroups
-        .filter((g) => trackIds.has(g.trackId))
+        .filter((g) => g.trackId === formationId)
         .map((g) => ({
           id: g.id,
           name: g.name,
-          academicYear: g.academicYear,
-          trackId: g.trackId,
-          trackName: trackMap.get(g.trackId) ?? '—',
-          programId: program?.id ?? '',
-          formationName: program?.name ?? '—',
+          academicYear: g.academicYear ?? '',
+          filiereName: filiereLabel,
         }))
 
       setGroups(filtered)
@@ -55,7 +49,7 @@ export function useFormationGroups(formationId: string) {
     } finally {
       setIsLoading(false)
     }
-  }, [formationId])
+  }, [formationId, getTrackById, getProgramById, getGroups])
 
   useEffect(() => {
     fetchGroups()
