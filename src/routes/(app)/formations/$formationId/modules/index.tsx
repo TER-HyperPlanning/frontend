@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ModuleTable from "@/components/modules/ModuleTable";
 import ModuleForm from "@/components/modules/ModuleForm";
 import PageLayout from "@/layout/PageLayout";
@@ -42,6 +42,7 @@ function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
 
 function ModulesPage() {
   const { formationId } = Route.useParams();
+  const selectedTrackId = formationId;
 
   const { courses, createCourse, updateCourse, deleteCourse } = useCourses();
   const { assigns, createAssign, updateAssign, deleteAssign } = useAssign();
@@ -50,26 +51,9 @@ function ModulesPage() {
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTrackId, setSelectedTrackId] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const formationTracks = tracks.filter(
-    (track) => (track as { programId?: string }).programId === formationId
-  );
-
-  useEffect(() => {
-    if (formationTracks.length > 0) {
-      const trackStillExists = formationTracks.some(
-        (track) => track.id === selectedTrackId
-      );
-
-      if (!trackStillExists) {
-        setSelectedTrackId(formationTracks[0].id);
-      }
-    } else {
-      setSelectedTrackId("");
-    }
-  }, [formationTracks, selectedTrackId]);
+  const selectedTrack = tracks.find((track) => track.id === selectedTrackId);
 
   const handleAddOrUpdate = async (data: {
     name: string;
@@ -79,11 +63,6 @@ function ModulesPage() {
     teacher?: string;
   }) => {
     try {
-      if (!selectedTrackId) {
-        toast.error("Aucune filière sélectionnée");
-        return;
-      }
-
       const parsedVolume =
         Number.parseInt((data.volume || "0").replace(/\D/g, ""), 10) || 0;
 
@@ -105,7 +84,6 @@ function ModulesPage() {
         setEditingModule(null);
         toast.success("Module modifié avec succès");
         setRefreshKey((prev) => prev + 1);
-
         return;
       }
 
@@ -134,7 +112,6 @@ function ModulesPage() {
 
         toast.success("Module ajouté à la formation avec succès");
         setRefreshKey((prev) => prev + 1);
-
         return;
       }
 
@@ -164,11 +141,6 @@ function ModulesPage() {
     if (!confirmDelete) return;
 
     try {
-      if (!selectedTrackId) {
-        toast.error("Aucune filière sélectionnée");
-        return;
-      }
-
       const relatedAssigns = assigns.filter((a) => a.courseId === id);
 
       await deleteAssign({
@@ -249,21 +221,9 @@ function ModulesPage() {
               Formation sélectionnée
             </label>
 
-            <select
-              className="select select-bordered w-full"
-              value={selectedTrackId}
-              onChange={(e) => setSelectedTrackId(e.target.value)}
-            >
-              {formationTracks.length === 0 ? (
-                <option value="">Aucune formation sélectionnée</option>
-              ) : (
-                formationTracks.map((track) => (
-                  <option key={track.id} value={track.id}>
-                    {track.name}
-                  </option>
-                ))
-              )}
-            </select>
+            <div className="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-gray-700">
+              {selectedTrack?.name || "Aucune formation sélectionnée"}
+            </div>
           </div>
         </div>
 
