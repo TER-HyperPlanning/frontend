@@ -16,8 +16,12 @@ interface GroupFormValues {
 }
 
 function getDefaultAcademicYear() {
-  const currentYear = new Date().getFullYear()
-  return `${currentYear}-${currentYear + 1}`
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const month = now.getMonth()
+  const startYear = month >= 8 ? currentYear : currentYear - 1
+
+  return `${startYear}-${startYear + 1}`
 }
 
 interface GroupFormModalProps {
