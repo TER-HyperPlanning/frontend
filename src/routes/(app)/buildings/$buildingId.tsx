@@ -8,7 +8,6 @@ import {
   HiOutlineSearch,
   HiPlus
 } from 'react-icons/hi';
-import { useRooms } from "@/hooks/rooms/useRooms";
 import { useBuildings } from "@/hooks/buildings/useBuildings";
 import Logo from '@/components/Logo';
 
@@ -44,7 +43,7 @@ export default function BuildingDetailsPage() {
   // 1. Récupérer toutes les salles (Données réelles de l'API)
   const { data: allRooms = [], isLoading: roomsLoading } = useSearchRoom(searchTerm, filterType);
   // 2. Récupérer les infos du bâtiment pour le titre
-  const { data: buildings = [] } = useBuildings();
+  const { data: buildings = [] } = useBuildings(searchTerm);
   const currentBuilding = buildings.find(b => b.id === buildingId);
 
   // 3. Filtrer les salles par BuildingId provenant de l'URL
