@@ -14,7 +14,7 @@ import {
 
 import { useState, useMemo, useEffect  } from 'react'
 import type { SessionChange } from '../../types/sessionChange'
-
+import { useQueryClient } from '@tanstack/react-query'
 import { useRoom } from '@/hooks/requests/useRoomQuery'
 import { useSessionChange } from '@/hooks/requests/useSessionChangesById'
 import { useSessionGroups } from '@/hooks/requests/useSessionGroups'
@@ -87,15 +87,7 @@ export default function RequestDetailsModal({
   const { data: oldRoom } = useRoom(oldRoomId)
 
   const { data: attends } = useSessionGroups(sessionId)
-  
-  useEffect(() => {
-  const savedToast = localStorage.getItem('toast')
-
-  if (savedToast) {
-    setToast(JSON.parse(savedToast))
-    localStorage.removeItem('toast')
-  }
-}, [])
+  const queryClient = useQueryClient()
 
   const { getGroup } = useSessionChangeService()
   const oldBuildingId = oldRoom?.buildingId
@@ -360,19 +352,13 @@ export default function RequestDetailsModal({
                     },
                     {
                       onSuccess: () => {
-                        localStorage.setItem(
-                          'toast',
-                          JSON.stringify({
-                            message: 'Demande refusée avec succès',
-                            type: 'success',
-                          })
-                        )
-                        
+                        setToast({
+                          message: 'Demande refusée avec succès',
+                          type: 'success',
+                        })
+
                         setShowRejectModal(false)
                         onClose()
-
-                        window.location.reload()
-
                       },
                       onError: () => {
                         setToast({ message: 'Erreur lors du refus', type: 'error' })
@@ -404,18 +390,14 @@ export default function RequestDetailsModal({
                     },
                     {
                       onSuccess: () => {
-                        localStorage.setItem(
-                          'toast',
-                          JSON.stringify({
-                            message: 'Demande refusée avec succès',
-                            type: 'success',
-                          })
-                        )
+                        setToast({
+                          message: 'Demande approuvée avec succès',
+                          type: 'success',
+                        })
 
                         setShowConfirmRoom(false)
                         onClose()
-
-                        window.location.reload()
+                        queryClient.invalidateQueries({ queryKey: ['sessionChanges'] })
                       },
                       onError: () => {
                         setToast({ message: 'Erreur lors de l’approbation', type: 'error' })
