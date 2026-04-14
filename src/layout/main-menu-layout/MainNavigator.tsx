@@ -11,6 +11,7 @@ import { navItemsForRole, normalizeRole, type AppRole } from '@/auth/rolePermiss
 const NAV_ICONS: Record<string, ReactNode> = {
   '/planning': <CalendarDays size={20} />,
   '/teachers': <Users size={20} />,
+  '/students': <UsersRound size={20} />,
   '/groupes': <UsersRound size={20} />,
   '/buildings': <HiOutlineOfficeBuilding size={20} />,
   '/formations': <BookOpen size={20} />,
