@@ -18,6 +18,7 @@ import { Route as AuthInitPwdIndexRouteImport } from './routes/auth/init-pwd/ind
 import { Route as AuthForgetPwdIndexRouteImport } from './routes/auth/forget-pwd/index'
 import { Route as appTeachersIndexRouteImport } from './routes/(app)/teachers/index'
 import { Route as appStudentsIndexRouteImport } from './routes/(app)/students/index'
+import { Route as appSettingsIndexRouteImport } from './routes/(app)/settings/index'
 import { Route as appSessionsIndexRouteImport } from './routes/(app)/sessions/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
@@ -75,6 +76,11 @@ const appTeachersIndexRoute = appTeachersIndexRouteImport.update({
 const appStudentsIndexRoute = appStudentsIndexRouteImport.update({
   id: '/students/',
   path: '/students/',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appSettingsIndexRoute = appSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => appRouteRoute,
 } as any)
 const appSessionsIndexRoute = appSessionsIndexRouteImport.update({
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/requests/': typeof appRequestsIndexRoute
   '/scolarite/': typeof appScolariteIndexRoute
   '/sessions/': typeof appSessionsIndexRoute
+  '/settings/': typeof appSettingsIndexRoute
   '/students/': typeof appStudentsIndexRoute
   '/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
@@ -189,6 +196,7 @@ export interface FileRoutesByTo {
   '/requests': typeof appRequestsIndexRoute
   '/scolarite': typeof appScolariteIndexRoute
   '/sessions': typeof appSessionsIndexRoute
+  '/settings': typeof appSettingsIndexRoute
   '/students': typeof appStudentsIndexRoute
   '/teachers': typeof appTeachersIndexRoute
   '/auth/forget-pwd': typeof AuthForgetPwdIndexRoute
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/(app)/requests/': typeof appRequestsIndexRoute
   '/(app)/scolarite/': typeof appScolariteIndexRoute
   '/(app)/sessions/': typeof appSessionsIndexRoute
+  '/(app)/settings/': typeof appSettingsIndexRoute
   '/(app)/students/': typeof appStudentsIndexRoute
   '/(app)/teachers/': typeof appTeachersIndexRoute
   '/auth/forget-pwd/': typeof AuthForgetPwdIndexRoute
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/requests/'
     | '/scolarite/'
     | '/sessions/'
+    | '/settings/'
     | '/students/'
     | '/teachers/'
     | '/auth/forget-pwd/'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/scolarite'
     | '/sessions'
+    | '/settings'
     | '/students'
     | '/teachers'
     | '/auth/forget-pwd'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/(app)/requests/'
     | '/(app)/scolarite/'
     | '/(app)/sessions/'
+    | '/(app)/settings/'
     | '/(app)/students/'
     | '/(app)/teachers/'
     | '/auth/forget-pwd/'
@@ -370,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/students'
       fullPath: '/students/'
       preLoaderRoute: typeof appStudentsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/settings/': {
+      id: '/(app)/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof appSettingsIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
     '/(app)/sessions/': {
@@ -485,6 +504,7 @@ interface appRouteRouteChildren {
   appRequestsIndexRoute: typeof appRequestsIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
   appSessionsIndexRoute: typeof appSessionsIndexRoute
+  appSettingsIndexRoute: typeof appSettingsIndexRoute
   appStudentsIndexRoute: typeof appStudentsIndexRoute
   appTeachersIndexRoute: typeof appTeachersIndexRoute
   appAdminAccountsIndexRoute: typeof appAdminAccountsIndexRoute
@@ -504,6 +524,7 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appRequestsIndexRoute: appRequestsIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
   appSessionsIndexRoute: appSessionsIndexRoute,
+  appSettingsIndexRoute: appSettingsIndexRoute,
   appStudentsIndexRoute: appStudentsIndexRoute,
   appTeachersIndexRoute: appTeachersIndexRoute,
   appAdminAccountsIndexRoute: appAdminAccountsIndexRoute,
