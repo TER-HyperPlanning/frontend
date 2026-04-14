@@ -4,7 +4,12 @@ import {
   type CreateTrackRequest,
 } from '@/types/formation'
 import { useAppClient } from '@/hooks/api/useAppClient'
-import { type ApiResponse } from '@/services/apiClient'
+import { apiGet, type ApiResponse } from '@/services/apiClient'
+
+// Plain function (used in async contexts outside of React hooks)
+export function getTracks(): Promise<TrackResponse[]> {
+  return apiGet<TrackResponse[]>('/Tracks')
+}
 
 export interface UpdateTrackRequest {
   name: string
