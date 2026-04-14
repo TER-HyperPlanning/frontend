@@ -74,8 +74,8 @@ export function useSessions() {
       const rawSessions = await getSessions()
 
       const [groups, allAttends] = await Promise.all([
-        getGroups().catch(() => []),
-        getAllAttends().catch(() => []),
+        getGroups(),
+        getAllAttends(),
       ])
 
       const gMap: Record<string, string> = {}
@@ -107,8 +107,9 @@ export function useSessions() {
       })
 
       setSessions(enriched)
-    } catch {
-      setSessions([])
+    } catch (err) {
+      console.error('[useSessions] Erreur lors du chargement:', err)
+      // Ne pas écraser les sessions existantes en cas d'erreur de rafraîchissement
     } finally {
       setIsLoading(false)
     }

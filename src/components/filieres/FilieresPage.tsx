@@ -1,5 +1,4 @@
-import { useRef } from 'react'
-import { Plus, Upload } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Logo from '@/components/Logo'
 import FilieresSearchBar from '@/components/filieres/FilieresSearchBar'
 import FilieresList from '@/components/filieres/FilieresList'
@@ -18,6 +17,9 @@ export default function FilieresPage() {
     isLoading,
     searchQuery,
     setSearchQuery,
+    filiereFilter,
+    setFiliereFilter,
+    filieresOptions,
     isAddFiliereOpen,
     openAddFiliere,
     closeAddFiliere,
@@ -34,54 +36,17 @@ export default function FilieresPage() {
     openDeleteFormation,
     closeDeleteFormation,
     removeFormation,
-    isImporting,
-    importCSV,
   } = useFilieres()
 
   const { toast, showToast, hideToast } = useToast()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      const count = await importCSV(file)
-      showToast(`${count} filière(s)/formation(s) importée(s) avec succès`, 'success')
-    } catch (e: any) {
-      const backendMsg = e?.response?.data?.message || e?.response?.data || e?.message || 'Erreur inconnue'
-      showToast(`Erreur d'import : ${backendMsg}`, 'error')
-    } finally {
-      // Reset input so the same file can be uploaded again if needed
-      event.target.value = ''
-    }
-  }
 
   return (
     <>
       <div className="flex items-center justify-between mb-6">
         <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
         <div className="flex items-center gap-3">
-          <input
-            type="file"
-            accept=".csv"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-          />
-          <Button
-            type="button"
-            variant="outlined"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isImporting}
-            leftIcon={isImporting ? <span className="loading loading-spinner w-4 h-4" /> : <Upload size={18} />}
-            className="border-primary-900/30 text-primary-900 hover:bg-primary-900/10"
-          >
-            {isImporting ? 'Importation…' : 'Importer CSV'}
-          </Button>
           <Button
             onClick={openAddFiliere}
-            disabled={isImporting}
             leftIcon={<Plus size={18} />}
             className="bg-primary-900 hover:bg-primary-800 text-white"
           >
@@ -90,7 +55,13 @@ export default function FilieresPage() {
         </div>
       </div>
 
-      <FilieresSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <FilieresSearchBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        filiereFilter={filiereFilter}
+        onFiliereChange={setFiliereFilter}
+        filieresOptions={filieresOptions}
+      />
 
       <div className="card bg-base-100 border border-base-200">
         <FilieresList
