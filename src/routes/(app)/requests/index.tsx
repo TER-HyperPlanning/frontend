@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import RequestCard from '@/components/requests/RequestCard'
 import PageLayout from '@/layout/PageLayout'
+import RequestCard from '@/components/requests/RequestCard'
 import RequestDetailsModal from '@/components/requests/RequestDetailsModal'
 import Toast from '@/components/requests/Toast'
 import Header from '@/components/requests/Header'
 
-import { useSessionChangeService } from '@/services/requestservices'
+import { useSessionChanges } from '@/hooks/requests/useSessionChanges'
 import type { SessionChange } from '@/types/sessionChange'
 
 type RequestStatus = 'En attente' | 'Approuvé' | 'Refusé'
@@ -18,20 +18,33 @@ export const Route = createFileRoute('/(app)/requests/')({
   component: RequestsPage,
 })
 
-export default function RequestsPage() {
-  const { getRequests } = useSessionChangeService()
+/* =========================
+   STATUS FORMATTER
+========================= */
+const formatStatus = (status: string) => {
+  switch (status) {
+    case 'ATTENTE':
+      return 'En attente'
+    case 'APPROUVE':
+      return 'Approuvé'
+    case 'REFUSE':
+      return 'Refusé'
+    default:
+      return status
+  }
+}
 
-  const [requests, setRequests] = useState<SessionChange[]>([])
-  const [loading, setLoading] = useState(true)
+export default function RequestsPage() {
+  const { data: requests = [], isLoading } = useSessionChanges()
 
   const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] =
-  useState<RequestStatus | ''>('')
+  const [filterStatus, setFilterStatus] = useState<RequestStatus | ''>('')
 
-  const [filterType, setFilterType] =
-  useState<RequestType | ''>('')
+  const [filterType, setFilterType] = useState<RequestType | ''>('')
 
-  const [selectedRequest, setSelectedRequest] = useState<SessionChange | null>(null)
+  const [selectedRequest, setSelectedRequest] =
+    useState<SessionChange | null>(null)
+
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [toast, setToast] = useState<{
@@ -39,55 +52,57 @@ export default function RequestsPage() {
     type: 'success' | 'error'
   } | null>(null)
 
-  // 🔥 LOAD DATA FROM SERVICE
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getRequests()
-        setRequests(data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
-  }, [])
-
-  // 🔍 FILTER SAFE
-  const filteredRequests = requests
+  /* =========================
+     FILTER
+  ========================= */
+  const filteredRequests = (requests || [])
+    .filter(Boolean)
     .filter((req) => {
       const searchLower = search.toLowerCase()
 
       const matchesSearch =
-        (req.teacher ?? '').toLowerCase().includes(searchLower) ||
-        (req.subject ?? '').toLowerCase().includes(searchLower) ||
-        (req.formation ?? '').toLowerCase().includes(searchLower) ||
-        (req.type ?? '').toLowerCase().includes(searchLower)
+        (req.teacherName ?? '').toLowerCase().includes(searchLower) ||
+        (req.courseName ?? '').toLowerCase().includes(searchLower) ||
+        (req.teacherEmail ?? '').toLowerCase().includes(searchLower)
 
       return (
         matchesSearch &&
-        (filterStatus === '' || req.status === filterStatus) &&
-        (filterType === '' || req.type === filterType)
+        (filterStatus === '' ||
+          formatStatus(req.changeStatusLabel) === filterStatus) &&
+        (filterType === '' || req.changeType === filterType)
       )
     })
     .sort((a, b) => {
-      if (a.status === 'En attente' && b.status !== 'En attente') return -1
-      if (a.status !== 'En attente' && b.status === 'En attente') return 1
+      const aStatus = formatStatus(a.changeStatusLabel)
+      const bStatus = formatStatus(b.changeStatusLabel)
+
+      if (aStatus === 'En attente' && bStatus !== 'En attente') return -1
+      if (aStatus !== 'En attente' && bStatus === 'En attente') return 1
+
       return 0
     })
+
+  /* =========================
+     COUNTERS
+  ========================= */
+  const pendingCount = requests.filter(
+    (r) => formatStatus(r.changeStatusLabel) === 'En attente'
+  ).length
+
+  const approvedCount = requests.filter(
+    (r) => formatStatus(r.changeStatusLabel) === 'Approuvé'
+  ).length
+
+  const refusedCount = requests.filter(
+    (r) => formatStatus(r.changeStatusLabel) === 'Refusé'
+  ).length
 
   const handleViewDetails = (request: SessionChange) => {
     setSelectedRequest(request)
     setIsModalOpen(true)
   }
 
-  const pendingCount = requests.filter((r) => r.status === 'En attente').length
-  const approvedCount = requests.filter((r) => r.status === 'Approuvé').length
-  const refusedCount = requests.filter((r) => r.status === 'Refusé').length
-
-  if (loading) {
+  if (isLoading) {
     return (
       <PageLayout className="min-h-screen flex items-center justify-center">
         <div>Chargement...</div>
@@ -98,6 +113,7 @@ export default function RequestsPage() {
   return (
     <PageLayout className="min-h-screen bg-white py-12 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6">
+
         <Header
           pendingCount={pendingCount}
           approvedCount={approvedCount}
@@ -113,10 +129,10 @@ export default function RequestsPage() {
         {/* LIST */}
         <div className="flex flex-col gap-6 overflow-y-auto pt-2">
           {filteredRequests.length > 0 ? (
-            filteredRequests.map((req, index) => (
+            filteredRequests.map((req) => (
               <RequestCard
-                key={index}
-                {...req}
+                key={req.id}
+                data={req}
                 onViewDetails={() => handleViewDetails(req)}
               />
             ))
@@ -145,6 +161,7 @@ export default function RequestsPage() {
             onClose={() => setToast(null)}
           />
         )}
+
       </div>
     </PageLayout>
   )

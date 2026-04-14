@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { useAppClient } from '@/hooks/api/useAppClient'
-import { mockRequests } from '@/components/requests/mockRequests'
 import type { SessionChange } from '@/types/sessionChange'
 import type { ApiResponse } from '@/services/apiClient'
 
@@ -9,13 +8,10 @@ export function useSessionChangeService() {
 
   
   const getRequests = useCallback(async () => {
-    return Promise.resolve(mockRequests)
-
-    // FUTUR BACKEND
-    // return api
-    //   .get<ApiResponse<SessionChange[]>>('/SessionChanges')
-    //   .then((r) => r.data.result)
-  }, [])
+  return api
+    .get<ApiResponse<SessionChange[]>>('/SessionChanges')
+    .then((r) => r.data.result)
+}, [api])
 
   const getSessionChangeById = useCallback(
     (id: string) => {
@@ -73,6 +69,14 @@ export function useSessionChangeService() {
     },
     [api],
   )
+  const getSessionGroups = useCallback(
+  (sessionId: string) => {
+    return api
+      .get<ApiResponse<any>>(`/Attends/session/${sessionId}`)
+      .then((r) => r.data.result)
+  },
+  [api],
+  )
 
   const getRoom = useCallback(
     (id: string) => {
@@ -91,6 +95,23 @@ export function useSessionChangeService() {
     },
     [api],
   )
+  const getTrack = useCallback(
+  (id: string) => {
+    return api
+      .get(`/Tracks/${id}`)
+      .then((r) => r.data.result)
+  },
+  [api],
+)
+
+const getProgram = useCallback(
+  (id: string) => {
+    return api
+      .get(`/Programs/${id}`)
+      .then((r) => r.data.result)
+  },
+  [api],
+)
 
   return {
     getRequests,
@@ -102,5 +123,8 @@ export function useSessionChangeService() {
     getGroup,
     getRoom,
     getBuilding,
+    getSessionGroups,
+    getTrack,
+    getProgram,
   }
 }

@@ -1,52 +1,44 @@
 export interface SessionChange {
+  id: string
 
-  status: 'En attente' | 'Approuvé' | 'Refusé'
-  teacher: string
-  email?: string
-  type: 'Changement de salle' | 'Proposition de récupération de séance'
+  teacherId: string
+  teacherName: string
+  teacherEmail: string
 
-  subject: string
-  formation: string
-  sessionTime?: string
+  concernedTeacherId: string
+  concernedTeacherName: string
+  concernedTeacherEmail: string
+
+  sessionId: string
+  courseName: string
+  sessionDate: string
+
+  sessionStartTime: any
+  sessionEndTime: any
+
+  currentRoomId: string
+  currentRoomNumber: string
+  currentBuildingName: string
+
+  changeStatusId: string
+  changeStatusLabel: string
+  changeType: string
+
+  reason: string
   requestDate: string
-  groups?: string
 
-  reason?: string
-  rejectReason?: string
+  oldRoomId: string
+  approvedRoomId?: string
 
-  concernedTeacher?: string
-  concernedTeacherEmail?: string
+  proposedDate?: string
+  proposedStartTime: any
+  proposedEndTime: any
+  proposedRoomId?: string
 
-  // salle actuelle
-  currentRoom?: string
-  currentRoomType?: string
-  currentRoomCapacity?: string
-  currentBuilding?: string
+  counterProposalDate?: string
+  counterProposalStartTime: any
+  counterProposalEndTime: any
+  counterProposalRoomId?: string
 
-  // salle proposée
-  recentRoom?: string
-  recentRoomType?: string
-  recentRoomCapacity?: string
-  recentBuilding?: string
-
-  // séance ratée
-  missedSlot?: string
-  missedRoom?: string
-  missedRoomType?: string
-  missedRoomCapacity?: string
-  missedBuilding?: string
-
-  // proposition professeur
-  teacherProposalSlot?: string
-  teacherProposalRoom?: string
-  teacherProposalRoomType?: string
-  teacherProposalRoomCapacity?: string
-  teacherProposalBuilding?: string
-
-  // proposition admin
-  adminSlot?: string
-  adminRoom?: string
-  adminRoomType?: string
-  adminRoomCapacity?: string
-  adminBuilding?: string
+  rejectionReason?: string
 }
