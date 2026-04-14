@@ -161,11 +161,8 @@ function PlanningHeader({
         />
       </div>
 
-      <button className="btn btn-ghost btn-circle btn-sm">
-        <BellIcon className="w-5 h-5 text-gray-600" />
-      </button>
-    </PageHeader>
-  )
-}
+      </PageHeader>
+    )
+  }
 
 export default PlanningHeader
