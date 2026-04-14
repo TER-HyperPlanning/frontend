@@ -79,6 +79,58 @@ export interface TrackResponse {
   lieu: string | null
 }
 
+export interface GroupModel {
+  id: string
+  name: string
+  academicYear: string
+  capacity?: number
+  trackId: string
+}
+
+export interface CreateGroupRequest {
+  name: string
+  academicYear: string
+  capacity: number
+  trackId: string
+}
+
+export interface UpdateGroupRequest {
+  name: string
+  academicYear: string
+  capacity: number
+  trackId: string
+}
+
+export interface StudentModel {
+  id: string
+  email: string
+  password?: string
+  firstName: string
+  lastName: string
+  phone: string
+  role?: string
+  createdAt?: string
+  updatedAt?: string
+  groupId: string | null
+}
+
+export interface CreateStudentRequest {
+  email: string
+  password?: string
+  firstName: string
+  lastName: string
+  phone: string
+  groupId?: string | null
+}
+
+export interface UpdateStudentRequest {
+  email?: string
+  firstName?: string
+  lastName?: string
+  phone?: string
+  groupId?: string | null
+}
+
 export interface CreateTrackRequest {
   name: string
   teacherId: string

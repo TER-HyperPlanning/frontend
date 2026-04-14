@@ -32,6 +32,7 @@ export function isAllowedAppPath(role: AppRole, pathname: string): boolean {
   if (role === 'ADMIN') {
     const prefixes = [
       '/teachers',
+      '/students',
       '/scolarite',
       '/requests',
       '/modules',
@@ -84,6 +85,7 @@ export type NavItemDef = {
 export const MAIN_NAV_ITEMS: NavItemDef[] = [
   { to: '/planning', label: 'Planning', roles: ['ADMIN', 'TEACHER'] },
   { to: '/teachers', label: 'Enseignants', roles: ['ADMIN'] },
+  { to: '/students', label: 'Etudiants', roles: ['ADMIN'] },
   { to: '/groupes', label: 'Groupes', roles: ['ADMIN'] },
   { to: '/buildings', label: 'Bâtiments et salles', roles: ['ADMIN'] },
   { to: '/formations', label: 'Formations', roles: ['ADMIN'] },

@@ -1,5 +1,5 @@
 import { twMerge } from 'tailwind-merge';
-import { type ReactNode } from 'react';
+import { type MouseEventHandler, type ReactNode } from 'react';
 
 export interface ButtonProps {
   children: ReactNode;
@@ -8,7 +8,7 @@ export interface ButtonProps {
   rightIcon?: ReactNode;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
 }
 

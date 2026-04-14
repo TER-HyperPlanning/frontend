@@ -1,24 +1,25 @@
-export type GroupType = 'FI' | 'FA'
-
 export interface Group {
   id: string
-  nom: string
-  type: GroupType
-  formation: string
-  classe: string
-  capacite: number
-  effectif: number
+  name: string
+  academicYear: string
+  capacity: number
+  trackId: string
+  programId: string | null
+  trackName: string
+  programName: string
+  studentCount: number
 }
 
 export interface Student {
   id: string
-  nom: string
-  prenom: string
+  firstName: string
+  lastName: string
   email: string
-  groupeId: string | null
+  phone: string
+  groupId: string | null
 }
 
-export type SortKey = 'capacite' | 'effectif'
+export type SortKey = 'name' | 'academicYear' | 'trackName' | 'programName' | 'studentCount'
 
 export interface SortConfig {
   key: SortKey | null

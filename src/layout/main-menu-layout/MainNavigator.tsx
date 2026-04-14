@@ -11,6 +11,7 @@ import { navItemsForRole, normalizeRole, type AppRole } from '@/auth/rolePermiss
 const NAV_ICONS: Record<string, ReactNode> = {
   '/planning': <CalendarDays size={20} />,
   '/teachers': <Users size={20} />,
+  '/students': <UsersRound size={20} />,
   '/groupes': <UsersRound size={20} />,
   '/buildings': <HiOutlineOfficeBuilding size={20} />,
   '/formations': <BookOpen size={20} />,
@@ -91,7 +92,8 @@ export default function MainNavigator() {
           ))}
         </div>
 
-        <div className="border-none mt-auto px-2 flex flex-col">
+        <div className="border-none mt-auto px-1.5 flex flex-col gap-2">
+
           <UserAvatar fullName={fullName} roleLabel={roleLabel} isOpen={isOpen} />
           <button
             type="button"
