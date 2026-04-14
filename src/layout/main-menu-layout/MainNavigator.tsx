@@ -17,7 +17,6 @@ const NAV_ICONS: Record<string, ReactNode> = {
   '/formations': <BookOpen size={20} />,
   '/filieres': <GitBranch size={20} />,
   '/sessions': <CalendarCheck size={20} />,
-  '/modules': <BookOpen size={20} />,
   '/requests': <Clock size={20} />,
   '/scolarite': <GraduationCap size={20} />,
   '/availability': <CalendarRange size={20} />,
@@ -64,11 +63,9 @@ export default function MainNavigator() {
       <motion.nav
         animate={{ width: isOpen ? 240 : 72 }}
         transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden md:flex h-screen flex-col py-4 overflow-hidden shrink-0 sticky top-0"// AJOUT Rosane
+        className="hidden md:flex h-screen flex-col py-4 overflow-hidden shrink-0 sticky top-0"
       >
         <div className={`flex items-center mb-6 px-4 ${isOpen ? 'justify-between' : 'justify-center  gap-4 flex-col-reverse'}`}>
-          
-          
           <Logo showText={false} className="h-8 w-auto text-primary-700" />
           <button
             onClick={() => setIsOpen((prev) => !prev)}
@@ -81,10 +78,8 @@ export default function MainNavigator() {
               {isOpen ? <X size={20} /> : <Menu size={20} />}
             </motion.div>
           </button>
-          
         </div>
 
-        {/* Navigation links */}
         <div className="flex-1 flex flex-col gap-1 px-3">
           {navItems.map((item) => (
             <NavLink
@@ -119,7 +114,6 @@ export default function MainNavigator() {
         </div>
       </motion.nav>
 
-      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden flex flex-row items-center justify-around bg-white border-t border-gray-200 p-2 shrink-0 z-50">
         {navItems.map((item) => (
           <NavLink

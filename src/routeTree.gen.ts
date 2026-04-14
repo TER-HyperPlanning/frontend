@@ -22,7 +22,6 @@ import { Route as appSettingsIndexRouteImport } from './routes/(app)/settings/in
 import { Route as appSessionsIndexRouteImport } from './routes/(app)/sessions/index'
 import { Route as appScolariteIndexRouteImport } from './routes/(app)/scolarite/index'
 import { Route as appRequestsIndexRouteImport } from './routes/(app)/requests/index'
-import { Route as appModulesIndexRouteImport } from './routes/(app)/modules/index'
 import { Route as appGroupesIndexRouteImport } from './routes/(app)/groupes/index'
 import { Route as appFormationsIndexRouteImport } from './routes/(app)/formations/index'
 import { Route as appFilieresIndexRouteImport } from './routes/(app)/filieres/index'
@@ -98,11 +97,6 @@ const appRequestsIndexRoute = appRequestsIndexRouteImport.update({
   path: '/requests/',
   getParentRoute: () => appRouteRoute,
 } as any)
-const appModulesIndexRoute = appModulesIndexRouteImport.update({
-  id: '/modules/',
-  path: '/modules/',
-  getParentRoute: () => appRouteRoute,
-} as any)
 const appGroupesIndexRoute = appGroupesIndexRouteImport.update({
   id: '/groupes/',
   path: '/groupes/',
@@ -167,7 +161,6 @@ export interface FileRoutesByFullPath {
   '/filieres/': typeof appFilieresIndexRoute
   '/formations/': typeof appFormationsIndexRoute
   '/groupes/': typeof appGroupesIndexRoute
-  '/modules/': typeof appModulesIndexRoute
   '/requests/': typeof appRequestsIndexRoute
   '/scolarite/': typeof appScolariteIndexRoute
   '/sessions/': typeof appSessionsIndexRoute
@@ -192,7 +185,6 @@ export interface FileRoutesByTo {
   '/filieres': typeof appFilieresIndexRoute
   '/formations': typeof appFormationsIndexRoute
   '/groupes': typeof appGroupesIndexRoute
-  '/modules': typeof appModulesIndexRoute
   '/requests': typeof appRequestsIndexRoute
   '/scolarite': typeof appScolariteIndexRoute
   '/sessions': typeof appSessionsIndexRoute
@@ -219,7 +211,6 @@ export interface FileRoutesById {
   '/(app)/filieres/': typeof appFilieresIndexRoute
   '/(app)/formations/': typeof appFormationsIndexRoute
   '/(app)/groupes/': typeof appGroupesIndexRoute
-  '/(app)/modules/': typeof appModulesIndexRoute
   '/(app)/requests/': typeof appRequestsIndexRoute
   '/(app)/scolarite/': typeof appScolariteIndexRoute
   '/(app)/sessions/': typeof appSessionsIndexRoute
@@ -246,7 +237,6 @@ export interface FileRouteTypes {
     | '/filieres/'
     | '/formations/'
     | '/groupes/'
-    | '/modules/'
     | '/requests/'
     | '/scolarite/'
     | '/sessions/'
@@ -271,7 +261,6 @@ export interface FileRouteTypes {
     | '/filieres'
     | '/formations'
     | '/groupes'
-    | '/modules'
     | '/requests'
     | '/scolarite'
     | '/sessions'
@@ -297,7 +286,6 @@ export interface FileRouteTypes {
     | '/(app)/filieres/'
     | '/(app)/formations/'
     | '/(app)/groupes/'
-    | '/(app)/modules/'
     | '/(app)/requests/'
     | '/(app)/scolarite/'
     | '/(app)/sessions/'
@@ -412,13 +400,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appRequestsIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
-    '/(app)/modules/': {
-      id: '/(app)/modules/'
-      path: '/modules'
-      fullPath: '/modules/'
-      preLoaderRoute: typeof appModulesIndexRouteImport
-      parentRoute: typeof appRouteRoute
-    }
     '/(app)/groupes/': {
       id: '/(app)/groupes/'
       path: '/groupes'
@@ -500,7 +481,6 @@ interface appRouteRouteChildren {
   appFilieresIndexRoute: typeof appFilieresIndexRoute
   appFormationsIndexRoute: typeof appFormationsIndexRoute
   appGroupesIndexRoute: typeof appGroupesIndexRoute
-  appModulesIndexRoute: typeof appModulesIndexRoute
   appRequestsIndexRoute: typeof appRequestsIndexRoute
   appScolariteIndexRoute: typeof appScolariteIndexRoute
   appSessionsIndexRoute: typeof appSessionsIndexRoute
@@ -520,7 +500,6 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appFilieresIndexRoute: appFilieresIndexRoute,
   appFormationsIndexRoute: appFormationsIndexRoute,
   appGroupesIndexRoute: appGroupesIndexRoute,
-  appModulesIndexRoute: appModulesIndexRoute,
   appRequestsIndexRoute: appRequestsIndexRoute,
   appScolariteIndexRoute: appScolariteIndexRoute,
   appSessionsIndexRoute: appSessionsIndexRoute,

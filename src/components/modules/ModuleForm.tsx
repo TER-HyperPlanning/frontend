@@ -7,7 +7,6 @@ const moduleSchema = z.object({
   code: z.string().min(2, "Le code est obligatoire"),
   formationId: z.string().min(1, "Formation obligatoire"),
   volume: z.string().optional(),
-  teacher: z.string().optional(),
 });
 
 type Module = {
@@ -16,7 +15,6 @@ type Module = {
   code: string;
   formationId?: string;
   volume?: string;
-  teacher?: string;
 };
 
 type Props = {
@@ -25,7 +23,6 @@ type Props = {
     code: string;
     formationId: string;
     volume?: string;
-    teacher?: string;
   }) => void | Promise<void>;
   editingModule: Module | null;
   selectedFormation: string;
@@ -42,7 +39,6 @@ export default function ModuleForm({
       code: "",
       formationId: selectedFormation,
       volume: "",
-      teacher: "",
     },
     onSubmit: async ({ value }) => {
       await onSubmit(value);
@@ -58,9 +54,11 @@ export default function ModuleForm({
     if (editingModule) {
       form.setFieldValue("name", editingModule.name);
       form.setFieldValue("code", editingModule.code);
-      form.setFieldValue("formationId", editingModule.formationId || selectedFormation);
+      form.setFieldValue(
+        "formationId",
+        editingModule.formationId || selectedFormation
+      );
       form.setFieldValue("volume", editingModule.volume || "");
-      form.setFieldValue("teacher", editingModule.teacher || "");
     }
   }, [editingModule, selectedFormation]);
 
@@ -107,7 +105,8 @@ export default function ModuleForm({
             <input
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
-              className="input input-bordered w-full"
+              disabled={!!editingModule}
+              className="input input-bordered w-full disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
             />
             {field.state.meta.errors?.length > 0 && (
               <p className="text-error text-sm mt-1">
@@ -120,7 +119,7 @@ export default function ModuleForm({
 
       <form.Field name="volume">
         {(field) => (
-          <div>
+          <div className="col-span-2">
             <label className="block mb-1 font-medium">
               Volume horaire (CM/TD)
             </label>
@@ -129,22 +128,6 @@ export default function ModuleForm({
               onChange={(e) => field.handleChange(e.target.value)}
               className="input input-bordered w-full"
               placeholder="En attente de Assign"
-            />
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field name="teacher">
-        {(field) => (
-          <div>
-            <label className="block mb-1 font-medium">
-              Intervenant responsable
-            </label>
-            <input
-              value={field.state.value || ""}
-              onChange={(e) => field.handleChange(e.target.value)}
-              className="input input-bordered w-full"
-              placeholder="Non géré par l'API actuelle"
             />
           </div>
         )}
