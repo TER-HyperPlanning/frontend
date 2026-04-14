@@ -19,6 +19,10 @@ interface AddSessionModalProps {
   onAdd: (values: AddSessionValues) => Promise<boolean>
   /** Préremplit le groupe (ex. groupe choisi sur la page) */
   defaultGroupId?: string
+  /** Préremplit la date de début (ex. double-click sur un slot) */
+  defaultDate?: Date | null
+  /** Préremplit la plage de temps (ex. heure de début et fin) */
+  defaultDateRange?: { start: Date; end: Date } | null
 }
 
 export default function AddSessionModal({
@@ -26,6 +30,8 @@ export default function AddSessionModal({
   onClose,
   onAdd,
   defaultGroupId = '',
+  defaultDate = null,
+  defaultDateRange = null,
 }: AddSessionModalProps) {
   const form = useAddSessionForm(async (values) => {
     const ok = await onAdd(values)
@@ -37,6 +43,32 @@ export default function AddSessionModal({
       form.setFieldValue('groupId', defaultGroupId)
     }
   }, [isOpen, defaultGroupId, form])
+
+  useEffect(() => {
+    if (isOpen && defaultDate) {
+      const dateStr = defaultDate.toISOString().split('T')[0]
+      form.setFieldValue('startDate', dateStr)
+      form.setFieldValue('endDate', dateStr)
+    }
+  }, [isOpen, defaultDate, form])
+
+  useEffect(() => {
+    if (isOpen && defaultDateRange) {
+      const startDateStr = defaultDateRange.start.toISOString().split('T')[0]
+      const startTimeStr = defaultDateRange.start
+        .toISOString()
+        .split('T')[1]
+        .slice(0, 5)
+
+      const endDateStr = defaultDateRange.end.toISOString().split('T')[0]
+      const endTimeStr = defaultDateRange.end.toISOString().split('T')[1].slice(0, 5)
+
+      form.setFieldValue('startDate', startDateStr)
+      form.setFieldValue('startTime', startTimeStr)
+      form.setFieldValue('endDate', endDateStr)
+      form.setFieldValue('endTime', endTimeStr)
+    }
+  }, [isOpen, defaultDateRange, form])
 
   const courseOptions = useCourseOptions()
   const groupOptions = useGroupOptions()
