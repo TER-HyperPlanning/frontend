@@ -1,6 +1,8 @@
-import ReactDOM from 'react-dom/client'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { Toaster } from 'react-hot-toast'
 import { routeTree } from './routeTree.gen'
 
 import { NotificationProvider } from './features/notifications/NotificationContext'
@@ -40,11 +42,3 @@ if (rootElement && !rootElement.innerHTML) {
     </StrictMode>,
   )
 }
-
-const root = ReactDOM.createRoot(rootElement)
-
-root.render(
-	<QueryClientProvider client={queryClient}>
-		<RouterProvider router={router} />
-	</QueryClientProvider>,
-)
