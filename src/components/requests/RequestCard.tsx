@@ -6,16 +6,13 @@ interface RequestCardProps {
   onViewDetails?: () => void
 }
 
-/* =========================
-   STATUS FORMATTER
-========================= */
 const formatStatus = (status: string) => {
   switch (status) {
-    case 'ATTENTE':
+    case 'En attente':
       return 'En attente'
-    case 'APPROUVE':
+    case 'Approuvé':
       return 'Approuvé'
-    case 'REFUSE':
+    case 'Refusé':
       return 'Refusé'
     default:
       return status
@@ -29,7 +26,6 @@ export default function RequestCard({
 
   if (!data) return null
 
-  /* ✅ IMPORTANT FIX ICI */
   const status = formatStatus(data.changeStatusLabel)
 
   let statusIcon

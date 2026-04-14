@@ -23,13 +23,15 @@ export function useSessionChangeService() {
   )
 
   const approveRoom = useCallback(
-    (id: string) => {
-      return api
-        .post<ApiResponse<any>>(`/SessionChanges/${id}/approve-room`)
-        .then((r) => r.data.result)
-    },
-    [api],
-  )
+  ({ id, roomId }: { id: string; roomId: string }) => {
+    return api
+      .post<ApiResponse<any>>(`/SessionChanges/${id}/approve-room`, {
+        roomId,
+      })
+      .then((r) => r.data.result)
+  },
+  [api],
+)
 
   const approveRecovery = useCallback(
     (id: string) => {
@@ -41,9 +43,11 @@ export function useSessionChangeService() {
   )
 
   const rejectSessionChange = useCallback(
-    (data: { id: string; reason: string }) => {
+    ({ id, rejectionReason }: { id: string; rejectionReason: string }) => {
       return api
-        .post<ApiResponse<any>>(`/SessionChanges/${data.id}/reject`, { reason: data.reason })
+        .post<ApiResponse<any>>(`/SessionChanges/${id}/reject`, {
+          rejectionReason,
+        })
         .then((r) => r.data.result)
     },
     [api],

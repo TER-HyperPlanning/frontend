@@ -22,7 +22,16 @@ export default function AlternativeSlotModal({
 }: AlternativeSlotModalProps) {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
 
+  // ✅ AJOUT : plage horaire personnalisée
+  const [startRange, setStartRange] = useState('')
+  const [endRange, setEndRange] = useState('')
+
   if (!isOpen) return null
+
+  const now = new Date()
+  const minDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16)
 
   // Exemple de créneaux
   const slots: Slot[] = [
@@ -30,6 +39,11 @@ export default function AlternativeSlotModal({
     { date: '11/03/2026', start: '14:00', end: '16:00', room: '105', typeRoom:'Amphitheatre', building: 'B' },
     { date: '12/03/2026', start: '08:00', end: '10:00', room: '302', typeRoom:'Informatique', building: 'C' },
   ]
+
+  const isRangeValid =
+    startRange &&
+    endRange &&
+    new Date(startRange) < new Date(endRange)
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50" onClick={onClose}>
@@ -44,6 +58,31 @@ export default function AlternativeSlotModal({
         <p className="mb-4 text-gray-600">
           Sélectionnez un créneau disponible pour la récupération de cette séance :
         </p>
+
+        {/* ✅ AJOUT : sélection plage horaire */}
+        <div className="mb-6 grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm text-gray-600">Début de plage</label>
+            <input
+              type="datetime-local"
+              value={startRange}
+              min={minDateTime}
+              onChange={(e) => setStartRange(e.target.value)}
+              className="w-full border border-gray-300 rounded-xl p-2 mt-1"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-600">Fin de plage</label>
+            <input
+              type="datetime-local"
+              value={endRange}
+              min={startRange || minDateTime}
+              onChange={(e) => setEndRange(e.target.value)}
+              className="w-full border border-gray-300 rounded-xl p-2 mt-1"
+            />
+          </div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-4">
           {slots.map((slot, index) => {
@@ -64,7 +103,11 @@ export default function AlternativeSlotModal({
                 <div>
                   <p className="font-semibold">{slot.date}</p>
                   <p>{slot.start} - {slot.end}</p>
-                  <p>Salle {slot.room} <br />Type: {slot.typeRoom} <br />Batiment: {slot.building}</p>
+                  <p>
+                    Salle {slot.room} <br />
+                    Type: {slot.typeRoom} <br />
+                    Batiment: {slot.building}
+                  </p>
                 </div>
 
                 {isSelected && (
@@ -77,23 +120,23 @@ export default function AlternativeSlotModal({
 
         <div className="flex gap-4 mt-6">
           <button
-            disabled={!selectedSlot}
+            disabled={!selectedSlot || !isRangeValid}
             onClick={() => selectedSlot && onConfirm(selectedSlot)}
             className={`flex-1 py-2 rounded-xl text-white ${
-              selectedSlot
+              selectedSlot && isRangeValid
                 ? 'bg-blue-500 hover:bg-blue-600'
                 : 'bg-blue-300 cursor-not-allowed'
             }`}
           >
             Confirmer le créneau alternatif
           </button>
+
           <button
             onClick={onClose}
             className="flex-1 bg-gray-200 hover:bg-gray-300 py-2 rounded-xl"
           >
             Annuler
           </button>
-
         </div>
       </div>
     </div>

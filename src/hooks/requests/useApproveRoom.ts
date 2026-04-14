@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useSessionChangeService} from '@/services/requestservices'
+import { useSessionChangeService } from '@/services/requestservices'
 
 export function useApproveRoom() {
   const queryClient = useQueryClient()
@@ -7,6 +7,7 @@ export function useApproveRoom() {
 
   return useMutation({
     mutationFn: approveRoom,
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessionChanges'] })
     },

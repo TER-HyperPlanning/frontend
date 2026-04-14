@@ -12,7 +12,7 @@ import {
   XCircle, CalendarDays, Check 
 } from 'lucide-react'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect  } from 'react'
 import type { SessionChange } from '../../types/sessionChange'
 
 import { useRoom } from '@/hooks/requests/useRoomQuery'
@@ -24,8 +24,11 @@ import { useProgram } from '@/hooks/requests/useProgramFromTrack'
 import { useQueries } from '@tanstack/react-query'
 import { useBuilding } from '@/hooks/requests/useBuilding'
 import { useAvailableRooms } from '@/hooks/requests/useAvailableRooms'
+import {useApproveRoom} from '@/hooks/requests/useApproveRoom'
 import AlternativeSlotModal from './AlternativeSlotModal'
 import ConfirmModal from './ConfirmModal'
+import RejectReasonModal from './RejectReasonModal'
+import { useRejectSessionChange } from '@/hooks/requests/useReject'
 
 
 interface RequestDetailsModalProps {
@@ -54,11 +57,11 @@ const formatTime = (time: any) => {
 
 const formatStatus = (status: string) => {
   switch (status) {
-    case 'ATTENTE':
+    case 'En attente':
       return 'En attente'
-    case 'APPROUVE':
+    case 'Approuvé':
       return 'Approuvé'
-    case 'REFUSE':
+    case 'Refusé':
       return 'Refusé'
     default:
       return status
@@ -71,6 +74,8 @@ export default function RequestDetailsModal({
   request,
   setToast,
 }: RequestDetailsModalProps) {
+  const { mutate: approveRoom } = useApproveRoom()
+  const { mutate: rejectSessionChange } = useRejectSessionChange()
 
   const { data: session } = useSessionChange(request.id)
 
@@ -82,6 +87,15 @@ export default function RequestDetailsModal({
   const { data: oldRoom } = useRoom(oldRoomId)
 
   const { data: attends } = useSessionGroups(sessionId)
+  
+  useEffect(() => {
+  const savedToast = localStorage.getItem('toast')
+
+  if (savedToast) {
+    setToast(JSON.parse(savedToast))
+    localStorage.removeItem('toast')
+  }
+}, [])
 
   const { getGroup } = useSessionChangeService()
   const oldBuildingId = oldRoom?.buildingId
@@ -130,10 +144,10 @@ export default function RequestDetailsModal({
   const [selectedRoom, setSelectedRoom] = useState<AvailableRoom | null>(null)
   const [roomSearch, setRoomSearch] = useState('')
   const [showConfirmRoom, setShowConfirmRoom] = useState(false)
+  const [showRejectModal, setShowRejectModal] = useState(false)
 
 
   const { getRoom } = useSessionChangeService()
-  // 🔥 RÉCUPERATION TYPE DES SALLES
   const roomDetailsQueries = useQueries({
     queries: (availableRoomsData ?? []).map((r: any) => ({
       queryKey: ['room-details', r.roomId],
@@ -186,17 +200,17 @@ export default function RequestDetailsModal({
             let statusIcon, statusStyle, borderColor
 
             switch (request.changeStatusLabel) {
-              case 'ATTENTE':
+              case 'En attente':
                 statusIcon = <Clock className="w-4 h-4" />
                 statusStyle = 'bg-yellow-100 text-yellow-700'
                 borderColor = 'border-yellow-400'
                 break
-              case 'APPROUVE':
+              case 'Approuvé':
                 statusIcon = <CheckCircle className="w-4 h-4" />
                 statusStyle = 'bg-green-100 text-green-700'
                 borderColor = 'border-green-500'
                 break
-              case 'REFUSE':
+              case 'Refusé':
                 statusIcon = <XCircle className="w-4 h-4" />
                 statusStyle = 'bg-red-100 text-red-700'
                 borderColor = 'border-red-500'
@@ -283,7 +297,7 @@ export default function RequestDetailsModal({
             <p>{request.reason}</p>
           </div>
         </div>
-        {request.changeType === 'RoomChange' && request.changeStatusLabel === 'ATTENTE' && (
+        {request.changeType === 'RoomChange' && request.changeStatusLabel === 'En attente' && (
           <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
               <MapPin className="w-6 h-6 text-gray-600" /> Sélectionner une salle disponible
@@ -328,14 +342,45 @@ export default function RequestDetailsModal({
 
             <div className="mt-6 flex gap-4">
               <button
-                onClick={() => {
-                  setToast({ message: 'Demande refusée', type: 'error' })
-                  onClose()
-                }}
+                onClick={() => setShowRejectModal(true)}
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl transition flex justify-center items-center gap-2"
               >
                 <XCircle className="w-5 h-5" /> Refuser
               </button>
+              <RejectReasonModal
+                isOpen={showRejectModal}
+                onClose={() => setShowRejectModal(false)}
+                onConfirm={(reason) => {
+                  if (!request.id) return
+
+                  rejectSessionChange(
+                    {
+                      id: request.id,
+                      rejectionReason: reason,
+                    },
+                    {
+                      onSuccess: () => {
+                        localStorage.setItem(
+                          'toast',
+                          JSON.stringify({
+                            message: 'Demande refusée avec succès',
+                            type: 'success',
+                          })
+                        )
+                        
+                        setShowRejectModal(false)
+                        onClose()
+
+                        window.location.reload()
+
+                      },
+                      onError: () => {
+                        setToast({ message: 'Erreur lors du refus', type: 'error' })
+                      },
+                    }
+                  )
+                }}
+              />
               <button
                 disabled={!selectedRoom}
                 onClick={() => setShowConfirmRoom(true)}
@@ -350,9 +395,33 @@ export default function RequestDetailsModal({
                 isOpen={showConfirmRoom}
                 onClose={() => setShowConfirmRoom(false)}
                 onConfirm={() => {
-                  setToast({ message: 'Changement de salle approuvé', type: 'success' })
-                  setShowConfirmRoom(false)
-                  onClose()
+                  if (!selectedRoom || !request.id) return
+
+                  approveRoom(
+                    {
+                      id: request.id,
+                      roomId: selectedRoom.roomId,
+                    },
+                    {
+                      onSuccess: () => {
+                        localStorage.setItem(
+                          'toast',
+                          JSON.stringify({
+                            message: 'Demande refusée avec succès',
+                            type: 'success',
+                          })
+                        )
+
+                        setShowConfirmRoom(false)
+                        onClose()
+
+                        window.location.reload()
+                      },
+                      onError: () => {
+                        setToast({ message: 'Erreur lors de l’approbation', type: 'error' })
+                      },
+                    }
+                  )
                 }}
                 title="Confirmer l'approbation"
                 description={`Vous êtes sur le point d'approuver le changement de salle.`}
@@ -368,7 +437,7 @@ export default function RequestDetailsModal({
             </div>
           </div>
         )}
-        {request.changeType === 'RoomChange' && request.changeStatusLabel !== 'REFUSE' && oldRoom && (
+        {request.changeType === 'RoomChange' && request.changeStatusLabel !== 'Refusé' && oldRoom && (
           <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
             <MapPin className="w-8 h-8 text-gray-800 mt-1" />
             <div>
@@ -446,7 +515,7 @@ export default function RequestDetailsModal({
           </div>
         )}
         {request.changeType === 'SessionRecovery' &&
-          request.changeStatusLabel === 'REFUSE' &&
+          request.changeStatusLabel === 'Refusé' &&
           session && (
             
             <div className="bg-orange-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
@@ -495,7 +564,7 @@ export default function RequestDetailsModal({
             </div>
           )}
         {request.changeType === 'SessionRecovery' &&
-          request.changeStatusLabel === 'ATTENTE' && (
+          request.changeStatusLabel === 'En attente' && (
             
             <div className="mt-4 flex gap-4">
                   
@@ -578,16 +647,18 @@ export default function RequestDetailsModal({
           )}
 
         {/* REJECT */}
-        {request.changeStatusLabel === 'REFUSE' && session?.rejectionReason && (
-          <div className="bg-red-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-            <XCircle className="w-8 h-8 text-red-600 mt-1" />
-            <div>
-              <h3 className="font-semibold text-lg mb-2 text-red-600">
-                Motif du refus
-              </h3>
-              <p>{session.rejectionReason}</p>
+        {request.changeStatusLabel === 'Refusé' &&
+          request.changeType === 'RoomChange' &&
+          session?.rejectionReason && (
+            <div className="bg-red-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+              <XCircle className="w-8 h-8 text-red-600 mt-1" />
+              <div>
+                <h3 className="font-semibold text-lg mb-2 text-red-600">
+                  Motif du refus
+                </h3>
+                <p>{session.rejectionReason}</p>
+              </div>
             </div>
-          </div>
         )}
 
       </div>
