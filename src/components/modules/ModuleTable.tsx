@@ -7,7 +7,6 @@ type Module = {
   code: string;
   formationId?: string;
   volume?: string;
-  teacher?: string;
 };
 
 type Props = {
@@ -28,7 +27,6 @@ export default function ModuleTable({
           <TableHeader>Nom</TableHeader>
           <TableHeader>Code</TableHeader>
           <TableHeader>Volume horaire</TableHeader>
-          <TableHeader>Intervenant</TableHeader>
           <TableHeader>Actions</TableHeader>
         </TableRow>
       </TableHead>
@@ -49,10 +47,6 @@ export default function ModuleTable({
 
               <TableCell className="text-sm text-base-content/80">
                 {module.volume ?? <span className="text-base-content/40 italic">—</span>}
-              </TableCell>
-
-              <TableCell className="text-sm text-base-content/80">
-                {module.teacher ?? <span className="text-base-content/40 italic">Non assigné</span>}
               </TableCell>
 
               <TableCell>
@@ -76,7 +70,7 @@ export default function ModuleTable({
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={5} className="py-16 text-center text-base-content/50">
+            <TableCell colSpan={4} className="py-16 text-center text-base-content/50">
               Aucun module trouvé.
             </TableCell>
           </TableRow>
