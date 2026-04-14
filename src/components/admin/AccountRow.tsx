@@ -74,9 +74,13 @@ export default function AccountRow({
           className="px-3 py-1 text-xs sm:text-sm bg-red-600/80 hover:bg-red-600 text-white flex-shrink-0 transition-all"
           onClick={async () => {
             if (confirm(`Êtes-vous sûr de vouloir supprimer le compte "${account.name}" ?`)) {
+              console.log(`Delete button clicked for account: ${account.id}`)
               setLoading(true)
-              await onDelete(account.id)
-              setLoading(false)
+              try {
+                await onDelete(account.id)
+              } finally {
+                setLoading(false)
+              }
             }
           }}
           disabled={loading}

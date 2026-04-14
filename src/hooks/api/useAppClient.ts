@@ -4,6 +4,7 @@ import axios, {
     type InternalAxiosRequestConfig,
 } from 'axios';
 import { useMemo } from 'react';
+import { getApiBaseUrl } from '@/config/api';
 
 /**
  * Hook retournant une instance Axios authentifiée (Bearer JWT).
@@ -13,7 +14,7 @@ import { useMemo } from 'react';
 export function useAppClient() {
     const api: AxiosInstance = useMemo(() => {
         const instance = axios.create({
-            baseURL: import.meta.env.VITE_API_URL || "https://hyper-planning.fr/api",
+            baseURL: getApiBaseUrl(),
             headers: {
                 'Content-Type': 'application/json',
             },

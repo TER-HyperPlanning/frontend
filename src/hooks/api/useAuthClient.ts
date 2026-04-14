@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import { useMemo } from 'react';
+import { getApiBaseUrl } from '@/config/api';
 
 /**
  * Hook retournant une instance Axios publique (sans token).
@@ -9,7 +10,7 @@ export function useAuthClient() {
     const authApi: AxiosInstance = useMemo(
         () =>
             axios.create({
-                baseURL: import.meta.env.VITE_API_URL || "https://hyper-planning.fr/api",
+                baseURL: getApiBaseUrl(),
                 headers: {
                     'Content-Type': 'application/json',
                 },

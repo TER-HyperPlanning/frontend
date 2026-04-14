@@ -21,6 +21,13 @@ export default defineConfig({
     },
   },
   server: {
+    proxy: {
+      '/api': {
+        target: 'https://hyper-planning.fr',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
     watch: {
       ignored: ['**/frontend/**'],
     },
