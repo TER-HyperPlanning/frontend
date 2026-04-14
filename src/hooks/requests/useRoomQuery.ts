@@ -7,6 +7,6 @@ export function useRoom(roomId?: string) {
   return useQuery({
     queryKey: ['room', roomId],
     queryFn: () => getRoom(roomId!),
-    enabled: !!roomId, // 🔥 très important
+    enabled: !!roomId,
   })
 }

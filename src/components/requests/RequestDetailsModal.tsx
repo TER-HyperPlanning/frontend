@@ -23,6 +23,7 @@ import { useTrack } from '@/hooks/requests/useTrackFromGroup'
 import { useProgram } from '@/hooks/requests/useProgramFromTrack'
 import { useQueries } from '@tanstack/react-query'
 import { useBuilding } from '@/hooks/requests/useBuilding'
+import { useAvailableRooms } from '@/hooks/requests/useAvailableRooms'
 import AlternativeSlotModal from './AlternativeSlotModal'
 import ConfirmModal from './ConfirmModal'
 
@@ -34,8 +35,9 @@ interface RequestDetailsModalProps {
   setToast: (toast: { message: string; type: 'success' | 'error' }) => void
 }
 interface AvailableRoom {
-  room: string
-  building: string
+  roomId: string
+  roomNumber: string
+  buildingName: string
   capacity: number
   type: string
 }
@@ -119,6 +121,7 @@ export default function RequestDetailsModal({
 
   const counterBuildingId = counterRoom?.buildingId
   const { data: counterBuilding } = useBuilding(counterBuildingId)
+  const { data: availableRoomsData, isLoading } = useAvailableRooms(sessionId)
   
   const [showConfirmAccept, setShowConfirmAccept] = useState(false)
   const [showAlternativeModal, setShowAlternativeModal] = useState(false)
@@ -127,20 +130,33 @@ export default function RequestDetailsModal({
   const [selectedRoom, setSelectedRoom] = useState<AvailableRoom | null>(null)
   const [roomSearch, setRoomSearch] = useState('')
   const [showConfirmRoom, setShowConfirmRoom] = useState(false)
- 
-  // Exemple de salles disponibles
-  const availableRooms: AvailableRoom[] = [
-    { room: '201', building: 'A', capacity: 30, type: 'Salle TD' },
-    { room: '202', building: 'A', capacity: 35, type: 'Salle informatique' },
-    { room: '301', building: 'B', capacity: 40, type: 'Amphithéâtre' },
-  ]
-  if (!isOpen) return null
 
-  const filteredRooms = availableRooms.filter((room) =>
-    room.room.toLowerCase().includes(roomSearch.toLowerCase()) ||
-    room.building.toLowerCase().includes(roomSearch.toLowerCase()) ||
-    room.type.toLowerCase().includes(roomSearch.toLowerCase())
+
+  const { getRoom } = useSessionChangeService()
+  // 🔥 RÉCUPERATION TYPE DES SALLES
+  const roomDetailsQueries = useQueries({
+    queries: (availableRoomsData ?? []).map((r: any) => ({
+      queryKey: ['room-details', r.roomId],
+      queryFn: () => getRoom(r.roomId),
+      enabled: !!r.roomId,
+    })),
+  })
+
+  const roomsWithTypes = (availableRoomsData ?? []).map((room: any, index: number) => {
+    const details = roomDetailsQueries[index]?.data as AvailableRoom | undefined
+
+    return {
+      ...room,
+      type: details?.type ?? 'Inconnu',
+    }
+  })
+
+ 
+  const filteredRooms = roomsWithTypes.filter((room: any) =>
+    room.roomNumber.toLowerCase().includes(roomSearch.toLowerCase()) ||
+    room.buildingName.toLowerCase().includes(roomSearch.toLowerCase())
   )
+  if (!isOpen) return null
 
   return (
     <div
@@ -214,8 +230,10 @@ export default function RequestDetailsModal({
 
           <div>
             <h3 className="font-semibold text-lg mb-2">
-              Informations de la séance
-            </h3>
+              {request.changeType === 'RoomChange'
+                ? 'Informations actuelles de la séance'
+                : 'Informations de la séance ratée'}
+          </h3>
 
             <p>Matière : {request.courseName}</p>
 
@@ -279,14 +297,14 @@ export default function RequestDetailsModal({
               className="w-full mb-4 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-h-80 overflow-y-auto grid md:grid-cols-2 gap-4 pr-2">
               {filteredRooms.length === 0 ? (
                 <div className="col-span-full text-center py-10 text-gray-400">
                   Aucune salle disponible pour ce créneau
                 </div>
               ) : (
-                filteredRooms.map((room) => {
-                const isSelected = selectedRoom?.room === room.room && selectedRoom?.building === room.building
+                filteredRooms.map((room:any) => {
+                const isSelected = selectedRoom?.roomId === room.roomId && selectedRoom?.buildingName === room.buildingName
                 return (
                   <div
                     key={room.room + room.building}
@@ -296,9 +314,9 @@ export default function RequestDetailsModal({
                     }`}
                   >
                     <div>
-                      <p className="font-semibold"><MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {room.room}</p>
-                      <p>Type : {room.type}</p>
-                      <p>Bâtiment : {room.building}</p>
+                      <p className="font-semibold"><MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {room.roomNumber}</p>
+                      <p>Type salle: {room.type}</p>
+                      <p>Bâtiment : {room.buildingName}</p>
                       <p>Capacité : {room.capacity}</p>
                     </div>
                     {isSelected && <Check className="text-blue-600 w-6 h-6" />}
@@ -340,11 +358,9 @@ export default function RequestDetailsModal({
                 description={`Vous êtes sur le point d'approuver le changement de salle.`}
                 details={
                   <>
-                    Séance du <strong>{request.sessionDate}</strong>
-                    <br />
-                    Nouvelle salle : <strong>{selectedRoom?.room}</strong>
+                    Nouvelle salle : <strong>{selectedRoom?.roomNumber}</strong>
                       <br />
-                    Bâtiment: <strong>{selectedRoom?.building}</strong>
+                    Bâtiment: <strong>{selectedRoom?.buildingName}</strong>
                   </>
                 }
                 confirmColor="green"

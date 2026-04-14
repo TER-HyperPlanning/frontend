@@ -112,6 +112,14 @@ const getProgram = useCallback(
   },
   [api],
 )
+const getAvailableRooms = useCallback(
+  (sessionId: string) => {
+    return api
+      .get<ApiResponse<any>>(`/SessionChanges/${sessionId}/available-rooms`)
+      .then((r) => r.data.result)
+  },
+  [api],
+)
 
   return {
     getRequests,
@@ -125,6 +133,6 @@ const getProgram = useCallback(
     getBuilding,
     getSessionGroups,
     getTrack,
-    getProgram,
+    getProgram, getAvailableRooms,
   }
 }
