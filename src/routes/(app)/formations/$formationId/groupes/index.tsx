@@ -29,7 +29,7 @@ function RouteComponent() {
     return groups.filter(
       (g) =>
         g.name.toLowerCase().includes(q) ||
-        g.trackName.toLowerCase().includes(q) ||
+        g.filiereName.toLowerCase().includes(q) ||
         g.academicYear.toLowerCase().includes(q),
     )
   }, [groups, searchQuery])
@@ -101,7 +101,7 @@ function RouteComponent() {
                       {g.name}
                     </TableCell>
                     <TableCell className="text-sm text-base-content/80">
-                      {g.trackName}
+                      {g.filiereName}
                     </TableCell>
                     <TableCell className="text-sm text-base-content/80">
                       {g.academicYear}

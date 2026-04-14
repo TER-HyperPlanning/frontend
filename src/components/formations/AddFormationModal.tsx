@@ -6,7 +6,7 @@ import {
   type AddFormationValues,
 } from '@/hooks/formations/useAddFormationForm'
 import { useTeacherOptions } from '@/hooks/formations/useTeacherOptions'
-import { useTrackOptions } from '@/hooks/formations/useTrackOptions'
+import { useFiliereOptions } from '@/hooks/formations/useFiliereOptions'
 import TextField from '@/components/TextField'
 import TextAreaField from '@/components/TextAreaField'
 import Button from '@/components/Button'
@@ -16,20 +16,22 @@ interface AddFormationModalProps {
   isOpen: boolean
   onClose: () => void
   onAdd: (values: AddFormationValues) => Promise<void>
+  defaultFiliereId?: string
 }
 
 export default function AddFormationModal({
   isOpen,
   onClose,
   onAdd,
+  defaultFiliereId,
 }: AddFormationModalProps) {
   const form = useAddFormationForm(async (values) => {
     await onAdd(values)
     form.reset()
-  })
+  }, defaultFiliereId)
 
   const enseignantOptions = useTeacherOptions()
-  const filiereOptions = useTrackOptions()
+  const filiereOptions = useFiliereOptions()
 
   return (
     <AnimatePresence>

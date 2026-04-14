@@ -30,12 +30,17 @@ export function useRoomService() {
   const { api } = useAppClient();
 
   const getRooms = useCallback(
-    () =>
-      api.get<ApiResponse<Array<Room>>>("/Room")
-        .then(r => r.data),
+    (params?: { q?: string; types?: string[] }) =>
+      api
+        .get<ApiResponse<Array<Room>>>("/Room", {
+          params: {
+            q: params?.q,
+            types: params?.types?.join(","),
+          },
+        })
+        .then(r => r.data.result),
     [api]
   );
-
   const createRoom = useCallback(
     (data: RoomRequest) =>
       api.post<ApiResponse<Room>>("/Room", data)

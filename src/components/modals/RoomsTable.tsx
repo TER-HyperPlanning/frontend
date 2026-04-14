@@ -10,19 +10,17 @@ interface RoomsTableProps {
     searchTerm: string;
     onSuccess: (message: string) => void;
     onError: (message: string) => void;
+    filterType: string;
     existingRooms: Array<Room>;
 }
 
-export default function RoomsTable({ rooms, searchTerm, onSuccess, onError }: RoomsTableProps) {
+export default function RoomsTable({ rooms, onSuccess, onError }: RoomsTableProps) {
     const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const filteredRooms = rooms.filter(room =>
-        room.roomNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        room.type.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredRooms = rooms;
 
     return (
         <>

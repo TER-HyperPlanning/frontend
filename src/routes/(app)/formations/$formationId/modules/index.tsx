@@ -30,7 +30,7 @@ function RouteComponent() {
       (m) =>
         m.name.toLowerCase().includes(q) ||
         m.code.toLowerCase().includes(q) ||
-        m.trackName.toLowerCase().includes(q),
+        m.filiereName.toLowerCase().includes(q),
     )
   }, [modules, searchQuery])
 
@@ -108,7 +108,7 @@ function RouteComponent() {
                       {m.hourlyVolume}h
                     </TableCell>
                     <TableCell className="text-sm text-base-content/80">
-                      {m.trackName}
+                      {m.filiereName}
                     </TableCell>
                   </TableRow>
                 ))}

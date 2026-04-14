@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { type TrackResponse } from '@/types/formation'
 import { useTrackService } from '@/services/trackService'
 import { useProgramService } from '@/services/programService'
 import { useAssignService, type AssignResponse } from '@/services/assignService'
@@ -11,12 +10,13 @@ export interface FormationModuleRow {
   name: string
   code: string
   hourlyVolume: number
-  trackName: string
+  /** Filière (Program) rattachée à la formation */
+  filiereName: string
 }
 
 export function useFormationModules(formationId: string) {
+  const { getTrackById } = useTrackService()
   const { getProgramById } = useProgramService()
-  const { getTracks } = useTrackService()
   const { getAssigns } = useAssignService()
   const { getCourses } = useCourseService()
 
@@ -27,23 +27,23 @@ export function useFormationModules(formationId: string) {
   const fetchModules = useCallback(async () => {
     setIsLoading(true)
     try {
-      const [program, allTracks, allAssigns, allCourses] = await Promise.all([
-        getProgramById(formationId).catch(() => null),
-        getTracks().catch(() => [] as TrackResponse[]),
+      const track = await getTrackById(formationId).catch(() => null)
+      const program = track?.programId
+        ? await getProgramById(track.programId).catch(() => null)
+        : null
+
+      setFormationName(track?.name ?? '')
+
+      const [allAssigns, allCourses] = await Promise.all([
         getAssigns().catch(() => [] as AssignResponse[]),
         getCourses().catch(() => [] as CourseResponse[]),
       ])
 
-      setFormationName(program?.name ?? '')
-
-      const trackIds = new Set(
-        allTracks.filter((t) => t.programId === formationId).map((t) => t.id),
-      )
-      const trackMap = new Map(allTracks.map((t) => [t.id, t.name]))
       const courseMap = new Map(allCourses.map((c) => [c.id, c]))
+      const filiereLabel = program?.name ?? '—'
 
       const rows: FormationModuleRow[] = allAssigns
-        .filter((a) => trackIds.has(a.trackId))
+        .filter((a) => a.trackId === formationId)
         .map((a) => {
           const course = courseMap.get(a.courseId)
           return {
@@ -51,7 +51,7 @@ export function useFormationModules(formationId: string) {
             name: course?.name ?? '—',
             code: course?.code ?? '—',
             hourlyVolume: a.hourlyVolume,
-            trackName: trackMap.get(a.trackId) ?? '—',
+            filiereName: filiereLabel,
           }
         })
 
@@ -61,7 +61,7 @@ export function useFormationModules(formationId: string) {
     } finally {
       setIsLoading(false)
     }
-  }, [formationId, getProgramById, getTracks, getAssigns, getCourses])
+  }, [formationId, getTrackById, getProgramById, getAssigns, getCourses])
 
   useEffect(() => {
     fetchModules()

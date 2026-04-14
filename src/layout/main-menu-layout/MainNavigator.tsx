@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock, CalendarRange, CalendarCheck } from 'lucide-react'
+import { CalendarDays, Users, Settings, Menu, X, UsersRound, BookOpen, GraduationCap, LogOut, Clock, CalendarRange, CalendarCheck, GitBranch } from 'lucide-react'
 import Logo from '@/components/Logo'
 import NavLink from '../../components/NavLink'
 import UserAvatar from '../../components/UserAvatar'
@@ -14,6 +14,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   '/groupes': <UsersRound size={20} />,
   '/buildings': <HiOutlineOfficeBuilding size={20} />,
   '/formations': <BookOpen size={20} />,
+  '/filieres': <GitBranch size={20} />,
   '/sessions': <CalendarCheck size={20} />,
   '/modules': <BookOpen size={20} />,
   '/requests': <Clock size={20} />,
