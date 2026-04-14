@@ -1,24 +1,70 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Plus, Bell } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Logo from '@/components/Logo'
 import SearchBar from './SearchBar'
-import FilterDropdown from './FilterDropdown'
 import ScolariteTable from './ScolariteTable'
 import ScolariteModal from './ScolariteModal'
-import AssignFiliereModal from './AssignFiliereModal'
-import { MOCK_ACCOUNTS, FILIERES } from './types'
+import Toast from '@/components/Toast'
+import { useToast } from '@/utils/useToast'
 import type { ScolariteAccount } from './types'
+import {
+  fetchScolariteAccounts,
+  createScolariteAccount,
+  updateScolariteAccount,
+  deleteScolariteAccount,
+  fetchGroups,
+} from '@/utils/api'
 
 export default function ScolaritePage() {
-    const [accounts, setAccounts] = useState<ScolariteAccount[]>(MOCK_ACCOUNTS)
+    const [accounts, setAccounts] = useState<ScolariteAccount[]>([])
+    const [groups, setGroups] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState('')
-    const [filiereFilter, setFiliereFilter] = useState('')
 
     // Modal states
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editAccount, setEditAccount] = useState<ScolariteAccount | null>(null)
-    const [assignAccount, setAssignAccount] = useState<ScolariteAccount | null>(null)
+
+    const { toasts, removeToast, success, error } = useToast()
+
+    // Load data from backend
+    useEffect(() => {
+        loadData()
+    }, [])
+
+    const loadData = async () => {
+        try {
+            setLoading(true)
+            console.log('Loading students and groups from backend...')
+            const [studentsData, groupsData] = await Promise.all([
+                fetchScolariteAccounts(),
+                fetchGroups(),
+            ])
+            
+            console.log('Groups loaded from backend:', groupsData)
+            console.log('Students loaded from backend:', studentsData)
+            
+            // Transform students to ScolariteAccount format
+            const transformedAccounts: ScolariteAccount[] = studentsData.map((student: any) => ({
+                id: student.id,
+                nom: student.lastName || '',
+                prenom: student.firstName || '',
+                email: student.email || '',
+                phone: student.phone || '',
+            }))
+            
+            setAccounts(transformedAccounts)
+            setGroups(groupsData)
+            console.log('Data loaded successfully:', { accounts: transformedAccounts.length, groups: groupsData.length })
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : 'Erreur lors du chargement'
+            console.error('Error loading data:', err)
+            error(errorMsg)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     // Filter and search
     const filteredAccounts = useMemo(() => {
@@ -27,51 +73,109 @@ export default function ScolaritePage() {
                 !search ||
                 acc.nom.toLowerCase().includes(search.toLowerCase()) ||
                 acc.prenom.toLowerCase().includes(search.toLowerCase()) ||
-                acc.email.toLowerCase().includes(search.toLowerCase())
+                acc.email.toLowerCase().includes(search.toLowerCase()) ||
+                acc.phone.toLowerCase().includes(search.toLowerCase())
 
-            const matchesFiliere =
-                !filiereFilter || acc.filieres.includes(filiereFilter)
-
-            return matchesSearch && matchesFiliere
+            return matchesSearch
         })
-    }, [accounts, search, filiereFilter])
+    }, [accounts, search])
 
     // CRUD handlers
-    function handleCreate(data: { nom: string; prenom: string; email: string }) {
-        const newAccount: ScolariteAccount = {
-            id: String(Date.now()),
-            nom: data.nom.toUpperCase(),
-            prenom: data.prenom,
-            email: data.email,
-            filieres: [],
+    async function handleCreate(data: { nom: string; prenom: string; email: string; phone: string; password?: string; groupId?: string }) {
+        try {
+            console.log('Creating student with data:', data)
+            
+            if (!data.groupId) {
+                throw new Error('Groupe est requis pour créer un étudiant')
+            }
+
+            const createPayload = {
+                firstName: data.prenom,
+                lastName: data.nom.toUpperCase(),
+                email: data.email,
+                phone: data.phone,
+                password: data.password || 'TempPassword123!',
+                groupId: data.groupId,
+            }
+            
+            console.log('Sending API request with payload:', createPayload)
+            const newStudent = await createScolariteAccount(createPayload)
+            console.log('Student created response:', newStudent)
+
+            const newAccount: ScolariteAccount = {
+                id: newStudent.id,
+                nom: newStudent.lastName || '',
+                prenom: newStudent.firstName || '',
+                email: newStudent.email || '',
+                phone: newStudent.phone || '',
+            }
+
+            setAccounts((prev) => [...prev, newAccount])
+            setIsCreateOpen(false)
+            success('Étudiant créé avec succès')
+            console.log('Student added to UI:', newAccount)
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la création'
+            console.error('Error creating student:', err)
+            error(errorMsg)
         }
-        setAccounts((prev) => [...prev, newAccount])
     }
 
-    function handleEdit(data: { nom: string; prenom: string; email: string }) {
+    async function handleEdit(data: { nom: string; prenom: string; email: string; phone: string }) {
         if (!editAccount) return
-        setAccounts((prev) =>
-            prev.map((acc) =>
-                acc.id === editAccount.id
-                    ? { ...acc, nom: data.nom.toUpperCase(), prenom: data.prenom, email: data.email }
-                    : acc
+        try {
+            console.log('Updating student:', editAccount.id, data)
+            await updateScolariteAccount(editAccount.id, {
+                firstName: data.prenom,
+                lastName: data.nom.toUpperCase(),
+                email: data.email,
+                phone: data.phone,
+            })
+
+            setAccounts((prev) =>
+                prev.map((acc) =>
+                    acc.id === editAccount.id
+                        ? { ...acc, nom: data.nom.toUpperCase(), prenom: data.prenom, email: data.email, phone: data.phone }
+                        : acc
+                )
             )
-        )
-        setEditAccount(null)
+            setEditAccount(null)
+            success('Étudiant modifié avec succès')
+            console.log('Student updated successfully')
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la modification'
+            console.error('Error updating student:', err)
+            error(errorMsg)
+        }
     }
 
-    function handleAssignFilieres(accountId: string, filieres: string[]) {
-        setAccounts((prev) =>
-            prev.map((acc) =>
-                acc.id === accountId ? { ...acc, filieres } : acc
-            )
-        )
+    async function handleDelete(accountId: string) {
+        try {
+            console.log('Deleting student:', accountId)
+            await deleteScolariteAccount(accountId)
+            setAccounts((prev) => prev.filter((acc) => acc.id !== accountId))
+            success('Étudiant supprimé avec succès')
+            console.log('Student deleted successfully')
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la suppression'
+            console.error('Error deleting student:', err)
+            error(errorMsg)
+        }
     }
 
-    const filiereOptions = FILIERES.map((f) => ({ value: f.nom, label: f.nom }))
+
 
     return (
         <div className="flex h-full">
+            {/* Toast Container */}
+            <div className="fixed top-4 right-4 z-50 max-w-sm space-y-2 pointer-events-none">
+                {toasts.map((toast) => (
+                    <div key={toast.id} className="pointer-events-auto">
+                        <Toast toast={{ message: toast.message, type: toast.type as 'success' | 'error' }} onClose={() => removeToast(toast.id)} />
+                    </div>
+                ))}
+            </div>
+
             {/* Left sidebar label */}
             <div className="flex flex-col w-0 sm:w-auto">
                 <motion.div
@@ -130,12 +234,6 @@ export default function ScolaritePage() {
                         onChange={setSearch}
                         placeholder="Rechercher un compte scolarité"
                     />
-                    <FilterDropdown
-                        label="Filière"
-                        options={filiereOptions}
-                        value={filiereFilter}
-                        onChange={setFiliereFilter}
-                    />
                 </motion.div>
 
                 {/* Table */}
@@ -145,15 +243,21 @@ export default function ScolaritePage() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
                     >
-                        <div className="card bg-base-100 border border-base-200">
-                            <div className="overflow-x-auto">
-                                <ScolariteTable
-                                    accounts={filteredAccounts}
-                                    onEdit={(acc) => setEditAccount(acc)}
-                                    onAssignFiliere={(acc) => setAssignAccount(acc)}
-                                />
+                        {loading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <span className="text-gray-500">Chargement des étudiants...</span>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="card bg-base-100 border border-base-200">
+                                <div className="overflow-x-auto">
+                                    <ScolariteTable
+                                        accounts={filteredAccounts}
+                                        onEdit={(acc) => setEditAccount(acc)}
+                                        onDelete={handleDelete}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </motion.div>
 
                     {/* Stats summary */}
@@ -164,7 +268,7 @@ export default function ScolaritePage() {
                         className="mt-4 text-xs text-gray-400"
                     >
                         {filteredAccounts.length} compte{filteredAccounts.length !== 1 ? 's' : ''} affiché{filteredAccounts.length !== 1 ? 's' : ''}
-                        {(search || filiereFilter) && ` sur ${accounts.length}`}
+                        {search && ` sur ${accounts.length}`}
                     </motion.div>
                 </div>
             </div>
@@ -174,6 +278,7 @@ export default function ScolaritePage() {
                 isOpen={isCreateOpen}
                 onClose={() => setIsCreateOpen(false)}
                 onSubmit={handleCreate}
+                groups={groups}
             />
 
             <ScolariteModal
@@ -181,13 +286,7 @@ export default function ScolaritePage() {
                 onClose={() => setEditAccount(null)}
                 onSubmit={handleEdit}
                 account={editAccount}
-            />
-
-            <AssignFiliereModal
-                isOpen={!!assignAccount}
-                onClose={() => setAssignAccount(null)}
-                onSubmit={handleAssignFilieres}
-                account={assignAccount}
+                groups={groups}
             />
         </div>
     )

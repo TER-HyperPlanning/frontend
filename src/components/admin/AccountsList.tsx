@@ -22,11 +22,14 @@ export default function AccountsList() {
   const loadAccounts = async () => {
     try {
       setLoading(true)
+      console.log('Loading admin accounts from backend...')
       const list = await fetchAccounts()
+      console.log('Accounts loaded successfully:', list)
       setAccounts(list)
     } catch (err) {
-      error('Erreur lors du chargement des comptes')
-      console.error(err)
+      const errorMsg = err instanceof Error ? err.message : 'Erreur lors du chargement des comptes'
+      console.error('Error loading accounts:', err)
+      error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -46,25 +49,29 @@ export default function AccountsList() {
 
   async function handleToggleActive(id: string, nextActive: boolean) {
     try {
+      console.log(`Toggling admin ${id} active status to:`, nextActive)
       if (nextActive) await enableAccount(id)
       else await disableAccount(id)
 
       setAccounts((prev) => prev.map((a) => (a.id === id ? { ...a, active: nextActive } : a)))
       success(nextActive ? 'Compte activé avec succès' : 'Compte désactivé avec succès')
     } catch (err) {
-      error('Erreur lors de la modification du statut')
-      console.error(err)
+      const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la modification du statut'
+      console.error('Error toggling account status:', err)
+      error(errorMsg)
     }
   }
 
   async function handleDelete(id: string) {
     try {
+      console.log(`Deleting admin account: ${id}`)
       await deleteAccount(id)
       setAccounts((prev) => prev.filter((a) => a.id !== id))
       success('Compte supprimé avec succès')
     } catch (err) {
-      error('Erreur lors de la suppression du compte')
-      console.error(err)
+      const errorMsg = err instanceof Error ? err.message : 'Erreur lors de la suppression du compte'
+      console.error('Error deleting account:', err)
+      error(errorMsg)
     }
   }
 
