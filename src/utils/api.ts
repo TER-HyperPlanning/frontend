@@ -1,7 +1,7 @@
 import { type Account } from '@/types'
+import { getApiBaseUrl } from '@/config/api'
 
-// API Configuration
-const API_BASE_URL = 'http://localhost:5075/api'
+const API_BASE_URL = getApiBaseUrl()
 
 // ==================== Interfaces ====================
 interface LoginResponse {
@@ -57,8 +57,6 @@ async function apiRequest<T>(
     ...options.headers,
   }
 
-  console.log(`API Request: ${options.method || 'GET'} ${API_BASE_URL}${endpoint}`)
-
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
@@ -67,7 +65,6 @@ async function apiRequest<T>(
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
     const errorMsg = errorData.message || `HTTP Error: ${response.status}`
-    console.error(`API Error: ${response.status} - ${errorMsg}`)
     throw new Error(errorMsg)
   }
 
@@ -77,7 +74,7 @@ async function apiRequest<T>(
 
 // ==================== Authentication ====================
 export async function login(credentials: { email: string; password: string }) {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/Auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(credentials),
@@ -89,7 +86,6 @@ export async function login(credentials: { email: string; password: string }) {
   
   if (token) {
     localStorage.setItem('accessToken', token)
-    console.log('Token saved to localStorage')
   }
   
   return data.result as LoginResponse
@@ -131,10 +127,7 @@ export async function fetchGroups() {
 
 // ==================== Admins - API Functions ====================
 export async function fetchAdmins() {
-  console.log('Fetching admins from:', `${API_BASE_URL}/Admins`)
-  const result = await apiRequest<AdminResponse[]>('/Admins')
-  console.log('Admins fetched:', result)
-  return result
+  return apiRequest<AdminResponse[]>('/Admins')
 }
 
 export async function createAdmin(data: {
@@ -143,7 +136,6 @@ export async function createAdmin(data: {
   email: string
   password: string
 }) {
-  console.log('Creating admin:', data)
   return apiRequest<AdminResponse>('/Admins', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -151,7 +143,6 @@ export async function createAdmin(data: {
 }
 
 export async function getAdminById(id: string) {
-  console.log('Fetching admin by ID:', id)
   return apiRequest<AdminResponse>(`/Admins/${id}`)
 }
 
@@ -164,22 +155,12 @@ export async function updateAdmin(id: string, data: Partial<AdminResponse>) {
 }
 
 export async function deleteAdmin(id: string) {
-  console.log('Deleting admin:', id)
   return apiRequest<void>(`/Admins/${id}`, { method: 'DELETE' })
 }
 
 export async function getDeletedAdmins() {
-  console.log('Fetching deleted admins')
   return apiRequest<AdminResponse[]>('/Admins/deleted')
 }
-
-// ==================== Legacy Mock Functions ====================
-// These are kept for backward compatibility
-const mockAccounts: Account[] = [
-  { id: '1', name: 'Alice Dupont', email: 'alice.dupont@uni.fr', active: true },
-  { id: '2', name: 'Benoît Martin', email: 'benoit.martin@uni.fr', active: true },
-  { id: '3', name: 'Chloé Bernard', email: 'chloe.bernard@uni.fr', active: false },
-]
 
 export async function fetchAccounts() {
   const admins = await fetchAdmins()

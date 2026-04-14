@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { clearSession, getAccessToken, getStoredCurrentUser, setSession, setStoredCurrentUser } from '@/auth/storage'
+import { getApiBaseUrl } from '@/config/api'
 import { useAuthClient } from './useAuthClient'
 import { useAppClient } from './useAppClient'
 
@@ -63,9 +64,8 @@ export function useAuth() {
             await queryClient.fetchQuery({
                 queryKey: authKeys.currentUser,
                 queryFn: async () => {
-                    const baseURL = import.meta.env.VITE_API_URL || "https://hyper-planning.fr/api"
                     const { data } = await axios.get<ApiResponse<CurrentUserResponse>>(
-                        `${baseURL}/Auth/current-user`,
+                        `${getApiBaseUrl()}/Auth/current-user`,
                         {
                             headers: { Authorization: `Bearer ${result.accessToken}` },
                         },

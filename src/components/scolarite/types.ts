@@ -61,6 +61,6 @@ export const MOCK_ACCOUNTS: ScolariteAccount[] = [
         nom: 'SIMON',
         prenom: 'Emma',
         email: 'emma.simon@univ-evry.fr',
-        filieres: ['Informatique'],
+        phone: '+33 6 11 22 33 44',
     },
 ]
