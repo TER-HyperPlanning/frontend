@@ -50,7 +50,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {...props}
       >
         {placeholder && (
-          <option value="" disabled selected={!value && !defaultValue}>
+          <option value="" disabled>
             {placeholder}
           </option>
         )}

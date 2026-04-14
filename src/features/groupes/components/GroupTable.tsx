@@ -1,93 +1,130 @@
-import { UserPlus } from 'lucide-react'
-import Button from '@/components/Button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table'
-import SortableHeader from './SortableHeader'
-import type { Group, SortConfig, SortKey, Student } from '../types'
+import { Pencil, Trash2, UserPlus } from 'lucide-react'
+import { useMemo } from 'react'
+import DataTable, { type DataColumn } from './DataTable'
+import type { Group, SortConfig, SortKey } from '../types'
 
 interface GroupTableProps {
   groupes: Group[]
-  students: Student[]
   sortConfig: SortConfig
   onSort: (key: SortKey) => void
+  onRowClick?: (groupe: Group) => void
   onAssign: (groupe: Group) => void
+  onEdit: (groupe: Group) => void
+  onDelete: (groupe: Group) => void
 }
 
-function GroupTable({ groupes, students, sortConfig, onSort, onAssign }: GroupTableProps) {
-  return (
-    <Table>
-      <TableHead>
-        <TableRow className="text-base-content/60 text-xs uppercase">
-          <TableHeader>Nom</TableHeader>
-          <TableHeader>Type</TableHeader>
-          <TableHeader>Formation</TableHeader>
-          <TableHeader>Classe</TableHeader>
-          <SortableHeader sortKey="capacite" sortConfig={sortConfig} onSort={onSort}>
-            Capacité
-          </SortableHeader>
-          <SortableHeader sortKey="effectif" sortConfig={sortConfig} onSort={onSort}>
-            Effectif
-          </SortableHeader>
-          <TableHeader>Remplissage</TableHeader>
-          <TableHeader>Actions</TableHeader>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {groupes.map(groupe => {
-          const ratio = groupe.effectif / groupe.capacite
-          const assignedCount = students.filter(student => student.groupeId === groupe.id).length
+const GROUP_CAPACITY_LIMIT = 30
 
+function GroupTable({ groupes, sortConfig, onSort, onRowClick, onAssign, onEdit, onDelete }: GroupTableProps) {
+  const columns = useMemo<DataColumn<Group, SortKey>[]>(
+    () => [
+      {
+        key: 'name',
+        label: 'Nom',
+        sortable: true,
+        render: groupe => <span className="font-medium text-base-content">{groupe.name}</span>,
+      },
+      {
+        key: 'academicYear',
+        label: 'Année',
+        sortable: true,
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.academicYear}</span>,
+      },
+      {
+        key: 'programName',
+        label: 'Formation',
+        sortable: true,
+        render: groupe => <span className="text-sm text-base-content/80">{groupe.programName}</span>,
+      },
+      {
+        key: 'studentCount',
+        label: 'Étudiants',
+        sortable: true,
+        render: groupe => <span className="badge badge-neutral badge-outline badge-sm font-medium">{groupe.studentCount}</span>,
+      },
+      {
+        key: 'actions',
+        label: 'Remplissage',
+        render: groupe => {
+          const ratio = groupe.studentCount / GROUP_CAPACITY_LIMIT
+          const progressValue = Math.min(ratio * 100, 100)
+          const progressLabel = `${Math.round(ratio * 100)}%`
           return (
-            <TableRow key={groupe.id}>
-              <TableCell className="font-medium text-base-content">{groupe.nom}</TableCell>
-              <TableCell>
-                <span
-                  className={`badge badge-sm font-medium ${
-                    groupe.type === 'FI'
-                      ? 'badge-primary badge-outline'
-                      : 'badge-secondary badge-outline'
-                  }`}
-                >
-                  {groupe.type}
-                </span>
-              </TableCell>
-              <TableCell className="text-sm text-base-content/80">{groupe.formation}</TableCell>
-              <TableCell className="text-sm text-base-content/80">{groupe.classe}</TableCell>
-              <TableCell className="text-sm">{groupe.capacite}</TableCell>
-              <TableCell className="text-sm">{groupe.effectif}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <progress
-                    className={`progress w-16 h-2 ${
-                      ratio > 0.9
-                        ? 'progress-error'
-                        : ratio > 0.7
-                          ? 'progress-warning'
-                          : 'progress-success'
-                    }`}
-                    value={ratio * 100}
-                    max={100}
-                  />
-                  <span className="text-xs text-base-content/50">{Math.round(ratio * 100)}%</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="outlined"
-                  leftIcon={<UserPlus size={15} />}
-                  className="btn-sm text-xs"
-                  onClick={() => onAssign(groupe)}
-                >
-                  Assigner
-                  {assignedCount > 0 && (
-                    <span className="badge badge-primary badge-sm ml-1">{assignedCount}</span>
-                  )}
-                </Button>
-              </TableCell>
-            </TableRow>
+            <div className="flex items-center gap-2">
+              <progress
+                className={`progress w-16 h-2 ${
+                  ratio >= 1 ? 'progress-error' : ratio >= 0.8 ? 'progress-warning' : 'progress-success'
+                }`}
+                value={progressValue}
+                max={100}
+              />
+              <span className="text-xs text-base-content/50">{progressLabel}</span>
+            </div>
           )
-        })}
-      </TableBody>
-    </Table>
+        },
+      },
+      {
+        key: 'actions',
+        label: 'Actions',
+        render: groupe => (
+          <div className="flex items-center flex-nowrap gap-2 whitespace-nowrap">
+            <div className="tooltip" data-tip="Modifier">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline btn-square"
+                aria-label="Modifier"
+                onClick={event => {
+                  event.stopPropagation()
+                  onEdit(groupe)
+                }}
+              >
+                <Pencil size={15} />
+              </button>
+            </div>
+
+            <div className="tooltip" data-tip="Assigner">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline btn-square"
+                aria-label="Assigner"
+                onClick={event => {
+                  event.stopPropagation()
+                  onAssign(groupe)
+                }}
+              >
+                <UserPlus size={15} />
+              </button>
+            </div>
+
+            <div className="tooltip" data-tip="Supprimer">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline btn-square border-error text-error hover:bg-error hover:text-white"
+                aria-label="Supprimer"
+                onClick={event => {
+                  event.stopPropagation()
+                  onDelete(groupe)
+                }}
+              >
+                <Trash2 size={15} />
+              </button>
+            </div>
+          </div>
+        ),
+      },
+    ],
+    [onAssign, onEdit, onDelete],
+  )
+
+  return (
+    <DataTable<Group, SortKey>
+      columns={columns}
+      data={groupes}
+      getRowKey={groupe => groupe.id}
+      onRowClick={onRowClick}
+      sortConfig={sortConfig}
+      onSort={onSort}
+    />
   )
 }
 
