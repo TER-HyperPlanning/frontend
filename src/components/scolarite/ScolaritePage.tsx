@@ -9,11 +9,11 @@ import Toast from '@/components/Toast'
 import { useToast } from '@/utils/useToast'
 import type { ScolariteAccount } from './types'
 import {
-  fetchScolariteAccounts,
-  createScolariteAccount,
-  updateScolariteAccount,
-  deleteScolariteAccount,
-  fetchGroups,
+    fetchScolariteAccounts,
+    createScolariteAccount,
+    updateScolariteAccount,
+    deleteScolariteAccount,
+    fetchGroups,
 } from '@/utils/api'
 
 export default function ScolaritePage() {
@@ -41,10 +41,10 @@ export default function ScolaritePage() {
                 fetchScolariteAccounts(),
                 fetchGroups(),
             ])
-            
+
             console.log('Groups loaded from backend:', groupsData)
             console.log('Students loaded from backend:', studentsData)
-            
+
             // Transform students to ScolariteAccount format
             const transformedAccounts: ScolariteAccount[] = studentsData.map((student: any) => ({
                 id: student.id,
@@ -53,7 +53,7 @@ export default function ScolaritePage() {
                 email: student.email || '',
                 phone: student.phone || '',
             }))
-            
+
             setAccounts(transformedAccounts)
             setGroups(groupsData)
             console.log('Data loaded successfully:', { accounts: transformedAccounts.length, groups: groupsData.length })
@@ -81,13 +81,9 @@ export default function ScolaritePage() {
     }, [accounts, search])
 
     // CRUD handlers
-    async function handleCreate(data: { nom: string; prenom: string; email: string; phone: string; password?: string; groupId?: string }) {
+    async function handleCreate(data: { nom: string; prenom: string; email: string; phone: string; password?: string }) {
         try {
             console.log('Creating student with data:', data)
-            
-            if (!data.groupId) {
-                throw new Error('Groupe est requis pour créer un étudiant')
-            }
 
             const createPayload = {
                 firstName: data.prenom,
@@ -95,9 +91,8 @@ export default function ScolaritePage() {
                 email: data.email,
                 phone: data.phone,
                 password: data.password || 'TempPassword123!',
-                groupId: data.groupId,
             }
-            
+
             console.log('Sending API request with payload:', createPayload)
             const newStudent = await createScolariteAccount(createPayload)
             console.log('Student created response:', newStudent)
@@ -175,19 +170,6 @@ export default function ScolaritePage() {
                     </div>
                 ))}
             </div>
-
-            {/* Left sidebar label */}
-            <div className="flex flex-col w-0 sm:w-auto">
-                <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="bg-primary-800 text-white font-semibold text-sm px-6 py-3 rounded-r-xl mt-6 whitespace-nowrap hidden sm:block"
-                >
-                    Comptes Scolarité
-                </motion.div>
-            </div>
-
             {/* Main content area */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Top header bar */}
@@ -197,9 +179,6 @@ export default function ScolaritePage() {
                     transition={{ duration: 0.4, ease: 'easeOut' }}
                     className="flex items-center justify-between px-8 py-4"
                 >
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-500">Hello, Admin</span>
-                    </div>
                     <div className="flex items-center gap-4">
                         <Logo showText={false} className="h-10 w-auto" />
                     </div>
@@ -278,7 +257,6 @@ export default function ScolaritePage() {
                 isOpen={isCreateOpen}
                 onClose={() => setIsCreateOpen(false)}
                 onSubmit={handleCreate}
-                groups={groups}
             />
 
             <ScolariteModal
@@ -286,7 +264,6 @@ export default function ScolaritePage() {
                 onClose={() => setEditAccount(null)}
                 onSubmit={handleEdit}
                 account={editAccount}
-                groups={groups}
             />
         </div>
     )

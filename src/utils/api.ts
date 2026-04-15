@@ -35,6 +35,7 @@ interface AdminResponse {
   firstName: string
   lastName: string
   email: string
+  phone?: string
   isActive: boolean
 }
 
@@ -91,9 +92,9 @@ export async function login(credentials: { email: string; password: string }) {
   return data.result as LoginResponse
 }
 
-// ==================== Scolarite (Students) ====================
+// ==================== Scolarite (Admins) ====================
 export async function fetchScolariteAccounts() {
-  return apiRequest<StudentResponse[]>('/students')
+  return apiRequest<AdminResponse[]>('/Admins')
 }
 
 export async function createScolariteAccount(data: {
@@ -102,23 +103,22 @@ export async function createScolariteAccount(data: {
   email: string
   phone: string
   password: string
-  groupId: string
 }) {
-  return apiRequest<StudentResponse>('/students', {
+  return apiRequest<AdminResponse>('/Admins', {
     method: 'POST',
     body: JSON.stringify(data),
   })
 }
 
-export async function updateScolariteAccount(id: string, data: Partial<StudentResponse>) {
-  return apiRequest<StudentResponse>(`/students/${id}`, {
+export async function updateScolariteAccount(id: string, data: Partial<AdminResponse>) {
+  return apiRequest<AdminResponse>(`/Admins/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   })
 }
 
 export async function deleteScolariteAccount(id: string) {
-  return apiRequest<void>(`/students/${id}`, { method: 'DELETE' })
+  return apiRequest<void>(`/Admins/${id}`, { method: 'DELETE' })
 }
 
 export async function fetchGroups() {

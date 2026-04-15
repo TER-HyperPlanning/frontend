@@ -3,27 +3,20 @@ import { X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { ScolariteAccount } from './types'
 
-interface GroupOption {
-    id: string
-    name: string
-}
-
 interface ScolariteModalProps {
     isOpen: boolean
     onClose: () => void
-    onSubmit: (data: { nom: string; prenom: string; email: string; phone: string; password?: string; groupId?: string }) => void
+    onSubmit: (data: { nom: string; prenom: string; email: string; phone: string; password?: string }) => void
     account?: ScolariteAccount | null
-    groups?: GroupOption[]
 }
 
-export default function ScolariteModal({ isOpen, onClose, onSubmit, account, groups = [] }: ScolariteModalProps) {
+export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: ScolariteModalProps) {
     const isEdit = !!account
     const [nom, setNom] = useState('')
     const [prenom, setPrenom] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
-    const [groupId, setGroupId] = useState('')
     const [errors, setErrors] = useState<Record<string, string>>({})
 
     useEffect(() => {
@@ -33,14 +26,12 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account, gro
             setEmail(account.email)
             setPhone(account.phone)
             setPassword('')
-            setGroupId('')
         } else {
             setNom('')
             setPrenom('')
             setEmail('')
             setPhone('')
             setPassword('')
-            setGroupId('')
         }
         setErrors({})
     }, [account, isOpen])
@@ -54,7 +45,6 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account, gro
         if (!phone.trim()) errs.phone = 'Le téléphone est requis'
         if (!isEdit && !password.trim()) errs.password = 'Le mot de passe est requis'
         if (!isEdit && password.length > 0 && password.length < 6) errs.password = 'Minimum 6 caractères'
-        if (!isEdit && !groupId.trim()) errs.groupId = 'Le groupe est requis'
         return errs
     }
 
@@ -63,13 +53,12 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account, gro
         const errs = validate()
         setErrors(errs)
         if (Object.keys(errs).length === 0) {
-            onSubmit({ 
-                nom: nom.trim(), 
-                prenom: prenom.trim(), 
+            onSubmit({
+                nom: nom.trim(),
+                prenom: prenom.trim(),
                 email: email.trim(),
                 phone: phone.trim(),
                 password: isEdit ? undefined : password,
-                groupId: isEdit ? undefined : groupId,
             })
             onClose()
         }
@@ -160,36 +149,17 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account, gro
                             </div>
 
                             {!isEdit && (
-                                <>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
-                                        <input
-                                            type="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className={`w-full px-3 py-2.5 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30 ${errors.password ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-primary-500'}`}
-                                            placeholder="••••••••"
-                                        />
-                                        {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Groupe</label>
-                                        <select
-                                            value={groupId}
-                                            onChange={(e) => setGroupId(e.target.value)}
-                                            className={`w-full px-3 py-2.5 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30 ${errors.groupId ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-primary-500'}`}
-                                        >
-                                            <option value="">-- Sélectionner un groupe --</option>
-                                            {groups.map((group) => (
-                                                <option key={group.id} value={group.id}>
-                                                    {group.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors.groupId && <p className="mt-1 text-xs text-red-500">{errors.groupId}</p>}
-                                    </div>
-                                </>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className={`w-full px-3 py-2.5 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30 ${errors.password ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-primary-500'}`}
+                                        placeholder="••••••••"
+                                    />
+                                    {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
+                                </div>
                             )}
 
                             <div className="flex justify-end gap-3 pt-4">
