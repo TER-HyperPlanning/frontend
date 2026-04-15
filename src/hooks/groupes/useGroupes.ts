@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { type GroupModel } from '@/types/group'
-import { type TrackResponse, type ProgramModel } from '@/types/formation'
 import { useGroupService } from '@/services/groupService'
 import { useTrackService } from '@/services/trackService'
 import { useProgramService } from '@/services/programService'
@@ -30,9 +28,9 @@ export function useGroupes() {
     setIsLoading(true)
     try {
       const [allGroups, allTracks, allPrograms] = await Promise.all([
-        getGroups().catch(() => [] as GroupModel[]),
-        getTracks().catch(() => [] as TrackResponse[]),
-        getPrograms().catch(() => [] as ProgramModel[]),
+        getGroups(),
+        getTracks(),
+        getPrograms(),
       ])
 
       const trackMap = new Map(allTracks.map((t) => [t.id, t]))
@@ -52,8 +50,9 @@ export function useGroupes() {
       })
 
       setGroups(rows)
-    } catch {
-      setGroups([])
+    } catch (err) {
+      console.error('[useGroupes] Erreur lors du chargement:', err)
+      // Ne pas écraser les groupes existants en cas d'erreur de rafraîchissement
     } finally {
       setIsLoading(false)
     }

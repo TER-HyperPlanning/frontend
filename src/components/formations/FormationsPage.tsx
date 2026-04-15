@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Plus, Upload } from 'lucide-react'
 import Logo from '@/components/Logo'
 import FormationsSearchBar from '@/components/formations/FormationsSearchBar'
 import FormationsTable from '@/components/formations/FormationsTable'
@@ -45,12 +46,33 @@ export default function FormationsPage({
     addFormation,
     editFormation,
     deleteFormation,
+    isImporting,
+    importCSV,
+    sortOrder,
+    setSortOrder,
   } = useFormations()
 
   const filiereFilterOptions = useFiliereOptions()
   const { toast, showToast, hideToast } = useToast()
   const navigate = useNavigate()
   const [programmeTarget, setProgrammeTarget] = useState<Formation | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const count = await importCSV(file)
+      showToast(`${count} formation(s) importée(s) avec succès`, 'success')
+    } catch (e: any) {
+      const backendMsg = e?.response?.data?.message || e?.response?.data || e?.message || 'Erreur inconnue'
+      showToast(`Erreur d'import : ${backendMsg}`, 'error')
+    } finally {
+      // Reset input so the same file can be uploaded again if needed
+      event.target.value = ''
+    }
+  }
 
   // Auto-ouvrir le modal d'ajout si on arrive avec un filiereId dans l'URL
   useEffect(() => {
@@ -91,8 +113,26 @@ export default function FormationsPage({
       <div className="flex items-center justify-between mb-6">
         <Logo showText={true} className="h-10 text-primary-800 shrink-0" />
         <div className="flex items-center gap-3">
+          <input
+            type="file"
+            accept=".csv"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+          />
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isImporting}
+            leftIcon={isImporting ? <span className="loading loading-spinner w-4 h-4" /> : <Upload size={18} />}
+            className="border-primary-900/30 text-primary-900 hover:bg-primary-900/10"
+          >
+            {isImporting ? 'Importation…' : 'Importer CSV'}
+          </Button>
           <Button
             onClick={openAddModal}
+            disabled={isImporting}
             leftIcon={<Plus size={18} />}
             className="bg-primary-900 hover:bg-primary-800 text-white"
           >
@@ -114,6 +154,8 @@ export default function FormationsPage({
           <FormationsTable
             formations={formations}
             isLoading={isLoading}
+            sortOrder={sortOrder}
+            onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
             onViewProgramme={(f) => setProgrammeTarget(f)}

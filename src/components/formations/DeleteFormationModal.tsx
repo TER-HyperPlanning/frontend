@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Button from '@/components/Button'
 import { type Formation } from '@/types/formation'
+import { useGroupService } from '@/services/groupService'
 
 interface DeleteFormationModalProps {
   isOpen: boolean
@@ -16,6 +18,26 @@ export default function DeleteFormationModal({
   onClose,
   onConfirm,
 }: DeleteFormationModalProps) {
+  const [isChecking, setIsChecking] = useState(false)
+  const [hasGroups, setHasGroups] = useState(false)
+  const { getGroups } = useGroupService()
+
+  useEffect(() => {
+    if (isOpen && formation) {
+      setIsChecking(true)
+      getGroups()
+        .then((groups) => {
+          setHasGroups(groups.some((g) => g.trackId === formation.id))
+        })
+        .catch(() => {
+          setHasGroups(false)
+        })
+        .finally(() => setIsChecking(false))
+    } else {
+      setHasGroups(false)
+    }
+  }, [isOpen, formation, getGroups])
+
   return (
     <AnimatePresence>
       {isOpen && formation && (
@@ -40,27 +62,56 @@ export default function DeleteFormationModal({
               </button>
             </div>
 
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Voulez-vous vraiment supprimer cette formation ?
-              </h3>
-              <p className="text-gray-500 mt-1">
-                {formation.nom} — {formation.filiere.nom}
-              </p>
-            </div>
+            {isChecking ? (
+              <div className="flex items-center justify-center py-10">
+                <span className="loading loading-spinner text-primary loading-md" />
+              </div>
+            ) : hasGroups ? (
+              <>
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-semibold text-red-600">
+                    Suppression impossible
+                  </h3>
+                  <p className="text-gray-600 mt-2 text-sm">
+                    Impossible de supprimer cette formation : des groupes y sont encore liés.
+                    Veuillez d'abord supprimer ou déplacer ces groupes.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outlined"
+                    onClick={onClose}
+                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-800"
+                  >
+                    Fermer
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Voulez-vous vraiment supprimer cette formation ?
+                  </h3>
+                  <p className="text-gray-500 mt-1">
+                    {formation.nom} — {formation.filiere.nom}
+                  </p>
+                </div>
 
-            <div className="flex gap-3">
-              <Button
-                variant="outlined"
-                onClick={onClose}
-                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-800"
-              >
-                Annuler
-              </Button>
-              <Button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white">
-                Confirmer
-              </Button>
-            </div>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outlined"
+                    onClick={onClose}
+                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-800"
+                  >
+                    Annuler
+                  </Button>
+                  <Button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+                    Confirmer
+                  </Button>
+                </div>
+              </>
+            )}
           </motion.div>
         </motion.div>
       )}

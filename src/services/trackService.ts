@@ -42,7 +42,7 @@ export function useTrackService() {
 
   const updateTrack = useCallback(
     (id: string, data: UpdateTrackRequest) =>
-      api.put<ApiResponse<TrackResponse>>(`/Tracks/${id}`, data).then((r) => r.data.result),
+      api.put<void>(`/Tracks/${id}`, data).then(() => void 0),
     [api],
   )
 

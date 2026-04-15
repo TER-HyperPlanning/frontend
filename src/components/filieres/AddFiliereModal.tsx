@@ -53,8 +53,7 @@ export default function AddFiliereModal({
             </div>
 
             <p className="text-sm text-gray-500 mb-4">
-              Une filière peut regrouper plusieurs formations. Indiquez le nom de la filière et au
-              moins une première formation (lien technique avec l’API).
+              Une filière peut regrouper plusieurs formations. Indiquez le nom de la nouvelle filière.
             </p>
 
             <div className="border-t border-gray-200 pt-4">
@@ -75,28 +74,6 @@ export default function AddFiliereModal({
                       <TextField
                         name={field.name}
                         placeholder="Ex: Informatique"
-                        value={field.state.value}
-                        maxLength={200}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                        className="bg-white text-gray-900 placeholder:text-gray-400 border-gray-300"
-                      />
-                      <p className="text-xs text-gray-400 text-right">
-                        {field.state.value.length}/200
-                      </p>
-                    </div>
-                  )}
-                </form.Field>
-
-                <form.Field name="premiereFormation">
-                  {(field) => (
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-primary-900">
-                        Première formation
-                      </label>
-                      <TextField
-                        name={field.name}
-                        placeholder="Ex: Licence 1 — Informatique"
                         value={field.state.value}
                         maxLength={200}
                         onChange={(e) => field.handleChange(e.target.value)}
