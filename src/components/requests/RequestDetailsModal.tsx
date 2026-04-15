@@ -630,7 +630,6 @@ export default function RequestDetailsModal({
 
         {/* REJECT */}
         {request.changeStatusLabel === 'Refusé' &&
-          request.changeType === 'RoomChange' &&
           session?.rejectionReason && (
             <div className="bg-red-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
               <XCircle className="w-8 h-8 text-red-600 mt-1" />

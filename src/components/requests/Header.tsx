@@ -36,7 +36,6 @@ export default function Header({
         <p className="text-gray-500 mt-2">Consultez et gérez les demandes des enseignants.</p> 
       </div>
 
-      {/* Stats cards */}
       <div className="grid md:grid-cols-3 gap-6 mb-5 overflow-hidden">
 
         <StatsCard
@@ -62,11 +61,10 @@ export default function Header({
         />
       </div>
 
-      {/* Barre de recherche + filtres */}
       <div className="bg-[#F4F6F8] rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-4">
         <input
           type="text"
-          placeholder="Rechercher un professeur, matière, formation..."
+          placeholder="Rechercher un professeur, matière..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-4 py-2 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#003A68]"
