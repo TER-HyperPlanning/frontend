@@ -125,13 +125,6 @@ function BuildingsPage() {
 
           {/* Actions (Import, Nouveau, Notifications) */}
           <div className="flex items-center gap-4 w-full lg:w-auto">
-            <button
-              onClick={() => console.log('Import CSV')}
-              className="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center p-3 rounded-xl shadow-sm"
-              title="Importer CSV (format CSV uniquement)"
-            >
-              <HiOutlineCloudUpload size={20} />
-            </button>
 
             <Button
               onClick={() => setIsAddModalOpen(true)}
