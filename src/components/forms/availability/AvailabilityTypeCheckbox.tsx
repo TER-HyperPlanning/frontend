@@ -30,7 +30,7 @@ export const AvailabilityTypeCheckbox = ({dispatchSelectedDays, selectedDays, se
   }
 
   useEffect(() => {
-    setPartialAvailability(typeof getGroupOfSelectedGroupNumber()?.numberOfDayOfAvailability === "number")
+    setPartialAvailability(typeof getGroupOfSelectedGroupNumber()?.numberOfAvailableDays === "number")
   }, [selectedGroupNumber]);
 
   function handleOnChangePartialAvailability(e : React.ChangeEvent<HTMLInputElement>){
@@ -38,7 +38,7 @@ export const AvailabilityTypeCheckbox = ({dispatchSelectedDays, selectedDays, se
     if(newAvailabilityNumber >= 0 || isNaN(newAvailabilityNumber))
     setGroups((prev)=>{return prev.map((group) => {
         if (group.number === selectedGroupNumber) {
-          return { ...group, numberOfDayOfAvailability: newAvailabilityNumber }
+          return { ...group, numberOfAvailableDays: newAvailabilityNumber }
         }
         return group
       })
@@ -63,7 +63,7 @@ export const AvailabilityTypeCheckbox = ({dispatchSelectedDays, selectedDays, se
     if(partialAvailability){
       setGroups((prev)=>{return prev.map((group) => {
         if (group.number === selectedGroupNumber) {
-          const { numberOfDayOfAvailability, ...rest } = group;
+          const { numberOfAvailableDays: numberOfDayOfAvailability, ...rest } = group;
           return rest;
         }
         return group
@@ -72,7 +72,7 @@ export const AvailabilityTypeCheckbox = ({dispatchSelectedDays, selectedDays, se
     } else{
       setGroups((prev)=>{return prev.map((group) => {
         if (group.number === selectedGroupNumber) {
-          return { ...group, numberOfDayOfAvailability: NaN }
+          return { ...group, numberOfAvailableDays: NaN }
         }
         return group
       })
@@ -83,7 +83,7 @@ export const AvailabilityTypeCheckbox = ({dispatchSelectedDays, selectedDays, se
   }
 
   function handlePartialAvailabilityCheckBoxError(){
-    const newAvailabilityNumber = getGroupOfSelectedGroupNumber()?.numberOfDayOfAvailability
+    const newAvailabilityNumber = getGroupOfSelectedGroupNumber()?.numberOfAvailableDays
 
     const groupLength = selectedDays.filter((day) => day.group.groupNumber === selectedGroupNumber).length 
 if(newAvailabilityNumber!==undefined)
@@ -121,7 +121,7 @@ if(newAvailabilityNumber!==undefined)
                 min={1}
                 error={handlePartialAvailabilityCheckBoxError()}
                 onChange={(e)=>{handleOnChangePartialAvailability(e)}}
-                value={getGroupOfSelectedGroupNumber()?.numberOfDayOfAvailability}
+                value={getGroupOfSelectedGroupNumber()?.numberOfAvailableDays}
                 required={true}
                 ></TextField>
               </div>}

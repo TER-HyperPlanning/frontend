@@ -8,11 +8,14 @@ import { PatternInfoForm } from '../../../components/forms/availability/PatternI
 import Logo from '../../../components/Logo'
 import { useAvailability } from '../../../hooks/availability/useAvailability'
 import { useCreateAvailability } from '../../../hooks/availability/useCreateAvailability'
+import { useDeleteAvailability } from '../../../hooks/availability/useDeleteAvailability'
 import { useUpdateAvailability } from '../../../hooks/availability/useUpateAvailability'
-import { useWeekDay } from '../../../hooks/weekDay/useWeekDay'
+import { useAvailabilityGroup } from '../../../hooks/availabilityGroup/useAvailabilityGroup'
+import { useCreateAvailabilityGroup } from '../../../hooks/availabilityGroup/useCreateAvailabilityGroup'
+import { useDeleteAvailabilityGroup } from '../../../hooks/availabilityGroup/useDeleteAvailabilityGroup'
 import PageLayout from '../../../layout/PageLayout'
-import type { GroupProps, TimeOfAvailabilityWithEmptyString } from '../../../types/date'
-import { availabilityReponseToDateAvailability, dateAvailabilityToAvailabilityReponse } from '../../../utils/date.utils'
+import type { GroupProps, GroupPropsEndPointRes, TimeOfAvailabilityWithEmptyString } from '../../../types/date'
+import { availabilityReponseToDateAvailability, dateAvailabilityToAvailabilityReponse, weekDay } from '../../../utils/date.utils'
 import { availabilityReducer } from './availabilityReducer'
 
 
@@ -26,9 +29,12 @@ const id = JSON.parse(localStorage.getItem("currentUser") as any).id
 
 function RouteComponent() {
   const { data: dataAvailability, isFetched: isFetchedAvailability } = useAvailability(id)
-  const { data: dataWeekDay, isFetched: isFetchedWeekDay } = useWeekDay()
   const { mutate: postAvailability } = useCreateAvailability()
+  const { mutateAsync: postAvailabilityGroup } = useCreateAvailabilityGroup()
+  const { mutate: deleteAvailability } = useDeleteAvailability()
   const { mutate: putAvailability } = useUpdateAvailability()
+  const { mutateAsync: deleteAvailabilityGroup } = useDeleteAvailabilityGroup()
+  const { data: dataAvailabilityGroup, isFetched: isFetchedAvailabilityGroup } = useAvailabilityGroup(id)
   const [selectedDays, dispatchSelectedDays] = useReducer(availabilityReducer, [])
   const selectedMonth = useRef(new Date().getMonth())
   const selectedYear = useRef(new Date().getFullYear())
@@ -38,6 +44,8 @@ function RouteComponent() {
   const [currentPage, setCurrentPage] = useState(0);
   const [numberOfDayPattern, setNumberOfDayPattern] = useState(0);
   const [endOfDatePattern, setEndOfDatePattern] = useState("");
+  const [isDataSave, setIsDataSave] = useState(false)
+  const [isErrorDataSave, setIsErrorDataSave]= useState(false)
   const [timeOfAvailability, setTimeOfAvailability] = useState<TimeOfAvailabilityWithEmptyString[]>([{
     start: "",
     end: "",
@@ -45,23 +53,92 @@ function RouteComponent() {
 
 
   useEffect(() => {
-    if (isFetchedAvailability && isFetchedWeekDay) {
-      const fetchedDays = availabilityReponseToDateAvailability(dataAvailability, dataWeekDay)
-      const b = dateAvailabilityToAvailabilityReponse(a, dataWeekDay, id)
-      console.log("convertres", b)
+    if (isFetchedAvailability && isFetchedAvailabilityGroup) {
+      const dicoGroupNumber: Record<string, number> = {}
+      const hasNullGroupId = dataAvailability.some((date) => date.availabilityGroupId === null)
+
+      let groupToPut: GroupProps[] = hasNullGroupId ? [{ number: 1 }] : []
+      let count = hasNullGroupId ? 2 : 1
+      for (let data of dataAvailabilityGroup) {
+        dicoGroupNumber[data.id] = count
+        groupToPut.push({ number: count, numberOfAvailableDays: data.numberOfAvailableDays })
+        count++
+      }
+      if (groupToPut.length !== 0) {
+        setGroups(groupToPut)
+      }
+      const fetchedDays = availabilityReponseToDateAvailability(dataAvailability, weekDay, dicoGroupNumber)
       dispatchSelectedDays({ type: "addSelected", value: fetchedDays })
     }
-  }, [isFetchedAvailability, isFetchedWeekDay])
+  }, [isFetchedAvailability, isFetchedAvailabilityGroup])
 
-  const postCurrentAvailability = useCallback(() => {
-    const dataToSend = dateAvailabilityToAvailabilityReponse(selectedDays, dataWeekDay, id)
-    const findedIndex : number[]=[]
+  useEffect(() => {
+    setTimeout(() => {
+      if (isDataSave) {
+        setIsDataSave(false)
+      }
+    }, 1000);
+  }, [isDataSave]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (isErrorDataSave) {
+        setIsErrorDataSave(false)
+      }
+    }, 1000);
+  }, [isErrorDataSave]);
+
+  const postCurrentAvailability = useCallback(async () => {
+    const availToDelete = []
+    for (let availGroup of dataAvailabilityGroup) {
+      if (availGroup.teacherId === id) {
+        availToDelete.push(deleteAvailabilityGroup(availGroup.id))
+      }
+    }
+    await Promise.all(availToDelete)
+
+    const groupPromises: Promise<GroupPropsEndPointRes>[] = [];
+    const keys: number[] = [];
+    groups.forEach((group) => {
+      if (group.numberOfAvailableDays) {
+        keys.push(group.number);
+        groupPromises.push(
+          postAvailabilityGroup({
+            numberOfAvailableDays: group.numberOfAvailableDays,
+            teacherId: id,
+          })
+        );
+      }
+    });
+
+    // 2. On attend tous les résultats
+    const results = await Promise.all(groupPromises);
+
+    // 3. On remplit l'objet final
+    const groupConversion: Record<number, GroupPropsEndPointRes> = {};
+    keys.forEach((key, index) => {
+      groupConversion[key] = results[index];
+    });
+
+    const dataToSend = dateAvailabilityToAvailabilityReponse(selectedDays, weekDay, id, groups)
+    const findedIndex = new Set<number>()
+    const usedId = new Set<string>()
     for (let date of dataToSend) {
-      const dateOverlap = dataAvailability.find((avail,i) => {
-        const isDateOverlap = date.startDate <= avail.endDate && date.endDate >= avail.startDate;
+      if (date.availabilityGroupId) {
+        date.availabilityGroupId = groupConversion[parseInt(date.availabilityGroupId)].id
+      }
+      const dateStart = new Date(date.startDate.split("T")[0]).getTime()
+      const dateEnd = new Date(date.endDate.split("T")[0]).getTime()
+
+      const dateOverlap = dataAvailability.find((avail, i) => {
+
+        const availStart = new Date(avail.startDate.split("T")[0]).getTime()
+        const availEnd = new Date(avail.endDate.split("T")[0]).getTime()
+
+        const isDateOverlap = dateStart <= availEnd && dateEnd >= availStart
         const isTimeOverlap = date.startTime <= avail.endTime && date.endTime >= avail.startTime;
-        if (isDateOverlap && isTimeOverlap){
-          findedIndex.push(i)
+        if (isDateOverlap && isTimeOverlap && date.weekDay === avail.weekDay) {
+          findedIndex.add(i)
           return true
         }
         return false
@@ -72,43 +149,59 @@ function RouteComponent() {
       } else {
         const isIntervalEqual = date.startTime === dateOverlap.startTime && date.endTime === dateOverlap.endTime && date.startDate === dateOverlap.startDate && date.endDate === dateOverlap.endDate
         if (!isIntervalEqual) {
-          putAvailability({
-            id: dateOverlap.id,
-            data: date
+          if (usedId.has(dateOverlap.id)) {
+            postAvailability(date)
+          } else {
+            putAvailability({
+              id: dateOverlap.id,
+              data: date
+            })
+            usedId.add(dateOverlap.id)
           }
-          )
         }
       }
-
     }
-  }, [])
+
+    dataAvailability.forEach((data, i) => {
+      if (!findedIndex.has(i)) {
+        deleteAvailability(data.id)
+      }
+
+    })
+
+    setIsDataSave(true)
+  }, [dataAvailability, selectedDays, groups, dataAvailabilityGroup])
 
 
   return (
     false ? <div></div> : (<div>
-      <div onClick={async () => {
-        console.log("avail", dataAvailability)
-        try {
+      <div>
+        <div onClick={async () => {
+          try {
+            postCurrentAvailability()
+          } catch (error) {
+            console.log(error)
+          }
+        }}>click</div>
 
-          const res = postAvailability(
-            // id
-            {
-              "weekDayId": "41005c9e-5360-bb11-50eb-28be4d5446a8", // Remplace "string"
-              "startTime": "12:00:00",           // Format string simple
-              "endTime": "13:00:00",             // Format string simple
-              "startDate": "2026-04-01",
-              "endDate": "2026-06-29",
-              "teacherId": id
+        <div onClick={async () => {
+          try {
+            for (let availGroup of dataAvailabilityGroup) {
+              console.log(deleteAvailabilityGroup(availGroup.id))
+              // console.log(availGroup)
+              // deleteAvailability(availGroup.id)
             }
-          )
-        } catch (error) {
 
-        }
-
-        // console.log(dataWeekDay)
-
-
-      }}>click</div>
+            for (let availGroup of dataAvailability) {
+              console.log(deleteAvailability(availGroup.id))
+              // console.log(availGroup)
+              // deleteAvailability(availGroup.id)
+            }
+          } catch (error) {
+            console.log(error)
+          }
+        }}>delete</div>
+      </div>
       <PageLayout>
         <div className='flex mt-8 ml-8 justify-between'>
           <Logo showText={true} className="h-8 w-auto text-primary-700" />
@@ -167,7 +260,25 @@ function RouteComponent() {
                 setGroups={setGroups}
                 setSelectedGroupNumber={setSelectedGroupNumber} />
             </div>
+
           </div>
+        </div>
+        <div>
+          <div className='flex justify-end mr-5'>
+            <button className='btn btn-success' onClick={() => {
+              try {
+                postCurrentAvailability()
+              } catch (error) {
+                setIsErrorDataSave(true)
+              }
+            }}>Sauvegarder</button>
+
+          </div>
+          <div className='flex justify-end mr-5'>
+            {isDataSave && <div>données sauvegarder</div>}
+            {isErrorDataSave && <div>erreur de sauvegarde</div>}
+            </div>
+
         </div>
       </PageLayout>
     </div>)

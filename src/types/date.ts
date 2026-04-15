@@ -87,8 +87,8 @@ type timeUnit60 =
   | '58'
   | '59'
 
-export type TimeString = `${Hours}:${timeUnit60}:${timeUnit60}`
-
+export type TimeString = `${Hours}:${timeUnit60}`
+export type TimeStringSec= `${Hours}:${timeUnit60}:${timeUnit60}`
 export interface DateAvailability {
   dateMs: number
   canModify: boolean
@@ -175,17 +175,28 @@ export interface GroupProps{
    * complete and not partial. If it NaN, it's an invalid
    * value so user must change it.
    */
-  numberOfDayOfAvailability?:number
+  numberOfAvailableDays?:number
 }
 
+export interface GroupPropsParam{
+   numberOfAvailableDays:number,
+   teacherId:string
+}
+
+export interface GroupPropsEndPointRes{
+   numberOfAvailableDays:number,
+   teacherId:string,
+   id:string
+}
 
 export interface AvailabilityPost {
-  weekDayId: string
-  startTime: TimeString
-  endTime: TimeString
+  weekDay: WeekDay
+  startTime: TimeStringSec
+  endTime: TimeStringSec
   startDate: string
   endDate: string
   teacherId: string 
+  availabilityGroupId?:string
 }
 
 export type AvailabilityPut = AvailabilityPost
@@ -193,17 +204,19 @@ export type AvailabilityPut = AvailabilityPost
 export interface AvailabilityGet {
   id:string
   weekDay: string
-  startTime: TimeString
-  endTime: TimeString
+  startTime: TimeStringSec
+  endTime: TimeStringSec
   startDate: string
   endDate: string
   teacherId: string 
+  availabilityGroupId?: string
 }
 
 
 export interface WeekDayReponse{
-  weekdayId:string,
   orderIndex:number,
-  name: string
+  name: WeekDay
 }
+
+export type WeekDay= "Lundi" | "Mardi" | "Mercredi" | "Jeudi" | "Vendredi" | "Samedi" | "Dimanche"
 

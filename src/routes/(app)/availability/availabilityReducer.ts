@@ -240,7 +240,7 @@ function addEditableBetweenDates(
  */
 function getAvailabilitiesHours(
   availableAllDay: boolean,
-  timeOfAvailability: TimeOfAvailabilityWithEmptyString[],
+  timeOfAvailability: TimeOfAvailabilityWithEmptyString[],  
   dateMs: number,
   groupNumber: number,
   canModify: boolean = true

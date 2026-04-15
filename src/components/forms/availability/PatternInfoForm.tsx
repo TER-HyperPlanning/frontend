@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import type { DateAvailability, DayActions, TimeOfAvailabilityWithEmptyString } from '../../../types/date'
+import type { DateAvailability, DayActions, TimeOfAvailabilitySecWithEmptyString } from '../../../types/date'
 import TextField from '../../TextField'
 
 interface PatternInfoFormProps {
@@ -12,7 +12,7 @@ interface PatternInfoFormProps {
   dispatchSelectedDays: React.ActionDispatch<[action: DayActions]>,
   selectedGroupNumber: number,
   availableAllDay: boolean,
-  timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
+  timeOfAvailability: TimeOfAvailabilitySecWithEmptyString[]
 }
 
 export const PatternInfoForm = ({ selectedGroupNumber, availableAllDay, timeOfAvailability,selectedDays, dispatchSelectedDays, className, numberOfDayPattern, endOfDatePattern, setNumberOfDayPattern, setEndOfDatePattern }: PatternInfoFormProps) => {

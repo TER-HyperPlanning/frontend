@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import type { DayActions, TimeOfAvailabilityWithEmptyString } from '../../../../types/date'
 import { AvailabilityHoursFields } from './AvailabilityHoursFields'
+import type { DayActions, TimeOfAvailabilityWithEmptyString } from '../../../../types/date'
 
 type AvailabilityHoursFormProps = {
   dispatchSelectedDays: React.ActionDispatch<[action: DayActions]>

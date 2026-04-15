@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { DateAvailability, DayActions, TimeOfAvailabilityWithEmptyString } from '../../../../types/date'
+import type { DateAvailability, DayActions, TimeOfAvailabilitySecWithEmptyString } from '../../../../types/date'
 import { AvailabilityHoursFields } from './AvailabilityHoursFields'
 
 type AvailabilityHoursFormProps = {
@@ -9,7 +9,7 @@ type AvailabilityHoursFormProps = {
 
 export const AvailabilityHoursFormForOneDay = ({ dispatchSelectedDays, day }: AvailabilityHoursFormProps) => {
   const [currentPage, setCurrentPage] = useState(0)
-  const [localTimeOfAvailability, setLocalTimeOfAvailability] = useState<TimeOfAvailabilityWithEmptyString[]>(
+  const [localTimeOfAvailability, setLocalTimeOfAvailability] = useState<TimeOfAvailabilitySecWithEmptyString[]>(
     day.timeOfAvailability
   )
 
@@ -44,7 +44,7 @@ export const AvailabilityHoursFormForOneDay = ({ dispatchSelectedDays, day }: Av
         dispatchSelectedDays({ type: 'setHoursForOneDay', value: newTimeOfAvailability, dateMs: day.dateMs })
       }}
       onAddAvailability={() => {
-        const newTimeOfAvailability = [...localTimeOfAvailability, { start: '', end: '' } satisfies TimeOfAvailabilityWithEmptyString]
+        const newTimeOfAvailability = [...localTimeOfAvailability, { start: '', end: '' } satisfies TimeOfAvailabilitySecWithEmptyString]
         setLocalTimeOfAvailability(newTimeOfAvailability)
         dispatchSelectedDays({ type: 'setHoursForOneDay', value: newTimeOfAvailability, dateMs: day.dateMs })
       }}

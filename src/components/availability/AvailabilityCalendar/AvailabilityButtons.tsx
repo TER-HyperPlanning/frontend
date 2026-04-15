@@ -1,5 +1,5 @@
 import type { ActionDispatch, RefObject } from "react"
-import type { DayActions, TimeOfAvailabilityWithEmptyString } from "../../../types/date"
+import type { DayActions, TimeOfAvailabilitySecWithEmptyString } from "../../../types/date"
 
 interface AvailabilityButtonsProps {
   dispatchSelectedDays: ActionDispatch<[action: DayActions]>
@@ -7,7 +7,7 @@ interface AvailabilityButtonsProps {
   selectedYear: RefObject<number>
   selectedGroupNumber:number
   availableAllDay:boolean
-  timeOfAvailability:TimeOfAvailabilityWithEmptyString[]
+  timeOfAvailability:TimeOfAvailabilitySecWithEmptyString[]
 }
 
 /**

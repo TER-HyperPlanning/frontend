@@ -3,7 +3,7 @@ import { DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
 import { twMerge } from "tailwind-merge";
-import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilityWithEmptyString } from "../../../types/date";
+import type { DateAvailability, DayActions, GroupProps, TimeOfAvailabilitySecWithEmptyString } from "../../../types/date";
 import { AvailabilityButtons } from "./AvailabilityButtons";
 import { CurrentMonthAndYear } from "./CalendarSelector/CurrentMonthAndYear";
 import { DayInfoPopUp } from "./DayInfoPopUp";
@@ -19,7 +19,7 @@ interface AvailabilityCalendarProps {
     groups: GroupProps[]
     calendarClasName?: string
     selectedGroupNumber: number
-    timeOfAvailability: TimeOfAvailabilityWithEmptyString[]
+    timeOfAvailability: TimeOfAvailabilitySecWithEmptyString[]
     availableAllDay: boolean
 }
 
@@ -100,7 +100,7 @@ export const AvailabilityCalendar = ({ groups, timeOfAvailability, availableAllD
             const hasEmptyHours = day.timeOfAvailability?.some((avail) => avail.start === "" || avail.end === "")
             const selectedGroupLength = selectedDays.filter(d => d.group.groupNumber === day.group.groupNumber).length
             const selectedGroupProps = groups.find(group => group.number === day.group.groupNumber)
-            const invalidDate = hasEmptyHours || (selectedGroupProps?.numberOfDayOfAvailability !== undefined && (isNaN(selectedGroupProps?.numberOfDayOfAvailability) || selectedGroupProps?.numberOfDayOfAvailability >= selectedGroupLength || selectedGroupProps?.numberOfDayOfAvailability <= 0))
+            const invalidDate = hasEmptyHours || (selectedGroupProps?.numberOfAvailableDays !== undefined && (isNaN(selectedGroupProps?.numberOfAvailableDays) || selectedGroupProps?.numberOfAvailableDays >= selectedGroupLength || selectedGroupProps?.numberOfAvailableDays <= 0))
             if (day.group.groupNumber !== selectedGroupNumber) {
                 //data is invalid if hours are empty. It also invalid if we added a number of availability with empty value or if it greater or equal 
                 //than the number of day in that group. if numberOfDayOfAvailability is undefined, it mean we didnt try to enter a value so
