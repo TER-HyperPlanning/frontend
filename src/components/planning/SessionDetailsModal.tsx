@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { XMarkIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import Button from '@/components/Button'
 import {
   type SessionWithGroup,
   SESSION_TYPE_LABELS,
@@ -10,6 +9,7 @@ import {
 interface SessionDetailsModalProps {
   isOpen: boolean
   session: SessionWithGroup | null
+  canManageSessions?: boolean
   onClose: () => void
   onEdit: (session: SessionWithGroup) => void
   onDelete: (session: SessionWithGroup) => void
@@ -30,6 +30,7 @@ function formatDateTime(iso: string) {
 export default function SessionDetailsModal({
   isOpen,
   session,
+  canManageSessions = false,
   onClose,
   onEdit,
   onDelete,
@@ -146,26 +147,25 @@ export default function SessionDetailsModal({
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-4 border-t border-gray-200">
-             
+            {canManageSessions ? (
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => onEdit(session)}
+                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 text-primary-900 hover:bg-primary-50 rounded-md px-3 py-2 text-sm font-medium transition"
+                >
+                  <PencilSquareIcon className="size-4" />
+                  Modifier
+                </button>
 
-              <button
-                onClick={() => onEdit(session)}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 text-primary-900 hover:bg-primary-50 rounded-md px-3 py-2 text-sm font-medium transition"
-              >
-                <PencilSquareIcon className="size-4" />
-                Modifier
-              </button>
-
-              <button
-                onClick={() => onDelete(session)}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 text-red-900 hover:bg-red-50 rounded-md px-3 py-2 text-sm font-medium transition"
-              >
-                <TrashIcon className="size-4" />
-                Supprimer
-              </button>
-            </div>
+                <button
+                  onClick={() => onDelete(session)}
+                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 text-red-900 hover:bg-red-50 rounded-md px-3 py-2 text-sm font-medium transition"
+                >
+                  <TrashIcon className="size-4" />
+                  Supprimer
+                </button>
+              </div>
+            ) : null}
           </motion.div>
         </motion.div>
       )}

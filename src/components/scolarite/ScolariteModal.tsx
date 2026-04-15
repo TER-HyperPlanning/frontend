@@ -6,7 +6,7 @@ import type { ScolariteAccount } from './types'
 interface ScolariteModalProps {
     isOpen: boolean
     onClose: () => void
-    onSubmit: (data: { nom: string; prenom: string; email: string; password?: string }) => void
+    onSubmit: (data: { nom: string; prenom: string; email: string; phone: string; password?: string }) => void
     account?: ScolariteAccount | null
 }
 
@@ -15,6 +15,7 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
     const [nom, setNom] = useState('')
     const [prenom, setPrenom] = useState('')
     const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
     const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -23,11 +24,13 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
             setNom(account.nom)
             setPrenom(account.prenom)
             setEmail(account.email)
+            setPhone(account.phone)
             setPassword('')
         } else {
             setNom('')
             setPrenom('')
             setEmail('')
+            setPhone('')
             setPassword('')
         }
         setErrors({})
@@ -39,6 +42,8 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
         if (!prenom.trim()) errs.prenom = 'Le prénom est requis'
         if (!email.trim()) errs.email = "L'email est requis"
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Format d'email invalide"
+        if (!phone.trim()) errs.phone = 'Le téléphone est requis'
+        else if (!/^\d{10,15}$/.test(phone.trim())) errs.phone = 'Format invalide (10 à 15 chiffres)'
         if (!isEdit && !password.trim()) errs.password = 'Le mot de passe est requis'
         if (!isEdit && password.length > 0 && password.length < 6) errs.password = 'Minimum 6 caractères'
         return errs
@@ -49,7 +54,7 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
         const errs = validate()
         setErrors(errs)
         if (Object.keys(errs).length === 0) {
-            onSubmit({ nom: nom.trim(), prenom: prenom.trim(), email: email.trim(), password: isEdit ? undefined : password })
+            onSubmit({ nom: nom.trim(), prenom: prenom.trim(), email: email.trim(), phone: phone.trim(), password: isEdit ? undefined : password })
             onClose()
         }
     }
@@ -124,6 +129,18 @@ export default function ScolariteModal({ isOpen, onClose, onSubmit, account }: S
                                     placeholder="agent@univ-evry.fr"
                                 />
                                 {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Téléphone</label>
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className={`w-full px-3 py-2.5 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30 ${errors.phone ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-primary-500'}`}
+                                    placeholder="0612345678"
+                                />
+                                {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
                             </div>
 
                             {!isEdit && (

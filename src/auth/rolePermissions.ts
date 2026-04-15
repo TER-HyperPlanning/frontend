@@ -26,7 +26,7 @@ export function isAllowedAppPath(role: AppRole, pathname: string): boolean {
   if (role === 'STUDENT') return false
 
   if (role === 'TEACHER') {
-    return p === '/requests' || p.startsWith('/requests/')
+    return false
   }
 
   if (role === 'ADMIN') {
@@ -91,7 +91,7 @@ export const MAIN_NAV_ITEMS: NavItemDef[] = [
   { to: '/formations', label: 'Formations', roles: ['ADMIN'] },
   { to: '/filieres', label: 'Filières', roles: ['ADMIN'] },
   { to: '/sessions', label: 'Séances', roles: ['ADMIN'] },
-  { to: '/requests', label: 'Demandes', roles: ['ADMIN', 'TEACHER'] },
+  { to: '/requests', label: 'Demandes', roles: ['ADMIN'] },
   { to: '/scolarite', label: 'Scolarité', roles: ['ADMIN'] },
   { to: '/availability', label: 'Disponibilités', roles: ['ADMIN'] },
   { to: '/admin/accounts', label: 'Comptes', roles: ['ADMIN'] },
