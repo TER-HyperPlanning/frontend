@@ -116,17 +116,7 @@ export default function ScolaritePage() {
 
     return (
         <div className="flex h-full">
-            {/* Left sidebar label */}
-            <div className="flex flex-col w-0 sm:w-auto">
-                <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="bg-primary-800 text-white font-semibold text-sm px-6 py-3 rounded-r-xl mt-6 whitespace-nowrap hidden sm:block"
-                >
-                    Comptes Scolarité
-                </motion.div>
-            </div>
+  
 
             {/* Main content area */}
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -137,9 +127,7 @@ export default function ScolaritePage() {
                     transition={{ duration: 0.4, ease: 'easeOut' }}
                     className="flex items-center justify-between px-8 py-4"
                 >
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-500">Hello, Admin</span>
-                    </div>
+
                     <div className="flex items-center gap-4">
                         <Logo showText={false} className="h-10 w-auto" />
                     </div>
