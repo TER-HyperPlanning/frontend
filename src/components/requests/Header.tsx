@@ -2,7 +2,8 @@ import { Clock, CheckCircle, XCircle } from 'lucide-react'
 import StatsCard from './StatsCard'
 
 type RequestStatus = 'En attente' | 'Approuvé' | 'Refusé'
-type RequestType = 'Changement de salle' | 'Proposition de récupération de séance'
+type RequestType = 'RoomChange' | 'SessionRecovery'
+
 
 interface PageHeaderProps {
   pendingCount: number
@@ -29,14 +30,12 @@ export default function Header({
 }: PageHeaderProps) {
   return (
     <div className="mb-8">
-      {/* Titre et description */}
 
       <div className="mb-7"> 
         <h1 className="text-4xl font-bold text-[#003A68]">Gestion des demandes</h1> 
         <p className="text-gray-500 mt-2">Consultez et gérez les demandes des enseignants.</p> 
       </div>
 
-      {/* Stats cards */}
       <div className="grid md:grid-cols-3 gap-6 mb-5 overflow-hidden">
 
         <StatsCard
@@ -62,11 +61,10 @@ export default function Header({
         />
       </div>
 
-      {/* Barre de recherche + filtres */}
       <div className="bg-[#F4F6F8] rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-4">
         <input
           type="text"
-          placeholder="Rechercher un professeur, matière, formation..."
+          placeholder="Rechercher un professeur, matière..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-4 py-2 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#003A68]"
@@ -77,8 +75,8 @@ export default function Header({
           className="px-4 py-2 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#003A68]"
         >
           <option value="">Tous les types</option>
-          <option value="Changement de salle">Changement de salle</option>
-          <option value="Proposition de récupération de séance">Proposition de récupération de séance</option>
+          <option value="RoomChange">Changement de salle</option>
+          <option value="SessionRecovery">Proposition de récupération de séance</option>
         </select>
         <select
           value={filterStatus}
