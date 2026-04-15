@@ -29,6 +29,7 @@ import { type SessionWithGroup } from '@/types/session'
 import './planning-calendar.css'
 
 interface PlanningCalendarProps {
+  canManageSessions?: boolean
   selectedDate: Date
   events?: EventInput[]
   isLoading?: boolean
@@ -141,6 +142,7 @@ function hasValue(value: string | null | undefined): value is string {
 }
 
 function PlanningCalendar({
+  canManageSessions = false,
   selectedDate,
   events = [],
   isLoading,
@@ -180,6 +182,8 @@ function PlanningCalendar({
   let clickTimer: any = null
 
   const handleDateClick = (arg: any) => {
+    if (!canManageSessions) return
+
     if (clickTimer) {
       clearTimeout(clickTimer)
       clickTimer = null
@@ -285,8 +289,8 @@ function PlanningCalendar({
       )}
       <div className="min-w-[700px] h-full">
         <FullCalendar
-          selectable={true}
-          dateClick={handleDateClick}
+          selectable={canManageSessions}
+          dateClick={canManageSessions ? handleDateClick : undefined}
           ref={calendarRef}
           plugins={[timeGridPlugin, interactionPlugin]}
           locale={frLocale}
@@ -311,9 +315,9 @@ function PlanningCalendar({
           eventContent={renderEventContent}
           eventMouseEnter={handleMouseEnter}
           eventMouseLeave={handleMouseLeave}
-          editable={true}
+          editable={canManageSessions}
           eventDurationEditable={false}
-          eventDrop={handleEventDropWithConfirmation}
+          eventDrop={canManageSessions ? handleEventDropWithConfirmation : undefined}
           eventClick={onEventClick}
         />
       </div>
@@ -433,33 +437,38 @@ function PlanningCalendar({
       <SessionDetailsModal
         isOpen={sessionDetailsOpen}
         session={selectedSession ?? null}
+        canManageSessions={canManageSessions}
         onClose={onCloseSessionDetails ?? (() => {})}
         onEdit={onEditSession ?? (() => {})}
         onDelete={onDeleteSessionFromDetails ?? (() => {})}
       />
 
-      <AddSessionModal
-        isOpen={addSessionOpen}
-        onClose={onCloseAddSession ?? (() => {})}
-        defaultGroupId=""
-        defaultDate={addSessionDefaultDate}
-        defaultDateRange={addSessionDateRange}
-        onAdd={onAddSession ?? (async () => false)}
-      />
+      {canManageSessions ? (
+        <>
+          <AddSessionModal
+            isOpen={addSessionOpen}
+            onClose={onCloseAddSession ?? (() => {})}
+            defaultGroupId=""
+            defaultDate={addSessionDefaultDate}
+            defaultDateRange={addSessionDateRange}
+            onAdd={onAddSession ?? (async () => false)}
+          />
 
-      <EditSessionModal
-        isOpen={editSessionOpen}
-        session={editTarget ?? null}
-        onClose={onCloseEditSession ?? (() => {})}
-        onEdit={onEditSession2 ?? (async () => false)}
-      />
+          <EditSessionModal
+            isOpen={editSessionOpen}
+            session={editTarget ?? null}
+            onClose={onCloseEditSession ?? (() => {})}
+            onEdit={onEditSession2 ?? (async () => false)}
+          />
 
-      <DeleteSessionModal
-        isOpen={deleteConfirmOpen}
-        session={deleteTarget ?? null}
-        onClose={onCloseDeleteConfirm ?? (() => {})}
-        onConfirm={onConfirmDelete ?? (() => {})}
-      />
+          <DeleteSessionModal
+            isOpen={deleteConfirmOpen}
+            session={deleteTarget ?? null}
+            onClose={onCloseDeleteConfirm ?? (() => {})}
+            onConfirm={onConfirmDelete ?? (() => {})}
+          />
+        </>
+      ) : null}
     </div>
   )
 }

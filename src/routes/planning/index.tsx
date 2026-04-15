@@ -3,6 +3,7 @@ import DateStrip from '@/components/planning/DateStrip'
 import PlanningHeader from '@/components/planning/PlanningHeader'
 import { useCurrentUser } from '@/hooks/api/useAuth'
 import { usePlanning, useMyPlanning } from '@/hooks/planning/usePlanning'
+import { normalizeRole } from '@/auth/rolePermissions'
 import { getAccessToken } from '@/auth/storage'
 import type { PlanningFilters } from '@/types/planning'
 import type { EventDropArg, EventClickArg } from '@fullcalendar/core'
@@ -46,7 +47,11 @@ function getWeekBounds(date: Date): { startDate: string; endDate: string } {
   }
 }
 
-function PlanningContent() {
+interface PlanningContentProps {
+  canManageSessions: boolean
+}
+
+function PlanningContent({ canManageSessions }: PlanningContentProps) {
   const [selectedDate, setSelectedDate] = useState(getInitialDate)
   const [programId, setProgramId] = useState('')
   const [trackId, setTrackId] = useState('')
@@ -78,8 +83,8 @@ function PlanningContent() {
 
   const { toast, showToast, hideToast } = useToast()
   const { updateSession, deleteSession, getSessionById, createSession, getAttendsBySession, deleteAttend } = useSessionService()
-  const courseOptions = useCourseOptions()
-  const roomOptions = useRoomOptions()
+  const courseOptions = useCourseOptions(canManageSessions)
+  const roomOptions = useRoomOptions(canManageSessions)
 
   const hasToken = !!getAccessToken()
 
@@ -438,16 +443,19 @@ function PlanningContent() {
       />
       <DateStrip selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <PlanningCalendar
+        canManageSessions={canManageSessions}
         selectedDate={selectedDate}
         events={activeQuery.data ?? []}
         isLoading={activeQuery.isLoading}
-        onEventDrop={handleEventDrop}
-        onEventClick={handleEventClick}
-        onDoubleClick={handleDoubleClick}
-        onEventDropForConfirmation={handleEventDropForConfirmation}
-        dragDropConfirmOpen={dragDropConfirmOpen}
+        onEventDrop={canManageSessions ? handleEventDrop : undefined}
+        onEventClick={canManageSessions ? handleEventClick : undefined}
+        onDoubleClick={canManageSessions ? handleDoubleClick : undefined}
+        onEventDropForConfirmation={
+          canManageSessions ? handleEventDropForConfirmation : undefined
+        }
+        dragDropConfirmOpen={canManageSessions ? dragDropConfirmOpen : false}
         dragDropData={
-          dragDropData
+          canManageSessions && dragDropData
             ? {
                 originalStart: dragDropData.oldStart,
                 originalEnd: dragDropData.oldEnd,
@@ -460,12 +468,14 @@ function PlanningContent() {
         dragDropError={null}
         onConfirmDragDrop={confirmDragDrop}
         onCancelDragDrop={cancelDragDrop}
-        sessionDetailsOpen={sessionDetailsOpen}
-        selectedSession={selectedSession}
+        sessionDetailsOpen={canManageSessions ? sessionDetailsOpen : false}
+        selectedSession={canManageSessions ? selectedSession : null}
         onCloseSessionDetails={() => setSessionDetailsOpen(false)}
-        onEditSession={handleEditFromDetails}
-        onDeleteSessionFromDetails={handleDeleteFromDetails}
-        addSessionOpen={addSessionOpen}
+        onEditSession={canManageSessions ? handleEditFromDetails : undefined}
+        onDeleteSessionFromDetails={
+          canManageSessions ? handleDeleteFromDetails : undefined
+        }
+        addSessionOpen={canManageSessions ? addSessionOpen : false}
         addSessionDefaultDate={addSessionDefaultDate}
         addSessionDateRange={addSessionDateRange}
         onCloseAddSession={() => {
@@ -473,21 +483,21 @@ function PlanningContent() {
           setAddSessionDefaultDate(null)
           setAddSessionDateRange(null)
         }}
-        onAddSession={handleAddSession}
-        editSessionOpen={editSessionOpen}
-        editTarget={editTarget}
+        onAddSession={canManageSessions ? handleAddSession : undefined}
+        editSessionOpen={canManageSessions ? editSessionOpen : false}
+        editTarget={canManageSessions ? editTarget : null}
         onCloseEditSession={() => {
           setEditSessionOpen(false)
           setEditTarget(null)
         }}
-        onEditSession2={handleEditSession}
-        deleteConfirmOpen={deleteConfirmOpen}
-        deleteTarget={deleteTarget}
+        onEditSession2={canManageSessions ? handleEditSession : undefined}
+        deleteConfirmOpen={canManageSessions ? deleteConfirmOpen : false}
+        deleteTarget={canManageSessions ? deleteTarget : null}
         onCloseDeleteConfirm={() => {
           setDeleteConfirmOpen(false)
           setDeleteTarget(null)
         }}
-        onConfirmDelete={handleDeleteSession}
+        onConfirmDelete={canManageSessions ? handleDeleteSession : undefined}
       />
       <Toast toast={toast} onClose={hideToast} />
     </PageLayout>
@@ -496,16 +506,18 @@ function PlanningContent() {
 
 function RouteComponent() {
   const { data: user } = useCurrentUser()
+  const role = normalizeRole(user?.role)
+  const canManageSessions = role === 'ADMIN'
 
   if (!user || user.role === 'STUDENT') {
-    return <PlanningContent />
+    return <PlanningContent canManageSessions={canManageSessions} />
   }
 
   return (
     <MainMenuContainer>
       <MainNavigator />
       <MainPageContainer>
-        <PlanningContent />
+        <PlanningContent canManageSessions={canManageSessions} />
       </MainPageContainer>
     </MainMenuContainer>
   )

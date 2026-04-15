@@ -2,11 +2,16 @@ import { useState, useEffect } from 'react'
 import { type SelectOption } from '@/types/formation'
 import { useRoomService } from '@/services/roomService'
 
-export function useRoomOptions() {
+export function useRoomOptions(enabled = true) {
   const { getRooms } = useRoomService()
   const [options, setOptions] = useState<SelectOption[]>([])
 
   useEffect(() => {
+    if (!enabled) {
+      setOptions([])
+      return
+    }
+
     getRooms()
       .then((rooms) => {
         setOptions(
@@ -21,7 +26,7 @@ export function useRoomOptions() {
       .catch(() => {
         setOptions([])
       })
-  }, [getRooms])
+  }, [enabled, getRooms])
 
   return options
 }

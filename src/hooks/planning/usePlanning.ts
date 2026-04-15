@@ -84,9 +84,9 @@ type PlanningQueryOptions = {
  * On the planning page this runs only for visitors; logged-in users use `useMyPlanning` (/Planning/me).
  */
 export function usePlanning(filters: PlanningFilters, options?: PlanningQueryOptions) {
+  const { api } = useAppClient()
   const hasToken = !!getAccessToken()
-  const appClient = hasToken ? useAppClient() : null
-  const enabled = options?.enabled !== false
+  const enabled = options?.enabled ?? !hasToken
 
   return useQuery({
     queryKey: ['planning', filters],
@@ -94,9 +94,10 @@ export function usePlanning(filters: PlanningFilters, options?: PlanningQueryOpt
     queryFn: async () => {
       const qs = buildQueryParams(filters)
 
-      if (appClient) {
-        const { data } = await appClient.api.get<ApiResponse<PlanningWeekDto[]>>(
-          `/Planning${qs}`,
+      // Safety net: if a logged-in session reaches this query, still use /Planning/me.
+      if (hasToken) {
+        const { data } = await api.get<ApiResponse<PlanningWeekDto[]>>(
+          `/Planning/me${qs}`,
         )
         return toCalendarEvents(data.result ?? [])
       }

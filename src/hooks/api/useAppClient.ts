@@ -32,11 +32,12 @@ export function useAppClient() {
             (error) => Promise.reject(error),
         );
 
-        // Intercepteur de réponse : gère les 401/403
+        // Intercepteur de réponse : gère les 401
+        // NOTE: 403 = droits insuffisants sur une ressource, la session reste valide.
         instance.interceptors.response.use(
             (response) => response,
             (error: AxiosError) => {
-                if (error.response?.status === 401 || error.response?.status === 403) {
+                if (error.response?.status === 401) {
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('expiresIn');
                     localStorage.removeItem('currentUser');
