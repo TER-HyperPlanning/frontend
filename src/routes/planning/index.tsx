@@ -126,7 +126,7 @@ function PlanningContent() {
 
   // Handle drag & drop with confirmation (validate session first)
  const handleEventDropForConfirmation = useCallback(
-  async (eventId, oldStart, oldEnd, newStart, newEnd) => {
+  async (eventId: string, oldStart: Date, oldEnd: Date, newStart: Date, newEnd: Date): Promise<void> => {
     const format = (d: Date) => {
       const pad = (n: number) => String(n).padStart(2, '0')
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
@@ -174,7 +174,7 @@ function PlanningContent() {
       })
       setDragDropConfirmOpen(true)
 
-      return true
+      return
     } catch (error: any) {
       const message =
         error?.response?.status === 409
@@ -183,7 +183,7 @@ function PlanningContent() {
 
       showToast(message, 'error')
 
-      return false
+      return
     }
   },
   [

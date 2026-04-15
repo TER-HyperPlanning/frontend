@@ -35,7 +35,7 @@ interface PlanningCalendarProps {
   onEventDrop?: (arg: EventDropArg) => void
   onEventClick?: (arg: EventClickArg) => void
   onDoubleClick?: (startDate: Date, endDate: Date) => void // Double-click with time range
-  onEventDropForConfirmation?: (eventId: string, oldStart: Date, oldEnd: Date, newStart: Date, newEnd: Date) => Promise<void> // Drag with confirmation (async validation)
+  onEventDropForConfirmation?: (eventId: string, oldStart: Date, oldEnd: Date, newStart: Date, newEnd: Date) => Promise<void | boolean> // Drag with confirmation (async validation)
   // Modal states
   dragDropConfirmOpen?: boolean
   dragDropData?: {
