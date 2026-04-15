@@ -1,24 +1,52 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Plus, Bell } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Logo from '@/components/Logo'
+import Toast from '@/components/Toast'
+import { useToast } from '@/hooks/useToast'
+import { useScolariteService, type AdminDto } from '@/services/scolariteService'
 import SearchBar from './SearchBar'
-import FilterDropdown from './FilterDropdown'
 import ScolariteTable from './ScolariteTable'
 import ScolariteModal from './ScolariteModal'
-import AssignFiliereModal from './AssignFiliereModal'
-import { MOCK_ACCOUNTS, FILIERES } from './types'
 import type { ScolariteAccount } from './types'
 
+function mapAdminToScolariteAccount(admin: AdminDto): ScolariteAccount {
+    return {
+        id: admin.id,
+        nom: admin.lastName,
+        prenom: admin.firstName,
+        email: admin.email,
+        phone: admin.phone,
+    }
+}
+
 export default function ScolaritePage() {
-    const [accounts, setAccounts] = useState<ScolariteAccount[]>(MOCK_ACCOUNTS)
+    const { getAdmins, createAdmin, updateAdmin, deleteAdmin } = useScolariteService()
+    const { toast, showToast, hideToast } = useToast()
+    const [accounts, setAccounts] = useState<ScolariteAccount[]>([])
+    const [isLoading, setIsLoading] = useState(false)
     const [search, setSearch] = useState('')
-    const [filiereFilter, setFiliereFilter] = useState('')
 
     // Modal states
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editAccount, setEditAccount] = useState<ScolariteAccount | null>(null)
-    const [assignAccount, setAssignAccount] = useState<ScolariteAccount | null>(null)
+
+    const loadAccounts = useCallback(async () => {
+        try {
+            setIsLoading(true)
+            const data = await getAdmins()
+            setAccounts(data.map(mapAdminToScolariteAccount))
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Erreur lors du chargement des comptes'
+            showToast(message, 'error')
+        } finally {
+            setIsLoading(false)
+        }
+    }, [getAdmins, showToast])
+
+    useEffect(() => {
+        void loadAccounts()
+    }, [loadAccounts])
 
     // Filter and search
     const filteredAccounts = useMemo(() => {
@@ -27,62 +55,68 @@ export default function ScolaritePage() {
                 !search ||
                 acc.nom.toLowerCase().includes(search.toLowerCase()) ||
                 acc.prenom.toLowerCase().includes(search.toLowerCase()) ||
-                acc.email.toLowerCase().includes(search.toLowerCase())
-
-            const matchesFiliere =
-                !filiereFilter || acc.filieres.includes(filiereFilter)
-
-            return matchesSearch && matchesFiliere
+                acc.email.toLowerCase().includes(search.toLowerCase()) ||
+                acc.phone.toLowerCase().includes(search.toLowerCase())
+            return matchesSearch
         })
-    }, [accounts, search, filiereFilter])
+    }, [accounts, search])
 
     // CRUD handlers
-    function handleCreate(data: { nom: string; prenom: string; email: string }) {
-        const newAccount: ScolariteAccount = {
-            id: String(Date.now()),
-            nom: data.nom.toUpperCase(),
-            prenom: data.prenom,
-            email: data.email,
-            filieres: [],
+    async function handleCreate(data: { nom: string; prenom: string; email: string; phone: string; password?: string }) {
+        if (!data.password) return
+        try {
+            const created = await createAdmin({
+                email: data.email,
+                password: data.password,
+                firstName: data.prenom,
+                lastName: data.nom.toUpperCase(),
+                phone: data.phone,
+            })
+            setAccounts((prev) => [...prev, mapAdminToScolariteAccount(created)])
+            showToast('Compte créé avec succès', 'success')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Erreur lors de la création du compte'
+            showToast(message, 'error')
         }
-        setAccounts((prev) => [...prev, newAccount])
     }
 
-    function handleEdit(data: { nom: string; prenom: string; email: string }) {
+    async function handleEdit(data: { nom: string; prenom: string; email: string; phone: string; password?: string }) {
         if (!editAccount) return
-        setAccounts((prev) =>
-            prev.map((acc) =>
-                acc.id === editAccount.id
-                    ? { ...acc, nom: data.nom.toUpperCase(), prenom: data.prenom, email: data.email }
-                    : acc
+
+        try {
+            const updated = await updateAdmin(editAccount.id, {
+                email: data.email,
+                firstName: data.prenom,
+                lastName: data.nom.toUpperCase(),
+                phone: data.phone,
+            })
+            setAccounts((prev) =>
+                prev.map((acc) =>
+                    acc.id === editAccount.id ? mapAdminToScolariteAccount(updated) : acc
+                )
             )
-        )
-        setEditAccount(null)
+            setEditAccount(null)
+            showToast('Compte modifié avec succès', 'success')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Erreur lors de la modification du compte'
+            showToast(message, 'error')
+        }
     }
 
-    function handleAssignFilieres(accountId: string, filieres: string[]) {
-        setAccounts((prev) =>
-            prev.map((acc) =>
-                acc.id === accountId ? { ...acc, filieres } : acc
-            )
-        )
+    async function handleDelete(account: ScolariteAccount) {
+        try {
+            await deleteAdmin(account.id)
+            setAccounts((prev) => prev.filter((acc) => acc.id !== account.id))
+            showToast('Compte supprimé avec succès', 'success')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Erreur lors de la suppression du compte'
+            showToast(message, 'error')
+        }
     }
-
-    const filiereOptions = FILIERES.map((f) => ({ value: f.nom, label: f.nom }))
 
     return (
         <div className="flex h-full">
-            {/* Left sidebar label */}
-            <div className="flex flex-col w-0 sm:w-auto">
-                <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="bg-primary-800 text-white font-semibold text-sm px-6 py-3 rounded-r-xl mt-6 whitespace-nowrap hidden sm:block"
-                >
-                    Comptes Scolarité
-                </motion.div>
-            </div>
+  
 
             {/* Main content area */}
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -93,9 +127,7 @@ export default function ScolaritePage() {
                     transition={{ duration: 0.4, ease: 'easeOut' }}
                     className="flex items-center justify-between px-8 py-4"
                 >
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-500">Hello, Admin</span>
-                    </div>
+
                     <div className="flex items-center gap-4">
                         <Logo showText={false} className="h-10 w-auto" />
                     </div>
@@ -118,7 +150,7 @@ export default function ScolaritePage() {
                     </div>
                 </motion.div>
 
-                {/* Controls: Search + Filters */}
+                {/* Controls */}
                 <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -128,13 +160,7 @@ export default function ScolaritePage() {
                     <SearchBar
                         value={search}
                         onChange={setSearch}
-                        placeholder="Rechercher un compte scolarité"
-                    />
-                    <FilterDropdown
-                        label="Filière"
-                        options={filiereOptions}
-                        value={filiereFilter}
-                        onChange={setFiliereFilter}
+                        placeholder="Rechercher un compte scolarité (nom, email, téléphone)"
                     />
                 </motion.div>
 
@@ -145,12 +171,19 @@ export default function ScolaritePage() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
                     >
-                        <ScolariteTable
-                            accounts={filteredAccounts}
-                            onEdit={(acc) => setEditAccount(acc)}
-                            onAssignFiliere={(acc) => setAssignAccount(acc)}
-                        />
+                        <div className="card bg-base-100 border border-base-200">
+                            <div className="overflow-x-auto">
+                                <ScolariteTable
+                                    accounts={filteredAccounts}
+                                    onEdit={(acc) => setEditAccount(acc)}
+                                    onDelete={handleDelete}
+                                />
+                            </div>
+                        </div>
                     </motion.div>
+                    {isLoading && (
+                        <div className="mt-4 text-sm text-gray-500">Chargement des comptes...</div>
+                    )}
 
                     {/* Stats summary */}
                     <motion.div
@@ -160,7 +193,7 @@ export default function ScolaritePage() {
                         className="mt-4 text-xs text-gray-400"
                     >
                         {filteredAccounts.length} compte{filteredAccounts.length !== 1 ? 's' : ''} affiché{filteredAccounts.length !== 1 ? 's' : ''}
-                        {(search || filiereFilter) && ` sur ${accounts.length}`}
+                        {search && ` sur ${accounts.length}`}
                     </motion.div>
                 </div>
             </div>
@@ -179,12 +212,7 @@ export default function ScolaritePage() {
                 account={editAccount}
             />
 
-            <AssignFiliereModal
-                isOpen={!!assignAccount}
-                onClose={() => setAssignAccount(null)}
-                onSubmit={handleAssignFilieres}
-                account={assignAccount}
-            />
+            <Toast toast={toast} onClose={hideToast} />
         </div>
     )
 }

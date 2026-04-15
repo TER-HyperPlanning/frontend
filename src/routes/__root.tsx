@@ -3,10 +3,9 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import MainLayout from '@/layout/MainLayout'
 
-
 export const Route = createRootRoute({
   component: () => (
-    <MainLayout >
+    <MainLayout>
       <Outlet />
       <TanStackDevtools
         config={{

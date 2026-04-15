@@ -1,9 +1,15 @@
+import { getAccessToken } from '@/auth/storage'
 import Logo from '@/components/Logo'
 import PageLayout from '@/layout/PageLayout'
-import { createFileRoute, Outlet, useRouterState } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/auth')({
+  beforeLoad: () => {
+    if (getAccessToken()) {
+      throw redirect({ to: '/planning' })
+    }
+  },
   component: RouteComponent,
 })
 
@@ -20,7 +26,7 @@ function RouteComponent() {
         <Logo showText className='text-white h-16 sm:h-20'/>
         <div 
           key={key}
-          className='w-full flex justify-center animate-[fadeSlideIn_0.5s_ease-out]'
+          className='w-full flex justify-center animate-[fadeSlideIn_0.5s_ease-out] text-slate-300'
           style={{
             animation: 'fadeSlideIn 0.5s ease-out'
           }}

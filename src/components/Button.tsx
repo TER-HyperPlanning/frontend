@@ -1,14 +1,14 @@
 import { twMerge } from 'tailwind-merge';
-import { type ReactNode } from 'react';
+import { type MouseEventHandler, type ReactNode } from 'react';
 
 export interface ButtonProps {
   children: ReactNode;
-  variant?: 'filled' | 'outlined';
+  variant?: 'filled' | 'outlined' | 'light';
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
 }
 
@@ -27,6 +27,7 @@ export default function Button({
   const variantClasses = {
     filled: 'bg-primary text-white border-0 hover:bg-primary-600 active:bg-primary-700',
     outlined: 'btn-outline border-2 border-primary text-primary hover:bg-primary hover:text-white',
+    light: 'bg-gray-100 border border-gray-200 text-gray-800 hover:bg-gray-200',
   };
 
   const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';

@@ -36,7 +36,7 @@ export default function NavLink({ to, icon, label, isOpen }: NavLinkProps) {
       )}
 
       {/* Icon */}
-      <span className="text-xl shrink-0 w-5 h-5 flex items-center justify-center">
+      <span className="text-xl shrink-0 w-4 h-4 flex items-center justify-center">
         {icon}
       </span>
 
@@ -62,7 +62,7 @@ export default function NavLink({ to, icon, label, isOpen }: NavLinkProps) {
           bg-gray-800 text-white text-xs
           opacity-0 group-hover:opacity-100
           pointer-events-none transition-opacity duration-200
-          whitespace-nowrap z-50
+          whitespace-nowrap z-50 hidden md:block
         ">
           {label}
         </div>

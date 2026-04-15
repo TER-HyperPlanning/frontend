@@ -1,3 +1,5 @@
+import React from 'react'
+import NotificationBell from '@/features/notifications/components/NotificationBell'
 
 interface Props{
     children:React.ReactNode
@@ -5,8 +7,9 @@ interface Props{
 
 function MainMenuContainer({children}:Props) {
   return (
-    <div className="size-full flex bg-gray-100">{children}</div>
-
+    <div className="h-screen w-full flex flex-col-reverse md:flex-row bg-gray-100 overflow-hidden relative">
+      {children}
+    </div>
   )
 }
 

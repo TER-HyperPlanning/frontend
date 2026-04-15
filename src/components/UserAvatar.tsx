@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 interface UserAvatarProps {
   fullName: string
+  roleLabel?: string
   isOpen: boolean
 }
 
@@ -14,7 +15,7 @@ function getInitials(name: string): string {
     .slice(0, 2)
 }
 
-export default function UserAvatar({ fullName, isOpen }: UserAvatarProps) {
+export default function UserAvatar({ fullName, roleLabel, isOpen }: UserAvatarProps) {
   return (
     <div
       className={`
@@ -23,7 +24,7 @@ export default function UserAvatar({ fullName, isOpen }: UserAvatarProps) {
       `}
     >
       {/* Avatar circle */}
-      <div className="w-9 h-9 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-semibold shrink-0">
+      <div className="w-7 h-7 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-semibold shrink-0">
         {getInitials(fullName)}
       </div>
 
@@ -37,10 +38,12 @@ export default function UserAvatar({ fullName, isOpen }: UserAvatarProps) {
             transition={{ duration: 0.2, ease: 'easeInOut' }}
             className="overflow-hidden whitespace-nowrap"
           >
-            <p className="text-sm font-medium text-gray-700 leading-tight">
+            <p className="text-xs font-medium text-gray-700 leading-tight">
               {fullName}
             </p>
-            <p className="text-xs text-gray-400 leading-tight">Enseignant</p>
+            {roleLabel ? (
+              <p className="text-xs text-gray-400 leading-tight">{roleLabel}</p>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>
