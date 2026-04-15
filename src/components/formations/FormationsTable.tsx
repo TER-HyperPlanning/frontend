@@ -12,11 +12,13 @@ import {
   TrashIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline'
-import { UsersRound, BookOpen } from 'lucide-react'
+import { UsersRound, BookOpen, ArrowUpDown } from 'lucide-react'
 
 interface FormationsTableProps {
   formations: Formation[]
   isLoading: boolean
+  sortOrder: 'asc' | 'desc'
+  onSortToggle: () => void
   onEdit: (formation: Formation) => void
   onDelete: (formation: Formation) => void
   onViewProgramme: (formation: Formation) => void
@@ -32,6 +34,8 @@ export default function FormationsTable({
   onViewProgramme,
   onViewGroups,
   onViewModules,
+  sortOrder,
+  onSortToggle,
 }: FormationsTableProps) {
   if (isLoading) {
     return (
@@ -58,7 +62,16 @@ export default function FormationsTable({
     <Table>
       <TableHead>
         <TableRow className="text-base-content/60 text-xs uppercase">
-          <TableHeader>Nom de la formation</TableHeader>
+          <TableHeader>
+            <button
+              type="button"
+              onClick={onSortToggle}
+              className="flex items-center gap-1 hover:text-base-content transition-colors font-medium"
+            >
+              Nom de la formation
+              <ArrowUpDown size={14} className={sortOrder === 'desc' ? 'rotate-180' : ''} />
+            </button>
+          </TableHeader>
           <TableHeader>Enseignant responsable</TableHeader>
           <TableHeader>Lieu</TableHeader>
           <TableHeader>Filière associée</TableHeader>
