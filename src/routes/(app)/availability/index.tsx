@@ -77,7 +77,7 @@ function RouteComponent() {
       if (isDataSave) {
         setIsDataSave(false)
       }
-    }, 1000);
+    }, 3000);
   }, [isDataSave]);
 
   useEffect(() => {
@@ -85,10 +85,11 @@ function RouteComponent() {
       if (isErrorDataSave) {
         setIsErrorDataSave(false)
       }
-    }, 1000);
+    }, 3000);
   }, [isErrorDataSave]);
 
   const postCurrentAvailability = useCallback(async () => {
+    try {
     const availToDelete = []
     for (let availGroup of dataAvailabilityGroup) {
       if (availGroup.teacherId === id) {
@@ -96,7 +97,6 @@ function RouteComponent() {
       }
     }
     await Promise.all(availToDelete)
-
     const groupPromises: Promise<GroupPropsEndPointRes>[] = [];
     const keys: number[] = [];
     groups.forEach((group) => {
@@ -170,37 +170,16 @@ function RouteComponent() {
     })
 
     setIsDataSave(true)
+    } catch (error) {
+      console.error(error)
+      setIsErrorDataSave(true)
+    }
   }, [dataAvailability, selectedDays, groups, dataAvailabilityGroup])
 
 
   return (
     false ? <div></div> : (<div>
       <div>
-        <div onClick={async () => {
-          try {
-            postCurrentAvailability()
-          } catch (error) {
-            console.log(error)
-          }
-        }}>click</div>
-
-        <div onClick={async () => {
-          try {
-            for (let availGroup of dataAvailabilityGroup) {
-              console.log(deleteAvailabilityGroup(availGroup.id))
-              // console.log(availGroup)
-              // deleteAvailability(availGroup.id)
-            }
-
-            for (let availGroup of dataAvailability) {
-              console.log(deleteAvailability(availGroup.id))
-              // console.log(availGroup)
-              // deleteAvailability(availGroup.id)
-            }
-          } catch (error) {
-            console.log(error)
-          }
-        }}>delete</div>
       </div>
       <PageLayout>
         <div className='flex mt-8 ml-8 justify-between'>
