@@ -1,54 +1,180 @@
-import { X, User, GraduationCap, Clock, MapPin, Check, XCircle, Calendar, Building, CheckCircle, Users, School } from 'lucide-react'
-import { useState } from 'react'
-import type { Request } from '@/routes/(app)/requests'
+import {
+  X,
+  User,
+  GraduationCap,
+  Clock,
+  MapPin,
+  Calendar,
+  Building,
+  CheckCircle,
+  Users,
+  School,
+  XCircle, CalendarDays, Check 
+} from 'lucide-react'
+
+import { useState, useMemo, useEffect  } from 'react'
+import type { SessionChange } from '../../types/sessionChange'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRoom } from '@/hooks/requests/useRoomQuery'
+import { useSessionChange } from '@/hooks/requests/useSessionChangesById'
+import { useSessionGroups } from '@/hooks/requests/useSessionGroups'
+import { useSessionChangeService } from '@/services/requestservices'
+import { useTrack } from '@/hooks/requests/useTrackFromGroup'
+import { useProgram } from '@/hooks/requests/useProgramFromTrack'
+import { useQueries } from '@tanstack/react-query'
+import { useBuilding } from '@/hooks/requests/useBuilding'
+import { useAvailableRooms } from '@/hooks/requests/useAvailableRooms'
+import {useApproveRoom} from '@/hooks/requests/useApproveRoom'
 import AlternativeSlotModal from './AlternativeSlotModal'
 import ConfirmModal from './ConfirmModal'
+import RejectReasonModal from './RejectReasonModal'
+import { useRejectSessionChange } from '@/hooks/requests/useReject'
+
 
 interface RequestDetailsModalProps {
   isOpen: boolean
   onClose: () => void
-  request: Request
+  request: SessionChange
   setToast: (toast: { message: string; type: 'success' | 'error' }) => void
 }
-
 interface AvailableRoom {
-  room: string
-  building: string
+  roomId: string
+  roomNumber: string
+  buildingName: string
   capacity: number
   type: string
 }
 
-export default function RequestDetailsModal({ isOpen, onClose, request, setToast }: RequestDetailsModalProps) {
-  const [selectedRoom, setSelectedRoom] = useState<AvailableRoom | null>(null)
-  const [roomSearch, setRoomSearch] = useState('')
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR')
+}
+
+const formatTime = (time: any) => {
+  if (!time) return ''
+  return typeof time === 'string' ? time.slice(0, 5) : ''
+}
+
+const formatStatus = (status: string) => {
+  switch (status) {
+    case 'En attente':
+      return 'En attente'
+    case 'Approuvé':
+      return 'Approuvé'
+    case 'Refusé':
+      return 'Refusé'
+    default:
+      return status
+  }
+}
+
+export default function RequestDetailsModal({
+  isOpen,
+  onClose,
+  request,
+  setToast,
+}: RequestDetailsModalProps) {
+  const { mutate: approveRoom } = useApproveRoom()
+  const { mutate: rejectSessionChange } = useRejectSessionChange()
+
+  const { data: session } = useSessionChange(request.id)
+
+  const sessionId = session?.sessionId
+  const roomId = session?.currentRoomId
+
+  const { data: room } = useRoom(roomId)
+  const oldRoomId = session?.oldRoomId
+  const { data: oldRoom } = useRoom(oldRoomId)
+
+  const { data: attends } = useSessionGroups(sessionId)
+  const queryClient = useQueryClient()
+
+  const { getGroup } = useSessionChangeService()
+  const oldBuildingId = oldRoom?.buildingId
+  const { data: oldBuilding } = useBuilding(oldBuildingId)
+
+  const groupQueries = useQueries({
+    queries: (attends ?? []).map((a: any) => ({
+      queryKey: ['group', a.groupId],
+      queryFn: () => getGroup(a.groupId),
+      enabled: !!a.groupId,
+    })),
+  })
+
+  const groupResults = useMemo<any[]>(
+    () => groupQueries.map(q => q.data).filter(Boolean),
+    [groupQueries]
+  )
+
+  const groupNames = groupResults
+    .map((g: any) => g?.name)
+    .filter(Boolean)
+
+  const trackId = groupResults?.[0]?.trackId
+  const { data: track } = useTrack(trackId ?? undefined)
+
+  const programId = track?.programId
+  const { data: program } = useProgram(programId ?? undefined)
+
+  const proposedRoomId = session?.proposedRoomId
+  const { data: proposedRoom } = useRoom(proposedRoomId)
+
+  const proposedBuildingId = proposedRoom?.buildingId
+  const { data: proposedBuilding } = useBuilding(proposedBuildingId)
+
+  const counterRoomId = session?.counterProposalRoomId
+  const { data: counterRoom } = useRoom(counterRoomId)
+
+  const counterBuildingId = counterRoom?.buildingId
+  const { data: counterBuilding } = useBuilding(counterBuildingId)
+  const { data: availableRoomsData, isLoading } = useAvailableRooms(sessionId)
+  
+  const [showConfirmAccept, setShowConfirmAccept] = useState(false)
   const [showAlternativeModal, setShowAlternativeModal] = useState(false)
   const [showConfirmAlternative, setShowConfirmAlternative] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<any>(null)
-  const [showConfirmAccept, setShowConfirmAccept] = useState(false)
+  const [selectedRoom, setSelectedRoom] = useState<AvailableRoom | null>(null)
+  const [roomSearch, setRoomSearch] = useState('')
   const [showConfirmRoom, setShowConfirmRoom] = useState(false)
+  const [showRejectModal, setShowRejectModal] = useState(false)
 
-  // Exemple de salles disponibles
-  const availableRooms: AvailableRoom[] = [
-    { room: '201', building: 'A', capacity: 30, type: 'Salle TD' },
-    { room: '202', building: 'A', capacity: 35, type: 'Salle informatique' },
-    { room: '301', building: 'B', capacity: 40, type: 'Amphithéâtre' },
-  ]
 
+  const { getRoom } = useSessionChangeService()
+  const roomDetailsQueries = useQueries({
+    queries: (availableRoomsData ?? []).map((r: any) => ({
+      queryKey: ['room-details', r.roomId],
+      queryFn: () => getRoom(r.roomId),
+      enabled: !!r.roomId,
+    })),
+  })
+
+  const roomsWithTypes = (availableRoomsData ?? []).map((room: any, index: number) => {
+    const details = roomDetailsQueries[index]?.data as AvailableRoom | undefined
+
+    return {
+      ...room,
+      type: details?.type ?? 'Inconnu',
+    }
+  })
+
+ 
+  const filteredRooms = roomsWithTypes.filter((room: any) =>
+    room.roomNumber.toLowerCase().includes(roomSearch.toLowerCase()) ||
+    room.buildingName.toLowerCase().includes(roomSearch.toLowerCase())
+  )
   if (!isOpen) return null
 
-  const filteredRooms = availableRooms.filter((room) =>
-    room.room.toLowerCase().includes(roomSearch.toLowerCase()) ||
-    room.building.toLowerCase().includes(roomSearch.toLowerCase()) ||
-    room.type.toLowerCase().includes(roomSearch.toLowerCase())
-  )
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-2xl w-full max-w-4xl p-6 relative overflow-y-auto max-h-[90vh] shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
+
+        {/* CLOSE */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 transition"
@@ -59,86 +185,103 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
         <h2 className="text-3xl font-bold text-[#003A68] mb-6 flex items-center gap-2">
           Détails de la demande
         </h2>
+
+        {/* STATUS */}
         <div className="mb-6">
-        {(() => {
-          let statusIcon, statusStyle, borderColor
+          {(() => {
+            let statusIcon, statusStyle, borderColor
 
-          switch (request.status) {
-            case 'En attente':
-              statusIcon = <Clock className="w-4 h-4" />
-              statusStyle = 'bg-yellow-100 text-yellow-700'
-              borderColor = 'border-yellow-400'
-              break
-            case 'Approuvé':
-              statusIcon = <CheckCircle className="w-4 h-4" />
-              statusStyle = 'bg-green-100 text-green-700'
-              borderColor = 'border-green-500'
-              break
-            case 'Refusé':
-              statusIcon = <XCircle className="w-4 h-4" />
-              statusStyle = 'bg-red-100 text-red-700'
-              borderColor = 'border-red-500'
-              break
-          }
+            switch (request.changeStatusLabel) {
+              case 'En attente':
+                statusIcon = <Clock className="w-4 h-4" />
+                statusStyle = 'bg-yellow-100 text-yellow-700'
+                borderColor = 'border-yellow-400'
+                break
+              case 'Approuvé':
+                statusIcon = <CheckCircle className="w-4 h-4" />
+                statusStyle = 'bg-green-100 text-green-700'
+                borderColor = 'border-green-500'
+                break
+              case 'Refusé':
+                statusIcon = <XCircle className="w-4 h-4" />
+                statusStyle = 'bg-red-100 text-red-700'
+                borderColor = 'border-red-500'
+                break
+            }
 
-          return (
-            <div
-              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${borderColor} ${statusStyle} font-semibold text-sm`}
-            >
-              {statusIcon} {request.status}
-            </div>
-          )
-        })()}
-      </div>
+            return (
+              <div
+                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${borderColor} ${statusStyle} font-semibold text-sm`}
+              >
+                {statusIcon} {formatStatus(request.changeStatusLabel)}
+              </div>
+            )
+          })()}
+        </div>
 
-        {/* Enseignant */}
+        {/* TEACHER */}
         <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
           <User className="w-8 h-8 text-gray-600 mt-1" />
           <div>
             <h3 className="font-semibold text-lg mb-2">Enseignant demandeur</h3>
-            <p>Nom : {request.teacher}</p>
-            <p>Email : {request.email || 'non renseigné'}</p>
-            <p>Date de la demande : {request.requestDate}</p>
+            <p>Nom : {request.teacherName}</p>
+            <p>Email : {request.teacherEmail || 'non renseigné'}</p>
+            <p>Date de la demande : {formatDate(request.requestDate)}</p>
           </div>
         </div>
 
-        {request.type === 'Changement de salle' && (
-          <>
-          {/* Séance */}
+        {/* SESSION */}
         <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
           <GraduationCap className="w-8 h-8 text-gray-600 mt-1" />
+
           <div>
-            <h3 className="font-semibold text-lg mb-2"> Informations actuelles de la séance</h3>
-            <p>Matière : {request.subject}</p>
-            <p>Formation : {request.formation}</p>
-            {request.groups && <p>Groupes : {request.groups}</p>}
+            <h3 className="font-semibold text-lg mb-2">
+              {request.changeType === 'RoomChange'
+                ? 'Informations actuelles de la séance'
+                : 'Informations de la séance ratée'}
+          </h3>
+
+            <p>Matière : {request.courseName}</p>
+
+            {program?.field && (
+              <p>Formation : {program.name} - {program.field}</p>
+            )}
+
+            {groupNames.length > 0 && (
+              <p>Groupes : {groupNames.join(', ')}</p>
+            )}
+
             <p>
-              <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.sessionTime}
+              <Clock className="inline w-4 h-4 mr-1" />
+              Horaire : {formatDate(request.sessionDate)} de {formatTime(request.sessionStartTime)} à {formatTime(request.sessionEndTime)}
             </p>
-            {request.currentRoom && (
-              <p>
-                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.currentRoom} 
-              </p>
-            )}
-            {request.currentRoomType && (
-              <p>
-                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.currentRoomType}
-              </p>
-            )}
-            {request.currentRoomCapacity && (
-              <p>
-                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.currentRoomCapacity}
-              </p>
-            )}
-            {request.currentBuilding && (
+
+            {room && (
+              <>
                 <p>
-                  <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.currentBuilding}
+                  <MapPin className="inline w-4 h-4 mr-1" />
+                  Salle : {room.roomNumber}
                 </p>
-              )}
+
+                <p>
+                  <School className="inline w-4 h-4 mr-1" />
+                  Type salle : {room.type}
+                </p>
+
+                <p>
+                  <Users className="inline w-4 h-4 mr-1" />
+                  Capacité : {room.capacity}
+                </p>
+              </>
+            )}
+
+            <p>
+              <Building className="inline w-4 h-4 mr-1" />
+              Bâtiment : {request.currentBuildingName}
+            </p>
           </div>
         </div>
-
-        {/* Motif */}
+        {/* REASON */}
         <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
           <Calendar className="w-8 h-8 text-gray-600 mt-1" />
           <div>
@@ -146,29 +289,7 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             <p>{request.reason}</p>
           </div>
         </div>
-        {/* Salle proposée déjà approuvée */}
-        {request.type === 'Changement de salle' && request.recentRoom && request.status !== 'Refusé' && (
-          <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-            <MapPin className="w-8 h-8 text-gray-800 mt-1" />
-            <div>
-              <h3 className="font-semibold text-gray-800 text-lg mb-2">Ancienne salle</h3>
-              <p>
-                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.recentRoom} 
-              </p>
-              <p>
-                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.recentRoomType}
-              </p>
-              <p>
-                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.recentRoomCapacity}
-              </p>
-              <p>
-                <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.recentBuilding}
-              </p>
-            </div>
-          </div>
-        )}
-        {/* Changement de salle */}
-        {request.type === 'Changement de salle' && request.status === 'En attente' && (
+        {request.changeType === 'RoomChange' && request.changeStatusLabel === 'En attente' && (
           <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
               <MapPin className="w-6 h-6 text-gray-600" /> Sélectionner une salle disponible
@@ -182,14 +303,14 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
               className="w-full mb-4 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-h-80 overflow-y-auto grid md:grid-cols-2 gap-4 pr-2">
               {filteredRooms.length === 0 ? (
                 <div className="col-span-full text-center py-10 text-gray-400">
                   Aucune salle disponible pour ce créneau
                 </div>
               ) : (
-                filteredRooms.map((room) => {
-                const isSelected = selectedRoom?.room === room.room && selectedRoom?.building === room.building
+                filteredRooms.map((room:any) => {
+                const isSelected = selectedRoom?.roomId === room.roomId && selectedRoom?.buildingName === room.buildingName
                 return (
                   <div
                     key={room.room + room.building}
@@ -199,9 +320,9 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                     }`}
                   >
                     <div>
-                      <p className="font-semibold"><MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {room.room}</p>
-                      <p>Type : {room.type}</p>
-                      <p>Bâtiment : {room.building}</p>
+                      <p className="font-semibold"><MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {room.roomNumber}</p>
+                      <p>Type salle: {room.type}</p>
+                      <p>Bâtiment : {room.buildingName}</p>
                       <p>Capacité : {room.capacity}</p>
                     </div>
                     {isSelected && <Check className="text-blue-600 w-6 h-6" />}
@@ -213,14 +334,39 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
 
             <div className="mt-6 flex gap-4">
               <button
-                onClick={() => {
-                  setToast({ message: 'Demande refusée', type: 'error' })
-                  onClose()
-                }}
+                onClick={() => setShowRejectModal(true)}
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl transition flex justify-center items-center gap-2"
               >
                 <XCircle className="w-5 h-5" /> Refuser
               </button>
+              <RejectReasonModal
+                isOpen={showRejectModal}
+                onClose={() => setShowRejectModal(false)}
+                onConfirm={(reason) => {
+                  if (!request.id) return
+
+                  rejectSessionChange(
+                    {
+                      id: request.id,
+                      rejectionReason: reason,
+                    },
+                    {
+                      onSuccess: () => {
+                        setToast({
+                          message: 'Demande refusée avec succès',
+                          type: 'success',
+                        })
+
+                        setShowRejectModal(false)
+                        onClose()
+                      },
+                      onError: () => {
+                        setToast({ message: 'Erreur lors du refus', type: 'error' })
+                      },
+                    }
+                  )
+                }}
+              />
               <button
                 disabled={!selectedRoom}
                 onClick={() => setShowConfirmRoom(true)}
@@ -235,19 +381,37 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                 isOpen={showConfirmRoom}
                 onClose={() => setShowConfirmRoom(false)}
                 onConfirm={() => {
-                  setToast({ message: 'Changement de salle approuvé', type: 'success' })
-                  setShowConfirmRoom(false)
-                  onClose()
+                  if (!selectedRoom || !request.id) return
+
+                  approveRoom(
+                    {
+                      id: request.id,
+                      roomId: selectedRoom.roomId,
+                    },
+                    {
+                      onSuccess: () => {
+                        setToast({
+                          message: 'Demande approuvée avec succès',
+                          type: 'success',
+                        })
+
+                        setShowConfirmRoom(false)
+                        onClose()
+                        queryClient.invalidateQueries({ queryKey: ['sessionChanges'] })
+                      },
+                      onError: () => {
+                        setToast({ message: 'Erreur lors de l’approbation', type: 'error' })
+                      },
+                    }
+                  )
                 }}
                 title="Confirmer l'approbation"
-                description={`Vous êtes sur le point d'approuver le changement de salle pour la séance de ${request.subject}.`}
+                description={`Vous êtes sur le point d'approuver le changement de salle.`}
                 details={
                   <>
-                    Séance du <strong>{request.sessionTime}</strong>
-                    <br />
-                    Nouvelle salle : <strong>{selectedRoom?.room}</strong>
+                    Nouvelle salle : <strong>{selectedRoom?.roomNumber}</strong>
                       <br />
-                    Bâtiment: <strong>{selectedRoom?.building}</strong>
+                    Bâtiment: <strong>{selectedRoom?.buildingName}</strong>
                   </>
                 }
                 confirmColor="green"
@@ -255,143 +419,136 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
             </div>
           </div>
         )}
-        </>
-)}
+        {request.changeType === 'RoomChange' && request.changeStatusLabel !== 'Refusé' && oldRoom && (
+          <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+            <MapPin className="w-8 h-8 text-gray-800 mt-1" />
+            <div>
+              <h3 className="font-semibold text-gray-800 text-lg mb-2">Ancienne salle</h3>
+              <p>
+                <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {oldRoom.roomNumber} 
+              </p>
+              <p>
+                <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {oldRoom.type}
+              </p>
+              <p>
+                <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {oldRoom.capacity}
 
-          {request.type === 'Proposition de récupération de séance' && (
-            <>
-            {/* Séance */}
-              <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                <GraduationCap className="w-8 h-8 text-gray-600 mt-1" />
-                <div>
-                  <h3 className="font-semibold text-lg mb-2"> Informations de la séance ratée</h3>
-                  <p>Matière : {request.subject}</p>
-                  <p>Formation : {request.formation}</p>
-                  {request.groups && <p>Groupes : {request.groups}</p>}
-                  <p>
-                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" /> Horaire : {request.missedSlot}
-                  </p>
-                  {request.missedRoom && (
-                    <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" /> Salle : {request.missedRoom} 
-                    </p>
-                  )}
-                  {request.missedRoomType && (
-                    <p>
-                      <School className="inline w-4 h-4 text-gray-600 mr-1" /> Type salle : {request.missedRoomType}
-                    </p>
-                  )}
-                  {request.missedRoomCapacity && (
-                    <p>
-                      <Users className="inline w-4 h-4 text-gray-600 mr-1" /> Capacité : {request.missedRoomCapacity}
-                    </p>
-                  )}
-                  {request.missedBuilding && (
-                      <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {request.missedBuilding}
-                      </p>
-                    )}
-                </div>
-              </div>
-              <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+              </p>
+              <p>
+                <Building className="inline w-4 h-4 text-gray-600 mr-1" /> Bâtiment : {oldBuilding?.name}
+              </p>
+            </div>
+          </div>
+        )}
+        {request.changeType === 'SessionRecovery' && (
+          <div className="bg-gray-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
                 <User className="w-8 h-8 text-gray-600 mt-1" />
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Enseignant concerné par la récupération</h3>
-                  <p>Nom : {request.concernedTeacher}</p>
+                  <p>Nom : {request.concernedTeacherName}</p>
                   <p>Email : {request.concernedTeacherEmail}</p>
                 </div>
               </div>
-              {request.status === 'Approuvé' && ( 
-                <div className="bg-yellow-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                  <Clock className="w-8 h-8 text-yellow-600 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-yellow-700">
-                      Proposition du professeur validée
-                    </h3>
+          )}
+        {request.changeType === 'SessionRecovery' && session && (
+            
+          <div className="bg-blue-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+            <Calendar className="w-8 h-8 text-blue-350 mt-1" />
 
-                    <p>
-                      <Clock className="inline w-4 h-4 text-gray-600 mr-1" />
-                      Nouveau créneau : {request.teacherProposalSlot}
-                    </p>
+            <div>
+              <h3 className="font-semibold text-lg mb-2 text-blue-350">
+                Proposition de récupération
+              </h3>
 
-                    {request.teacherProposalRoom && (
-                      <p>
-                        <MapPin className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Salle : {request.teacherProposalRoom}
-                      </p>
-                    )}
+              <p>
+                <CalendarDays className="inline w-4 h-4 mr-1" />
+                Date : {session.proposedDate ? formatDate(session.proposedDate) : 'Non définie'}
+              </p>
 
-                    {request.teacherProposalRoomType && (
-                      <p>
-                        <School className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Type salle : {request.teacherProposalRoomType}
-                      </p>
-                    )}
+              <p>
+                <Clock className="inline w-4 h-4 mr-1" />
+                Horaire : {formatTime(session.proposedStartTime)} - {formatTime(session.proposedEndTime)}
+              </p>
 
-                    {request.teacherProposalRoomCapacity && (
-                      <p>
-                        <Users className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Capacité : {request.teacherProposalRoomCapacity}
-                      </p>
-                    )}
-
-                    {request.teacherProposalBuilding && (
-                      <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Bâtiment : {request.teacherProposalBuilding}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                
-              )}
-              {request.type === 'Proposition de récupération de séance' &&
-              (request.status === 'En attente' || request.status === 'Refusé') && (
-              <div className="bg-yellow-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                <Clock className="w-8 h-8 text-yellow-600 mt-1" />
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-yellow-700">
-                    Proposition du professeur
-                  </h3>
-
+              {proposedRoom && (
+                <>
                   <p>
-                    <Clock className="inline w-4 h-4 text-gray-600 mr-1" />
-                    Créneau proposé : {request.teacherProposalSlot}
+                    <MapPin className="inline w-4 h-4 mr-1" />
+                    Salle : {proposedRoom.roomNumber}
                   </p>
 
-                  {request.teacherProposalRoom && (
-                    <p>
-                      <MapPin className="inline w-4 h-4 text-gray-600 mr-1" />
-                      Salle : {request.teacherProposalRoom}
-                    </p>
-                  )}
+                  <p>
+                    <School className="inline w-4 h-4 mr-1" />
+                    Type salle : {proposedRoom.type}
+                  </p>
 
-                  {request.teacherProposalRoomType && (
-                    <p>
-                      <School className="inline w-4 h-4 text-gray-600 mr-1" />
-                      Type : {request.teacherProposalRoomType}
-                    </p>
-                  )}
-                  {request.teacherProposalRoomCapacity && (
-                      <p>
-                        <Users className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Capacité : {request.teacherProposalRoomCapacity}
-                      </p>
-                    )}
+                  <p>
+                    <Users className="inline w-4 h-4 mr-1" />
+                    Capacité : {proposedRoom.capacity}
+                  </p>
 
-                  {request.teacherProposalBuilding && (
-                    <p>
-                      <Building className="inline w-4 h-4 text-gray-600 mr-1" />
-                      Bâtiment : {request.teacherProposalBuilding}
-                    </p>
-                  )}
-                </div>
-              </div>
+                  <p>
+                    <Building className="inline w-4 h-4 mr-1" />
+                    Bâtiment : {proposedBuilding?.name}
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        {request.changeType === 'SessionRecovery' &&
+          request.changeStatusLabel === 'Refusé' &&
+          session && (
+            
+            <div className="bg-orange-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
               
-            )}
-            {request.type === 'Proposition de récupération de séance' &&
-              request.status === 'En attente' && (
-                <div className="mt-4 flex gap-4">
+              <CalendarDays className="w-8 h-8 text-orange-350 mt-1" />
+
+              <div>
+                <h3 className="font-semibold text-lg mb-2 text-orange-350">
+                  Proposition alternative
+                </h3>
+
+                <p>
+                  <CalendarDays className="inline w-4 h-4 mr-1" />
+                  Date : {session.counterProposalDate ? formatDate(session.counterProposalDate) : 'Non définie'}
+                </p>
+
+                <p>
+                  <Clock className="inline w-4 h-4 mr-1" />
+                  Horaire : {formatTime(session.counterProposalStartTime)} - {formatTime(session.counterProposalEndTime)}
+                </p>
+
+                {counterRoom && (
+                  <>
+                    <p>
+                      <MapPin className="inline w-4 h-4 mr-1" />
+                      Salle : {counterRoom.roomNumber}
+                    </p>
+
+                    <p>
+                      <School className="inline w-4 h-4 mr-1" />
+                      Type salle : {counterRoom.type}
+                    </p>
+
+                    <p>
+                      <Users className="inline w-4 h-4 mr-1" />
+                      Capacité : {counterRoom.capacity}
+                    </p>
+
+                    <p>
+                      <Building className="inline w-4 h-4 mr-1" />
+                      Bâtiment : {counterBuilding?.name}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        {request.changeType === 'SessionRecovery' &&
+          request.changeStatusLabel === 'En attente' && (
+            
+            <div className="mt-4 flex gap-4">
                   
                   <button
                     onClick={() => setShowAlternativeModal(true)}
@@ -419,12 +576,15 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                       onClose()
                     }}
                     title="Confirmer l'acceptation"
-                    description={`Vous êtes sur le point d'accepter le créneau proposé par ${request.teacher}.`}
+                    description={`Vous êtes sur le point d'accepter le créneau proposé.`}
                     details={
                       <>
-                        Créneau : <strong>{request.teacherProposalSlot}</strong><br />
-                        Salle : <strong>{request.teacherProposalRoom}</strong><br />
-                        Bâtiment : <strong>{request.teacherProposalBuilding}</strong>
+                        Date : <strong>{session?.proposedDate ? formatDate(session.proposedDate) : '-'}</strong><br />
+                        Horaire : <strong>
+                          {formatTime(session?.proposedStartTime)} - {formatTime(session?.proposedEndTime)}
+                        </strong><br />
+                        Salle : <strong>{proposedRoom?.roomNumber}</strong><br />
+                        Bâtiment : <strong>{proposedBuilding?.name}</strong>
                       </>
                     }
                     confirmColor="green"
@@ -466,60 +626,22 @@ export default function RequestDetailsModal({ isOpen, onClose, request, setToast
                     confirmColor="red"
                   />
                 </div>
-              )}
-              {request.status === 'Refusé' && (
-                <div className="bg-green-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-                  <Clock className="w-8 h-8 text-green-600 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2 text-green-700">
-                      Créneau alternatif
-                    </h3>
-
-                    <p>
-                      <Clock className="inline w-4 h-4 text-gray-600 mr-1" />
-                      Créneau alternatif : {request.adminSlot}
-                    </p>
-
-                    {request.adminRoom && (
-                      <p>
-                        <MapPin className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Salle : {request.adminRoom}
-                      </p>
-                    )}
-
-                    {request.adminRoomType && (
-                      <p>
-                        <School className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Type : {request.adminRoomType}
-                      </p>
-                    )}
-
-                    {request.adminBuilding && (
-                      <p>
-                        <Building className="inline w-4 h-4 text-gray-600 mr-1" />
-                        Bâtiment : {request.adminBuilding}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-              )}
-
-            </>
           )}
-        
-        {/* Motif de refus */}
-        {request.status === 'Refusé' && request.rejectReason && (
-          <div className="bg-red-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
-            <XCircle className="w-8 h-8 text-red-600 mt-1" />
-            <div>
-              <h3 className="font-semibold text-lg mb-2 text-red-600">Motif du refus</h3>
-              <p>{request.rejectReason}</p>
+
+        {/* REJECT */}
+        {request.changeStatusLabel === 'Refusé' &&
+          session?.rejectionReason && (
+            <div className="bg-red-50 p-5 rounded-2xl mb-5 shadow-sm flex gap-4 items-start">
+              <XCircle className="w-8 h-8 text-red-600 mt-1" />
+              <div>
+                <h3 className="font-semibold text-lg mb-2 text-red-600">
+                  Motif du refus
+                </h3>
+                <p>{session.rejectionReason}</p>
+              </div>
             </div>
-          </div>
         )}
 
-        
       </div>
     </div>
   )
